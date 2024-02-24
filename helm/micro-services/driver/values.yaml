@@ -1,0 +1,30 @@
+# Default values for driver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+deploymentName: driver-deployment
+serviceName: driver
+appLabel: driver
+appName: driver
+
+replicaCount: 1
+
+image:
+  repository: uber-msa/driver
+  pullPolicy: IfNotPresent
+  tag: ""
+
+containerPort: 8080
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+appname_enabled: true
+profile_enabled: true # get profile from config server
+config_enabled: true # get config server url.
+discovery_enabled: true
+#eureka_enabled: true # client-side msa.
+resourceserver_enabled: false # gateway server which only needs keycloak url.
+#otel_enabled: true # grafana
+#kafka_enabled: true

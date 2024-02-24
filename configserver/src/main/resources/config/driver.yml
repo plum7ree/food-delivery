@@ -1,0 +1,10 @@
+
+
+driver:
+  message: "Please Contact this phone number for QA support"
+  contactDetails:
+    name: "x"
+    email: "x@company.com"
+  onCallSupport:
+    - (123) 456-789
+    - (987) 654-321

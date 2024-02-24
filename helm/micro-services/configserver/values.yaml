@@ -1,0 +1,28 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+deploymentName: configserver-deployment
+serviceName: configserver
+appLabel: configserver
+appName: configserver
+
+replicaCount: 1
+
+image:
+  repository: uber-msa/configserver
+  tag: s17
+
+containerPort: 8071
+
+service:
+  type: ClusterIP
+  port: 8071
+  targetPort: 8071
+
+appname_enabled: true
+profile_enabled: false # config server itself doesn't need this.
+config_enabled: false # config server itself doesn't need this.
+discovery_enabled: false # doesn't necessary need. we already have config_enabled
+resouceserver_enabled: false
+#otel_enabled: true # grafana
+#kafka_enabled: false

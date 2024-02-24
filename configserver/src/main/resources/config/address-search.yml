@@ -1,0 +1,7 @@
+
+
+address-search-elastic-config:
+  index-name: "address"
+  connection-url: ""
+  connection-timeout-ms: 1000
+  socket-timeout-ms: 1000
