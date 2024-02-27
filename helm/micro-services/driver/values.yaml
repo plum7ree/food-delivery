@@ -23,8 +23,8 @@ service:
 appname_enabled: true
 profile_enabled: true # get profile from config server
 config_enabled: true # get config server url.
-discovery_enabled: true
-#eureka_enabled: true # client-side msa.
+#server_side_discovery_enabled: false
+eureka_enabled: true
 resourceserver_enabled: false # gateway server which only needs keycloak url.
 #otel_enabled: true # grafana
 #kafka_enabled: true

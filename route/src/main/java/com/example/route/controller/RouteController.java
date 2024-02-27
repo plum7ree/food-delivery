@@ -15,7 +15,7 @@ public class RouteController {
 @GetMapping("/")
 public void Query() {
 //    GHRequest req = new GHRequest()
-    graphHopper.route()
+//    graphHopper.route()
 }
 
 

@@ -1,3 +1,4 @@
+
 server:
   port: 8071
 
@@ -13,6 +14,21 @@ spring:
         native:
           search-locations: "classpath:/config"
 
+#  cloud:
+#    config:
+#      server:
+#        # native:
+#          # search-locations: "classpath:/config"
+#          # search-locations: "file:///Users//Documents//config"
+#        git:
+##          uri: "https://github.com/repo/config.git"
+#          uri: "https://github.com/eazybytes/eazybytes-config.git"
+#          default-label: main
+#          timeout: 5
+#          clone-on-start: true
+#          force-pull: true
+
+
 management:
   endpoints:
     web:
@@ -27,3 +43,8 @@ management:
     health:
       probes:
         enabled: true
+
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

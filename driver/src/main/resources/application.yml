@@ -19,6 +19,7 @@ spring:
 # spring-boot-starter-actuator
 # application monitoring
 management:
+  # spring boot 2.x 버전에선 필요. 그 이후는 불필요
   endpoints:
     web:
       exposure:
@@ -44,15 +45,15 @@ management:
     tags:
       application: ${spring.application.name}
 
-#eureka:
-#  instance:
-#    # https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-eureka-server.html#spring-cloud-eureka-server-prefer-ip-address
-#    # if we want ip address more than host name.
-#    preferIpAddress: true
-#  client:
-#    fetchRegistry: true
-#    registerWithEureka: true
-#    serviceUrl:
-#      defaultZone: http://localhost:8070/eureka/
+eureka:
+  instance:
+    # https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-eureka-server.html#spring-cloud-eureka-server-prefer-ip-address
+    # if we want ip address more than host name.
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
 
 

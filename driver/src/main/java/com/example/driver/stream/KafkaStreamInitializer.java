@@ -1,4 +1,4 @@
-package com.example.driver.stream;
-
-public class KafkaStreamInitializer {
-}
+//package com.example.driver.stream;
+//
+//public class KafkaStreamInitializer {
+//}
