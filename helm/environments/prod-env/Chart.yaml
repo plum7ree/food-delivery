@@ -32,6 +32,10 @@ dependencies:
     version: 0.1.0
     repository: file://../../micro-services/configserver
 
+  - name: eurekaserver
+    version: 0.1.0
+    repository: file://../../micro-services/eurekaserver
+
   - name: driver
     version: 0.1.0
     repository: file://../../micro-services/driver

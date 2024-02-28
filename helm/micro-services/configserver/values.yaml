@@ -9,8 +9,9 @@ appName: configserver
 replicaCount: 1
 
 image:
-  repository: uber-msa/configserver
-  tag: s17
+  repository: lomojiki/uber-msa-configserver
+  PullPolicy: IfNotPresent
+  tag: latest
 
 containerPort: 8071
 

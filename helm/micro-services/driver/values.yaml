@@ -9,9 +9,9 @@ appName: driver
 replicaCount: 1
 
 image:
-  repository: uber-msa/driver
-  pullPolicy: IfNotPresent
-  tag: ""
+  repository: lomojiki/uber-msa-driver
+  imagePullPolicy: Never
+  tag: latest
 
 containerPort: 8080
 

@@ -1,0 +1,66 @@
+
+### kube node environment setting
+we need docker desktop and enable kubernetes
+
+### build & run order
+```shell
+# all micorservices and obersavation apps
+# docker image build with Google Jib added in pom.xml
+<plugin>
+    <groupId>com.google.cloud.tools</groupId>
+    <artifactId>jib-maven-plugin</artifactId>
+    <version>3.3.2</version>
+    <configuration>
+        <to>
+            <image>lomojiki/uber-msa/${project.artifactId}:latest</image>
+        </to>
+    </configuration>
+</plugin>
+
+# for each microservices,
+intellij tab maven -> select service -> Plugins -> jib -> jib:dockerBuild
+
+# image name must be lomojiki/uber-msa/driver
+# Pushing into hub fails if : lomojiki/uber-msa/driver
+push images into hub with a docker desktop
+
+# in values.yaml in each micro service
+# default is IfNotPresent which will search on local image first and then remote.
+# IfNotPresent vs Always
+# https://stackoverflow.com/questions/74006353/difference-between-always-and-ifnotpresent-imagepullpolicy
+image:
+  repository: uber-msa/driver
+  pullPolicy: IfNotPresent
+  tag: ""
+  
+  
+# helm build dependencies & install
+cd environments
+helm dependencies build prod-env
+helm install <cluster-name> prod-env/ 
+helm uninstall <cluster-name>
+
+cd environment
+helm install uber-msa /prod-env
+```
+<br/>
+
+### Start order in local IDE environment for dev
+1. configserver
+2. eureka
+3. micro services
+4. gateway server
+<br/>
+
+### Helm
+
+<b> container ports </b>   
+
+create new chart
+```shell
+helm create <chart-name>
+```
+
+configserver: 8071   
+driver: 8080
+

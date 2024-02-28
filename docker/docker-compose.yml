@@ -1,0 +1,76 @@
+services:
+
+  configserver:
+    image: "lomojiki/uber-msa-configserver"
+    container_name: configserver-ms
+    ports:
+      - "8071:8071"
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+#    environment:
+#      OTEL_SERVICE_NAME: "configserver"
+
+  eurekaserver:
+    image: "lomojiki/uber-msa-eurekaserver"
+    container_name: eurekaserver-ms
+    ports:
+      - "8070:8070"
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+#      OTEL_SERVICE_NAME: "eurekaserver"
+
+  gateway:
+    image: "lomojiki/uber-msa-gateway"
+    container_name: gateway-ms
+    ports:
+      - "8072:8072"
+    depends_on:
+      driver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "gateway"
+#      OTEL_SERVICE_NAME: "gateway"
+      # keycloak necessary
+#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+
+  driver:
+    image: "lomojiki/uber-msa-driver"
+    container_name: accounts-ms
+    healthcheck:
+      test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    environment:
+      SPRING_APPLICATION_NAME: "driver"
+      OTEL_SERVICE_NAME: "driver"
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: "kafka:9092"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+
+# communication between microservices.
+# bridge, host, overlay, macvlan, none
+networks:
+  uber-msa:
+    driver: "bridge"

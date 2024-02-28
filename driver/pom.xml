@@ -122,7 +122,7 @@
 				<version>3.3.2</version>
 				<configuration>
 					<to>
-						<image>uber-msa/${project.artifactId}:s1</image>
+						<image>lomojiki/uber-msa-${project.artifactId}:latest</image>
 					</to>
 				</configuration>
 			</plugin>
