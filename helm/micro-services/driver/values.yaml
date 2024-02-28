@@ -10,6 +10,7 @@ replicaCount: 1
 
 image:
   repository: lomojiki/uber-msa-driver
+  # Always, IfNotPresent, Never
   imagePullPolicy: Never
   tag: latest
 

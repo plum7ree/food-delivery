@@ -23,7 +23,8 @@ service:
 appname_enabled: true
 profile_enabled: false # config server itself doesn't need this.
 config_enabled: false # config server itself doesn't need this.
-server_side_discovery_enabled: false # doesn't necessary need. we already have config_enabled
+#server_side_discovery_enabled: false # doesn't necessary need. we already have config_enabled
+eureka_enabled: false # false
 resouceserver_enabled: false
 #otel_enabled: true # grafana
 #kafka_enabled: false
