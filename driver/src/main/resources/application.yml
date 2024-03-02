@@ -11,7 +11,7 @@ spring:
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # we don't need datasource yet
   config:
-    import: "optional:configserver:http://localhost:8071/"
+    import: "optional:configserver:http://localhost:8071/" # config file will be driver.yml or driver-profile.yml ?
   cloud:
     openfeign:
       circuitbreaker:
