@@ -124,8 +124,27 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-
-
+<dependency>
+    <groupId>org.redisson</groupId>
+    <artifactId>redisson-spring-data-23</artifactId>
+    <version>3.16.6</version>
+</dependency>
+<dependency>
+    <groupId>org.redisson</groupId>
+    <artifactId>redisson</artifactId>
+    <version>3.16.6</version>
+</dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>configserver</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

@@ -23,7 +23,7 @@ import java.util.Map;
 // V: avro's SpecificRecordBase
 public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecordBase> {
 
-    @Value(value = "${spring.kafka.bootstrap-servers}")
+    @Value(value = "${kafka-config.bootstrap-servers}")
     private String bootstrapAddress;
 
     @Autowired
