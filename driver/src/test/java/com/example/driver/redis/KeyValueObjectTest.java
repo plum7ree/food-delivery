@@ -77,9 +77,9 @@ public class KeyValueObjectTest {
 
     }
 
-    @Test
-    public void keyValueObjectTest() {
-        LocationDto location = new LocationDto(10.0F, 20.0F, 10000L);
-        RBucketReactive<String> bucket = redissonReactiveClient.getBucket("", JsonJacksonCodec.INSTANCE);
-    }
+//    @Test
+//    public void keyValueObjectTest() {
+//        LocationDto location = new LocationDto(10.0F, 20.0F, 10000L);
+//        RBucketReactive<String> bucket = redissonReactiveClient.getBucket("", JsonJacksonCodec.INSTANCE);
+//    }
 }

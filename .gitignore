@@ -4,6 +4,8 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+*.log
+
 ### STS ###
 .apt_generated
 .classpath
@@ -31,3 +33,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/docker-compose/prometheus/**
+/docker-compose/grafana/**

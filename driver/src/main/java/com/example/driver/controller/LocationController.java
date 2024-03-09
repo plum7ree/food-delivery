@@ -1,65 +1,91 @@
 package com.example.driver.controller;
 
 import com.example.driver.dto.LocationDto;
+import com.example.driver.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.engine.jdbc.batch.spi.Batch;
+import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class LocationController {
 
-    private KafkaTemplate<Long, Object> kafkaProducer;
+//    private KafkaTemplate<Long, Object> kafkaProducer;
     private RedisTemplate<String, Object> redisTemplate;
+
+    private RedissonReactiveClient redissonReactiveClient;
 
     //TODO userId from security utils
     // option 1. @AuthenticationPrincipal UserDetails userDetails
     // option 2. Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     //           String userId = authentication.getName();
 
-//    @PostMapping("/api/driver/location")
-//    public Mono<String> monoExample(@RequestBody LocationDto locationDto) {
-//        // where was former edge?
-//
-//        // if a driver entered into new edge, decrement the old one and increment the new one.
-//
-//        redisTemplate.opsForZSet().incrementScore("${driver.edge-ranking.key.name}}", locationDto.getEdgeId(), 1);
-////        kafkaProducer.send()
-//        return Mono.just("Mono with value: " + value);
+    @PostMapping("/api/driver/location")
+    public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) {
 
-//    String driverId = locationDto.getDriverId(); // Assuming LocationDto contains a driver ID.
-//    String newEdgeId = locationDto.getEdgeId();
-//    String driverEdgeHashKey = "driver:edge"; // Redis hash key to store driver's current edge
-//    String edgeRankingKey = "driver.edge-ranking.key.name"; // Redis ZSet key for edge ranking
-//
-//    return Mono.just(redisTemplate.opsForHash().get(driverEdgeHashKey, driverId))
-//        .flatMap(oldEdgeId -> {
-//            Mono<Void> decrementOldEdgeMono = Mono.empty();
-//            if (oldEdgeId != null && !oldEdgeId.equals(newEdgeId)) {
-//                // Decrement score for the old edge
-//                decrementOldEdgeMono = Mono.fromCallable(() -> redisTemplate.opsForZSet().incrementScore(edgeRankingKey, oldEdgeId, -1)).then();
-//            }
-//            return decrementOldEdgeMono.thenReturn(oldEdgeId);
-//        })
-//        .flatMap(oldEdgeId -> {
-//            // Increment score for the new edge
-//            redisTemplate.opsForZSet().incrementScore(edgeRankingKey, newEdgeId, 1);
-//            // Update the driver's current edge in the hash
-//            redisTemplate.opsForHash().put(driverEdgeHashKey, driverId, newEdgeId);
-//            // Send a message to Kafka, if needed
-//            // kafkaProducer.send(...)
-//            return Mono.just("Edge updated from " + oldEdgeId + " to " + newEdgeId);
-//        });
+        String driverId = locationDto.getDriverId(); // Assuming LocationDto contains a driver ID.
+        String oldEdgeId = locationDto.getOldEdgeId();
+        String currEdgeId = locationDto.getEdgeId();
+String driverEdgeHashKey = "driver:edge";
+String edgeRankingKey = "driver.edge-ranking.key.name";
+
+String script = "local driverId = KEYS[1]\n" +
+                "local oldEdgeId = KEYS[2]  -- This might be 'none' if not provided\n" +
+                "local currEdgeId = KEYS[3]\n" +
+                "local driverInfo = redis.call('hget', '" + driverEdgeHashKey + "', driverId)\n" +
+                "local map = '" + edgeRankingKey + "'\n" +
+                "\n" +
+                "-- Only proceed with oldEdgeId operations if oldEdgeId is not 'none'\n" +
+                "if oldEdgeId ~= 'none' then\n" +
+                "    local oldEdgeValue = redis.call('hget', map, oldEdgeId)\n" +
+                "    if oldEdgeValue then\n" +
+                "        oldEdgeValue = oldEdgeValue - 1\n" +
+                "        redis.call('hset', map, oldEdgeId, oldEdgeValue)\n" +
+                "    else\n" +
+                "        redis.call('hset', map, oldEdgeId, -1)\n" +
+                "    end\n" +
+                "end\n" +
+                "\n" +
+                "-- Operations for currEdgeId proceed as usual\n" +
+                "local currEdgeValue = redis.call('hget', map, currEdgeId)\n" +
+                "if currEdgeValue then\n" +
+                "    currEdgeValue = currEdgeValue + 1\n" +
+                "    redis.call('hset', map, currEdgeId, currEdgeValue)\n" +
+                "else\n" +
+                "    redis.call('hset', map, currEdgeId, 1)\n" +
+                "end\n" +
+                "\n" +
+                "-- Return values based on whether oldEdgeId was provided\n" +
+                "if oldEdgeId ~= 'none' then\n" +
+                "    return {oldEdgeValue, currEdgeValue}\n" +
+                "else\n" +
+                "    return {nil, currEdgeValue}\n" +
+                "end";
 
 
-//    }
 
-    @GetMapping("/flux")
-    public Flux<String> fluxExample() {
-        return Flux.just("Value 1", "Value 2", "Value 3");
+        // Keys that the script will operate on
+        List<Object> keys = Arrays.asList(driverId, (oldEdgeId != null ? oldEdgeId : "none"), currEdgeId);
+
+        // Execute the script
+        Mono<Object> results = redissonReactiveClient.getScript().eval(RScript.Mode.READ_WRITE,
+                                                                script,
+                                                                RScript.ReturnType.MULTI,
+                                                                keys);
+
+        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(new ResponseDto("200", "")));
+
     }
+
 }

@@ -23,13 +23,13 @@ import java.util.Map;
 // V: avro's SpecificRecordBase
 public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecordBase> {
 
-    @Value(value = "${kafka-config.bootstrap-servers}")
-    private String bootstrapAddress;
+//    @Value(value = "${kafka-config.bootstrap-servers}")
+//    private String bootstrapAddress;
 
-    @Autowired
-    private KafkaConfigData kafkaConfigData;
-    @Autowired
-    private KafkaProducerConfigData kafkaProducerConfigData;
+    // Lombok이 final 필드를 초기화하는 생성자를 자동으로 생성
+    private final KafkaConfigData kafkaConfigData;
+    private final KafkaProducerConfigData kafkaProducerConfigData;
+
 //    @Bean
 //    public ProducerFactory<String, Object> producerFactory() {
 //        Map<String, Object> configProps = new HashMap<>();

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class LocationDto {
     float lat;
     float lon;
-    Long edgeId;
-
+    String edgeId;
+    String oldEdgeId;
+    String driverId;
 }

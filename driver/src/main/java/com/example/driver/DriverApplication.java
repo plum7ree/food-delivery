@@ -13,8 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 //@EnableDiscoveryClient // no need for recent spring boot version
 //@EnableConfigurationProperties(value={ContactInfoDto.class}) // ComponentScan replaces this
 //@EnableFeignClients
-@ConfigurationPropertiesScan(basePackages = {"com.example"})
-
+@ComponentScan(basePackages = {"com.example"})
 public class DriverApplication {
 
     public static void main(String[] args) {

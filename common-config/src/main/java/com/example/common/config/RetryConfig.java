@@ -1,6 +1,6 @@
 package com.example.common.config;
 
-import com.example.common.data.config.RetryConfigData;
+import com.example.common.data.RetryConfigData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
@@ -10,13 +10,13 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 public class RetryConfig {
 
-    private RetryConfigData retryConfigData;
+    private final RetryConfigData retryConfigData;
 
     public RetryConfig(RetryConfigData configData) {
         this.retryConfigData = configData;
     }
 
-    @Bean
+    @Bean("common-retry-config")
     public RetryTemplate retryTemplate() {
         RetryTemplate retryTemplate = new RetryTemplate();
 

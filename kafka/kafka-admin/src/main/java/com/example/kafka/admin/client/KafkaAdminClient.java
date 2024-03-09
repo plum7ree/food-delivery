@@ -1,11 +1,16 @@
 package com.example.kafka.admin.client;
 
+
 import com.example.kafka.config.data.KafkaConfigData;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.CreateTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.KafkaException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -17,6 +22,7 @@ import java.util.List;
 public class KafkaAdminClient {
     private final KafkaConfigData kafkaConfigData;
     private final AdminClient adminClient;
+    @Qualifier("common-retry-config")
     private final RetryTemplate retryTemplate;
 
     public void createTopics() {
