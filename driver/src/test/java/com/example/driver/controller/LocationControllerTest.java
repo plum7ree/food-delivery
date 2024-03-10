@@ -1,22 +1,30 @@
 package com.example.driver.controller;
 
+import com.example.driver.config.RedisConfig;
 import com.example.driver.dto.LocationDto;
 import com.example.driver.dto.ResponseDto;
 import org.junit.jupiter.api.TestInstance;
 import org.redisson.api.RedissonReactiveClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.junit.jupiter.api.Test;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@ContextConfiguration(classes = {RedisConfig.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // @BeforeAll, @AfterAll
 //@ActiveProfiles("test")
-@TestPropertySource(properties = {"spring.redis.address=redis://localhost:6379", "kafka-config.bootstrap-servers=localhost:19092,localhost:29092,localhost:39092"})
+// test container
+// https://testcontainers.com/guides/testing-spring-boot-rest-api-using-testcontainers/
+// https://spring.io/blog/2023/06/23/improved-testcontainers-support-in-spring-boot-3-1
 class LocationControllerTest {
+
+    @Value("${driver.message}")
+    private String driverMessage;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -26,6 +34,9 @@ class LocationControllerTest {
 
     @Test
     void testMonoExample() {
+
+        System.out.println("driver MEssage: " + driverMessage);
+
         // Example data
         LocationDto exampleLocationDto = new LocationDto();
         exampleLocationDto.setDriverId("driver1");

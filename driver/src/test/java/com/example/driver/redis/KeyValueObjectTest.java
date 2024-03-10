@@ -1,6 +1,5 @@
 package com.example.driver.redis;
 
-import com.example.configserver.ConfigserverApplication;
 import com.example.driver.config.RedisConfig;
 import com.example.driver.dto.LocationDto;
 import lombok.RequiredArgsConstructor;

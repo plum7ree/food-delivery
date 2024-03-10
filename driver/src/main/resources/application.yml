@@ -9,13 +9,14 @@ spring:
   application:
     name: "driver"
   autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # we don't need datasource yet
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
   config:
-    import: "optional:configserver:http://localhost:8071/" # config file will be driver.yml or driver-profile.yml ?
+    import: "optional:configserver:http://localhost:8071/" # For default and 'native' profile, config will be fetched from config server
   cloud:
     openfeign:
       circuitbreaker:
-        enbaled: true
+        enabled: true
+
 # spring-boot-starter-actuator
 # application monitoring
 management:
