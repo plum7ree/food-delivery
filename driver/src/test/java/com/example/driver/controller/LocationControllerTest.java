@@ -4,8 +4,7 @@ import com.example.driver.config.RedisConfig;
 import com.example.driver.dto.LocationDto;
 import com.example.driver.dto.ResponseDto;
 import org.junit.jupiter.api.TestInstance;
-import org.redisson.api.RMapReactive;
-import org.redisson.api.RedissonReactiveClient;
+import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +14,10 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // @BeforeAll, @AfterAll
@@ -37,9 +40,19 @@ class LocationControllerTest {
     @Autowired
     private RedissonReactiveClient redissonReactiveClient;
 
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @Test
+    void connectionTest() {
+        RBucketReactive<String> bucket = redissonReactiveClient.getBucket("connection-test");
+        Mono<Void> set = bucket.set("test");
+        Mono<Void> get = bucket.get().doOnNext(v -> assertEquals(v, "test")).then();
+        StepVerifier.create(set.concatWith(get)).verifyComplete();
+
+    }
     @Test
     void testMonoExample() {
-
         System.out.println("driver MEssage: " + driverMessage);
 
         // Example data
@@ -67,7 +80,10 @@ class LocationControllerTest {
         // However, note that the actual update in Redis is not verified in this unit test, and would typically be covered in an integration test
 
         RMapReactive<String, String> driverLocationEdgeMap = redissonReactiveClient.getMap(driverLocationEdgeKey);
-        String edgeId = driverLocationEdgeMap.get(driverLocationEdgeKey);
-//        assertEquals(edgeId, )
+        Mono<String> edgeId = driverLocationEdgeMap.get(driverLocationEdgeKey);
+        StepVerifier.create(edgeId)
+            .expectNext("edge1")
+            .verifyComplete();
+
     }
 }

@@ -90,6 +90,8 @@ public class LocationController {
                                                                 RScript.ReturnType.MULTI,
                                                                 keys);
 
+//        results.block() or subscribe() // non-block
+//        doOnSuccess or doOnNext or doOnError
         return Mono.just(ResponseEntity.status(HttpStatus.OK).body(new ResponseDto("200", "")));
 
     }
