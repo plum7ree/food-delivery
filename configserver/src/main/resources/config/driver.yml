@@ -8,7 +8,12 @@ driver:
   onCallSupport:
     - (123) 456-789
     - (987) 654-321
-
+  redis:
+    keys:
+      # driver:location:edge:{driverId} => edgeId
+      driver-location-edge: "driver:location:edge"
+      # edge:visit:{edgeId} => count
+      edge-visit: "edge:visit"
 
 retry-config:
   initial-interval-ms: 1000

@@ -4,6 +4,7 @@ import com.example.driver.config.RedisConfig;
 import com.example.driver.dto.LocationDto;
 import com.example.driver.dto.ResponseDto;
 import org.junit.jupiter.api.TestInstance;
+import org.redisson.api.RMapReactive;
 import org.redisson.api.RedissonReactiveClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,10 @@ class LocationControllerTest {
 
     @Value("${driver.message}")
     private String driverMessage;
+    @Value("${driver.redis.keys.driver-location-edge}")
+    private String driverLocationEdgeKey ;
+     @Value("${driver.redis.keys.edge-visit}")
+    private String edgeVisitKey;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -60,5 +65,9 @@ class LocationControllerTest {
 
         // Additional verifications can be performed here to check that the script was called with the correct parameters
         // However, note that the actual update in Redis is not verified in this unit test, and would typically be covered in an integration test
+
+        RMapReactive<String, String> driverLocationEdgeMap = redissonReactiveClient.getMap(driverLocationEdgeKey);
+        String edgeId = driverLocationEdgeMap.get(driverLocationEdgeKey);
+//        assertEquals(edgeId, )
     }
 }

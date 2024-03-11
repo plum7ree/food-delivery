@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +24,14 @@ import java.util.List;
 public class LocationController {
 
 //    private KafkaTemplate<Long, Object> kafkaProducer;
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    private RedissonReactiveClient redissonReactiveClient;
+    private final RedissonReactiveClient redissonReactiveClient;
+
+    @Value("${driver.redis.keys.driver-location-edge}")
+    private String driverEdgeHashKey;
+     @Value("${driver.redis.keys.edge-visit}")
+    private String edgeRankingKey;
 
     //TODO userId from security utils
     // option 1. @AuthenticationPrincipal UserDetails userDetails
@@ -37,10 +44,9 @@ public class LocationController {
         String driverId = locationDto.getDriverId(); // Assuming LocationDto contains a driver ID.
         String oldEdgeId = locationDto.getOldEdgeId();
         String currEdgeId = locationDto.getEdgeId();
-String driverEdgeHashKey = "driver:edge";
-String edgeRankingKey = "driver.edge-ranking.key.name";
 
-String script = "local driverId = KEYS[1]\n" +
+
+        String script = "local driverId = KEYS[1]\n" +
                 "local oldEdgeId = KEYS[2]  -- This might be 'none' if not provided\n" +
                 "local currEdgeId = KEYS[3]\n" +
                 "local driverInfo = redis.call('hget', '" + driverEdgeHashKey + "', driverId)\n" +
