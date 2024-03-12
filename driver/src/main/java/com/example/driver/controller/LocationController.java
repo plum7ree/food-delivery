@@ -8,28 +8,37 @@ import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scripting.ScriptSource;
+import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
 public class LocationController {
+    private static final Logger log = LoggerFactory.getLogger(LocationController.class);
 
 //    private KafkaTemplate<Long, Object> kafkaProducer;
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final RedissonReactiveClient redissonReactiveClient;
 
-    @Value("${driver.redis.keys.driver-location-edge}")
-    private String driverEdgeHashKey;
+    @Value("${driver.redis.fields.driver}")
+    private String driverKey;
+
      @Value("${driver.redis.keys.edge-visit}")
     private String edgeRankingKey;
 
@@ -39,8 +48,8 @@ public class LocationController {
     //           String userId = authentication.getName();
 
     @PostMapping("/api/driver/location")
-    public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) {
-
+    public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) throws IOException {
+        log.info("location Dto Received: " + locationDto.toString());
         String driverId = locationDto.getDriverId(); // Assuming LocationDto contains a driver ID.
         String oldEdgeId = locationDto.getOldEdgeId();
         String currEdgeId = locationDto.getEdgeId();
@@ -79,21 +88,25 @@ public class LocationController {
                 "    return {nil, currEdgeValue}\n" +
                 "end";
 
-
+        ResourceScriptSource scriptSource = new ResourceScriptSource(new ClassPathResource("META-INF/scripts/location-edge-update.lua"));
 
         // Keys that the script will operate on
         List<Object> keys = Arrays.asList(driverId, (oldEdgeId != null ? oldEdgeId : "none"), currEdgeId);
+        log.info("keys: " + keys.toString());
 
         // Execute the script
         Mono<Object> results = redissonReactiveClient.getScript().eval(RScript.Mode.READ_WRITE,
-                                                                script,
+                                                                scriptSource.getScriptAsString(),
                                                                 RScript.ReturnType.MULTI,
                                                                 keys);
 
+
+
 //        results.block() or subscribe() // non-block
 //        doOnSuccess or doOnNext or doOnError
-        return Mono.just(ResponseEntity.status(HttpStatus.OK).body(new ResponseDto("200", "")));
-
-    }
+    return results
+            .flatMap(result -> Mono.just(ResponseEntity.ok(new ResponseDto("200", "Success"))))
+            .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().body(new ResponseDto("400", "Error occurred: " + error.getMessage()))));
+}
 
 }

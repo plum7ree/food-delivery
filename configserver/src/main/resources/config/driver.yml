@@ -9,11 +9,15 @@ driver:
     - (123) 456-789
     - (987) 654-321
   redis:
-    keys:
-      # driver:location:edge:{driverId} => edgeId
-      driver-location-edge: "driver:location:edge"
-      # edge:visit:{edgeId} => count
-      edge-visit: "edge:visit"
+    fields:
+      # key(driver:%s), field(location:edge), value(edgeId)
+      location-edge:
+        key: "driver:%s"
+        field-name: "location:edge"
+      # key(edge:%s), field(edge:visit), value(count)
+      edge-visit: #TODO move into seperate .yml
+        key: "edge:%s"
+        field-name: "edge:visit"
 
 retry-config:
   initial-interval-ms: 1000
