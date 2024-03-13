@@ -29,10 +29,16 @@ class LocationControllerTest {
 
     @Value("${driver.message}")
     private String driverMessage;
-    @Value("${driver.redis.keys.driver-location-edge}")
-    private String driverLocationEdgeKey ;
-     @Value("${driver.redis.keys.edge-visit}")
+    @Value("${driver.redis.fields.location-edge.key}")
+    private String locationEdgeKey;
+
+    @Value("${driver.redis.fields.location-edge.field-name}")
+    private String locationEdgeFieldName;
+
+     @Value("${driver.redis.fields.edge-visit.key}")
     private String edgeVisitKey;
+     @Value("${driver.redis.fields.edge-visit.field-name}")
+     private String edgeVisitFieldName;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -53,13 +59,14 @@ class LocationControllerTest {
     }
     @Test
     void testMonoExample() {
-        System.out.println("driver MEssage: " + driverMessage);
-
+        String driverId = "driver1";
+        String oldEdgeId = "1000000";
+        String currEdgeId = "1000002";
         // Example data
         LocationDto exampleLocationDto = new LocationDto();
-        exampleLocationDto.setDriverId("driver1");
-        exampleLocationDto.setOldEdgeId("edge1");
-        exampleLocationDto.setEdgeId("edge2");
+        exampleLocationDto.setDriverId(driverId);
+        exampleLocationDto.setOldEdgeId(oldEdgeId);
+        exampleLocationDto.setEdgeId(currEdgeId);
 
 //        // Mocking the RedissonReactiveClient behavior
 //        RScriptReactive rScriptReactive = mock(RScriptReactive.class);
@@ -79,10 +86,10 @@ class LocationControllerTest {
         // Additional verifications can be performed here to check that the script was called with the correct parameters
         // However, note that the actual update in Redis is not verified in this unit test, and would typically be covered in an integration test
 
-        RMapReactive<String, String> driverLocationEdgeMap = redissonReactiveClient.getMap(driverLocationEdgeKey);
-        Mono<String> edgeId = driverLocationEdgeMap.get(driverLocationEdgeKey);
-        StepVerifier.create(edgeId)
-            .expectNext("edge1")
+        RMapReactive<String, String> driverLocationEdgeMap = redissonReactiveClient.getMap(locationEdgeFieldName);
+        Mono<String> monoMapGet = driverLocationEdgeMap.get(driverId);
+        StepVerifier.create(monoMapGet)
+            .expectNext(currEdgeId)
             .verifyComplete();
 
     }

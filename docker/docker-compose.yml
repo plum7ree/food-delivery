@@ -1,5 +1,12 @@
 services:
 
+  redis:
+    image: redis:latest
+    container_name: ubermsa-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --loglevel debug
+
   configserver:
     image: "lomojiki/uber-msa-configserver"
     container_name: configserver-ms

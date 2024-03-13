@@ -5,6 +5,7 @@ import com.example.driver.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.redisson.api.*;
+import org.redisson.client.codec.StringCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -36,11 +37,17 @@ public class LocationController {
 
     private final RedissonReactiveClient redissonReactiveClient;
 
-    @Value("${driver.redis.fields.driver}")
-    private String driverKey;
+    @Value("${driver.redis.fields.location-edge.key}")
+    private String locationEdgeKey;
 
-     @Value("${driver.redis.keys.edge-visit}")
-    private String edgeRankingKey;
+    @Value("${driver.redis.fields.location-edge.field-name}")
+    private String locationEdgeFieldName;
+
+     @Value("${driver.redis.fields.edge-visit.key}")
+    private String edgeVisitKey;
+     @Value("${driver.redis.fields.edge-visit.field-name}")
+     private String edgeVisitFieldName;
+
 
     //TODO userId from security utils
     // option 1. @AuthenticationPrincipal UserDetails userDetails
@@ -55,50 +62,61 @@ public class LocationController {
         String currEdgeId = locationDto.getEdgeId();
 
 
-        String script = "local driverId = KEYS[1]\n" +
-                "local oldEdgeId = KEYS[2]  -- This might be 'none' if not provided\n" +
-                "local currEdgeId = KEYS[3]\n" +
-                "local driverInfo = redis.call('hget', '" + driverEdgeHashKey + "', driverId)\n" +
-                "local map = '" + edgeRankingKey + "'\n" +
-                "\n" +
-                "-- Only proceed with oldEdgeId operations if oldEdgeId is not 'none'\n" +
-                "if oldEdgeId ~= 'none' then\n" +
-                "    local oldEdgeValue = redis.call('hget', map, oldEdgeId)\n" +
-                "    if oldEdgeValue then\n" +
-                "        oldEdgeValue = oldEdgeValue - 1\n" +
-                "        redis.call('hset', map, oldEdgeId, oldEdgeValue)\n" +
-                "    else\n" +
-                "        redis.call('hset', map, oldEdgeId, -1)\n" +
-                "    end\n" +
-                "end\n" +
-                "\n" +
-                "-- Operations for currEdgeId proceed as usual\n" +
-                "local currEdgeValue = redis.call('hget', map, currEdgeId)\n" +
-                "if currEdgeValue then\n" +
-                "    currEdgeValue = currEdgeValue + 1\n" +
-                "    redis.call('hset', map, currEdgeId, currEdgeValue)\n" +
-                "else\n" +
-                "    redis.call('hset', map, currEdgeId, 1)\n" +
-                "end\n" +
-                "\n" +
-                "-- Return values based on whether oldEdgeId was provided\n" +
-                "if oldEdgeId ~= 'none' then\n" +
-                "    return {oldEdgeValue, currEdgeValue}\n" +
-                "else\n" +
-                "    return {nil, currEdgeValue}\n" +
-                "end";
+//        String script = "local driverId = KEYS[1]\n" +
+//                "local oldEdgeId = KEYS[2]  -- This might be 'none' if not provided\n" +
+//                "local currEdgeId = KEYS[3]\n" +
+//                "local driverInfo = redis.call('hget', '" + driverEdgeHashKey + "', driverId)\n" +
+//                "local map = '" + edgeRankingKey + "'\n" +
+//                "\n" +
+//                "-- Only proceed with oldEdgeId operations if oldEdgeId is not 'none'\n" +
+//                "if oldEdgeId ~= 'none' then\n" +
+//                "    local oldEdgeValue = redis.call('hget', map, oldEdgeId)\n" +
+//                "    if oldEdgeValue then\n" +
+//                "        oldEdgeValue = oldEdgeValue - 1\n" +
+//                "        redis.call('hset', map, oldEdgeId, oldEdgeValue)\n" +
+//                "    else\n" +
+//                "        redis.call('hset', map, oldEdgeId, -1)\n" +
+//                "    end\n" +
+//                "end\n" +
+//                "\n" +
+//                "-- Operations for currEdgeId proceed as usual\n" +
+//                "local currEdgeValue = redis.call('hget', map, currEdgeId)\n" +
+//                "if currEdgeValue then\n" +
+//                "    currEdgeValue = currEdgeValue + 1\n" +
+//                "    redis.call('hset', map, currEdgeId, currEdgeValue)\n" +
+//                "else\n" +
+//                "    redis.call('hset', map, currEdgeId, 1)\n" +
+//                "end\n" +
+//                "\n" +
+//                "-- Return values based on whether oldEdgeId was provided\n" +
+//                "if oldEdgeId ~= 'none' then\n" +
+//                "    return {oldEdgeValue, currEdgeValue}\n" +
+//                "else\n" +
+//                "    return {nil, currEdgeValue}\n" +
+//                "end";
 
         ResourceScriptSource scriptSource = new ResourceScriptSource(new ClassPathResource("META-INF/scripts/location-edge-update.lua"));
 
         // Keys that the script will operate on
-        List<Object> keys = Arrays.asList(driverId, (oldEdgeId != null ? oldEdgeId : "none"), currEdgeId);
-        log.info("keys: " + keys.toString());
+        List<Object> keys = Arrays.asList(String.format(locationEdgeKey,driverId), String.format(edgeVisitKey, currEdgeId), String.format(edgeVisitKey,oldEdgeId));
+        List<Object> args = Arrays.asList(locationEdgeFieldName, edgeVisitFieldName, driverId, currEdgeId, oldEdgeId);
 
-        // Execute the script
-        Mono<Object> results = redissonReactiveClient.getScript().eval(RScript.Mode.READ_WRITE,
+
+        //List<Object> keys = Arrays.asList(String.format("driver:%s", driverId),
+//                                  String.format("edge:%s", currEdgeId),
+//                                  String.format("edge:%s", oldEdgeId));
+//
+//List<Object> args = Arrays.asList(locationEdgeFieldName, edgeVisitFieldName, driverId, currEdgeId, oldEdgeId);
+
+
+        log.info("keys: " + keys.toString() + " args: " + args.toString());
+
+        // keys, args List<Object> 으로 해야하고,
+        // StringCodec.INSTANCE 반드시 코덱 설정해줘야한다.
+        Mono<Object> results = redissonReactiveClient.getScript(StringCodec.INSTANCE).eval(RScript.Mode.READ_WRITE,
                                                                 scriptSource.getScriptAsString(),
-                                                                RScript.ReturnType.MULTI,
-                                                                keys);
+                                                                RScript.ReturnType.BOOLEAN,
+                                                                keys, args);
 
 
 

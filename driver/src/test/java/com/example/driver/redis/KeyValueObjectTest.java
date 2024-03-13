@@ -47,7 +47,7 @@ public class KeyValueObjectTest {
     @Test
     public void keyValExpiryTest() {
         RBucketReactive<String> bucket = redissonReactiveClient.getBucket("user:1:name");
-        Mono<Void> set = bucket.set("sam10sec",10, TimeUnit.SECONDS);
+        Mono<Void> set = bucket.set("sam10sec");
         Mono<Void> set1 = bucket.set("sam1sec",1, TimeUnit.SECONDS);
         Mono<Void> set2 = bucket.set("sam2sec",2, TimeUnit.SECONDS);
         Mono<Void> get = bucket.get().doOnNext(System.out::println).then();

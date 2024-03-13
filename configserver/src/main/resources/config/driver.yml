@@ -10,11 +10,11 @@ driver:
     - (987) 654-321
   redis:
     fields:
-      # key(driver:%s), field(location:edge), value(edgeId)
+      # key(driver:{driverId}), field(location:edge), value(edgeId)
       location-edge:
         key: "driver:%s"
         field-name: "location:edge"
-      # key(edge:%s), field(edge:visit), value(count)
+      # key(edge:{edgeId}), field(edge:visit), value(count)
       edge-visit: #TODO move into seperate .yml
         key: "edge:%s"
         field-name: "edge:visit"
