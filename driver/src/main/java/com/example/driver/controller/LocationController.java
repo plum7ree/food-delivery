@@ -62,44 +62,13 @@ public class LocationController {
         String currEdgeId = locationDto.getEdgeId();
 
 
-//        String script = "local driverId = KEYS[1]\n" +
-//                "local oldEdgeId = KEYS[2]  -- This might be 'none' if not provided\n" +
-//                "local currEdgeId = KEYS[3]\n" +
-//                "local driverInfo = redis.call('hget', '" + driverEdgeHashKey + "', driverId)\n" +
-//                "local map = '" + edgeRankingKey + "'\n" +
-//                "\n" +
-//                "-- Only proceed with oldEdgeId operations if oldEdgeId is not 'none'\n" +
-//                "if oldEdgeId ~= 'none' then\n" +
-//                "    local oldEdgeValue = redis.call('hget', map, oldEdgeId)\n" +
-//                "    if oldEdgeValue then\n" +
-//                "        oldEdgeValue = oldEdgeValue - 1\n" +
-//                "        redis.call('hset', map, oldEdgeId, oldEdgeValue)\n" +
-//                "    else\n" +
-//                "        redis.call('hset', map, oldEdgeId, -1)\n" +
-//                "    end\n" +
-//                "end\n" +
-//                "\n" +
-//                "-- Operations for currEdgeId proceed as usual\n" +
-//                "local currEdgeValue = redis.call('hget', map, currEdgeId)\n" +
-//                "if currEdgeValue then\n" +
-//                "    currEdgeValue = currEdgeValue + 1\n" +
-//                "    redis.call('hset', map, currEdgeId, currEdgeValue)\n" +
-//                "else\n" +
-//                "    redis.call('hset', map, currEdgeId, 1)\n" +
-//                "end\n" +
-//                "\n" +
-//                "-- Return values based on whether oldEdgeId was provided\n" +
-//                "if oldEdgeId ~= 'none' then\n" +
-//                "    return {oldEdgeValue, currEdgeValue}\n" +
-//                "else\n" +
-//                "    return {nil, currEdgeValue}\n" +
-//                "end";
+
 
         ResourceScriptSource scriptSource = new ResourceScriptSource(new ClassPathResource("META-INF/scripts/location-edge-update.lua"));
 
         // Keys that the script will operate on
         List<Object> keys = Arrays.asList(String.format(driverLocationKey,driverId), String.format(edgeCountKey, currEdgeId), String.format(edgeCountKey,oldEdgeId));
-        List<Object> args = Arrays.asList(locationEdgeFieldName, countFieldName, driverId, currEdgeId, oldEdgeId);
+        List<Object> args = Arrays.asList(locationEdgeFieldName, countFieldName, currEdgeId);
 
 
         //List<Object> keys = Arrays.asList(String.format("driver:%s", driverId),
