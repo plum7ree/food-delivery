@@ -5,6 +5,7 @@ import com.example.driver.dto.LocationDto;
 import com.example.driver.dto.ResponseDto;
 import org.junit.jupiter.api.TestInstance;
 import org.redisson.api.*;
+import org.redisson.client.codec.StringCodec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,16 +30,17 @@ class LocationControllerTest {
 
     @Value("${driver.message}")
     private String driverMessage;
-    @Value("${driver.redis.fields.location-edge.key}")
-    private String locationEdgeKey;
 
-    @Value("${driver.redis.fields.location-edge.field-name}")
+        @Value("${redis.driver-location.key}")
+    private String driverLocationKey;
+
+    @Value("${redis.driver-location.fields.location.edge}")
     private String locationEdgeFieldName;
 
-     @Value("${driver.redis.fields.edge-visit.key}")
-    private String edgeVisitKey;
-     @Value("${driver.redis.fields.edge-visit.field-name}")
-     private String edgeVisitFieldName;
+     @Value("${redis.edge-count.key}")
+    private String edgeCountKey;
+     @Value("${redis.edge-count.fields.count}")
+     private String countFieldName;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -86,8 +88,10 @@ class LocationControllerTest {
         // Additional verifications can be performed here to check that the script was called with the correct parameters
         // However, note that the actual update in Redis is not verified in this unit test, and would typically be covered in an integration test
 
-        RMapReactive<String, String> driverLocationEdgeMap = redissonReactiveClient.getMap(locationEdgeFieldName);
-        Mono<String> monoMapGet = driverLocationEdgeMap.get(driverId);
+
+        RMapReactive<String, String> driverLocationEdgeMap = redissonReactiveClient.getMap(String.format(driverLocationKey, driverId), StringCodec.INSTANCE);
+        // 만일, 결과 값이 없으면 바로 onComplete() 가 호출됨. 따라서 expectNext() 는 fail 뜸.
+        Mono<String> monoMapGet = driverLocationEdgeMap.get(locationEdgeFieldName);
         StepVerifier.create(monoMapGet)
             .expectNext(currEdgeId)
             .verifyComplete();

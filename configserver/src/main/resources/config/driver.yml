@@ -8,16 +8,19 @@ driver:
   onCallSupport:
     - (123) 456-789
     - (987) 654-321
-  redis:
+    -
+redis:
+  driver-location:
+    key: "driver:%s"
     fields:
-      # key(driver:{driverId}), field(location:edge), value(edgeId)
-      location-edge:
-        key: "driver:%s"
-        field-name: "location:edge"
-      # key(edge:{edgeId}), field(edge:visit), value(count)
-      edge-visit: #TODO move into seperate .yml
-        key: "edge:%s"
-        field-name: "edge:visit"
+      location:
+        edge: "location:edge" # key(driver:{driverId}), field(location:edge), value(edgeId)
+        coord: "location:coord"
+  edge-count: #TODO move into seperate .yml
+    key: "edge:%s"
+    fields:
+      count: "count" # key(edge:{edgeId}), field(count), value(count)
+
 
 retry-config:
   initial-interval-ms: 1000

@@ -37,16 +37,16 @@ public class LocationController {
 
     private final RedissonReactiveClient redissonReactiveClient;
 
-    @Value("${driver.redis.fields.location-edge.key}")
-    private String locationEdgeKey;
+    @Value("${redis.driver-location.key}")
+    private String driverLocationKey;
 
-    @Value("${driver.redis.fields.location-edge.field-name}")
+    @Value("${redis.driver-location.fields.location.edge}")
     private String locationEdgeFieldName;
 
-     @Value("${driver.redis.fields.edge-visit.key}")
-    private String edgeVisitKey;
-     @Value("${driver.redis.fields.edge-visit.field-name}")
-     private String edgeVisitFieldName;
+     @Value("${redis.edge-count.key}")
+    private String edgeCountKey;
+     @Value("${redis.edge-count.fields.count}")
+     private String countFieldName;
 
 
     //TODO userId from security utils
@@ -98,8 +98,8 @@ public class LocationController {
         ResourceScriptSource scriptSource = new ResourceScriptSource(new ClassPathResource("META-INF/scripts/location-edge-update.lua"));
 
         // Keys that the script will operate on
-        List<Object> keys = Arrays.asList(String.format(locationEdgeKey,driverId), String.format(edgeVisitKey, currEdgeId), String.format(edgeVisitKey,oldEdgeId));
-        List<Object> args = Arrays.asList(locationEdgeFieldName, edgeVisitFieldName, driverId, currEdgeId, oldEdgeId);
+        List<Object> keys = Arrays.asList(String.format(driverLocationKey,driverId), String.format(edgeCountKey, currEdgeId), String.format(edgeCountKey,oldEdgeId));
+        List<Object> args = Arrays.asList(locationEdgeFieldName, countFieldName, driverId, currEdgeId, oldEdgeId);
 
 
         //List<Object> keys = Arrays.asList(String.format("driver:%s", driverId),
@@ -113,17 +113,20 @@ public class LocationController {
 
         // keys, args List<Object> 으로 해야하고,
         // StringCodec.INSTANCE 반드시 코덱 설정해줘야한다.
+        // Object...values 부분을 args 로 값을 주면 args 를 하나의 Object 로 인식해버린다!
+        // 따라서 args.toArray() 혹은 args.toArray(new Object[0]) 로 넘겨준다
+        // ref: https://stackoverflow.com/questions/9863742/how-to-pass-an-arraylist-to-a-varargs-method-parameter
         Mono<Object> results = redissonReactiveClient.getScript(StringCodec.INSTANCE).eval(RScript.Mode.READ_WRITE,
                                                                 scriptSource.getScriptAsString(),
                                                                 RScript.ReturnType.BOOLEAN,
-                                                                keys, args);
+                                                                keys, args.toArray());
 
 
 
 //        results.block() or subscribe() // non-block
 //        doOnSuccess or doOnNext or doOnError
     return results
-            .flatMap(result -> Mono.just(ResponseEntity.ok(new ResponseDto("200", "Success"))))
+            .flatMap(result -> Mono.just(ResponseEntity.ok(new ResponseDto("200", ""))))
             .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().body(new ResponseDto("400", "Error occurred: " + error.getMessage()))));
 }
 
