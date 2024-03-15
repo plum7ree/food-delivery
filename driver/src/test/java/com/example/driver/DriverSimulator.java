@@ -117,9 +117,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.geo.Point;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -131,36 +134,58 @@ class Address {
 
 @RequiredArgsConstructor
 class Driver {
-    private final WebClient webClient;
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    void requestToRoute(AddressSearchRequestDto startAddress, AddressSearchRequestDto endAddress) {
-//        webClient.post().uri("/api/route/address/search") {
-//
-//        }
-//        AddressSearchResponseDto startAddress_;
-//        AddressSearchResponseDto destAddress_;
-//        RouteRequestDto requestDto;
-//        requestDto.setStartAddress(startAddress_);
-//        requestDto.setDestAddress(destAddress_);
-//        webClient.post().uri("/api/route")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(requestDto)
-//                .exchange();
+        //TODO how to autowire this in a test environment?
+    private final WebClient webClient;
+    private Double currLat;
+    private Double currLon;
+
+    public CompletableFuture<Void> startRoute() {
+                // 광화문 삼거리
+        var startLat = 37.57524;
+        var startLon = 126.97711;
+        // 숭례문거리
+        var destLat = 37.5606;
+        var destLon = 126.9757;
+        var future = Mono.just(webClient.get().uri(uriBuilder -> uriBuilder.path("/api/route/query")
+                .queryParam("startLat", startLat)
+                .queryParam("startLon", startLon)
+                .queryParam("destLat", destLat)
+                .queryParam("destLon", destLon)
+                .build())
+                .retrieve();
+
     }
 
     public void updateCurrLocation(LocationDto locationDto) {
         webClient.post().uri("api/location/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(locationDto)
-                .exchange()
-                .subscribe();
+                .retrieve();
 
 
     }
 
 }
 
+class DriverManager {
+
+
+    //TODO change this to generic executor. and autowire from my setting.
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final List<Driver> driverList = new ArrayList<>();
+    public void addDriver(Driver driver) {
+        driverList.add(driver);
+    }
+    public void queryRoute() {
+        final Runnable locationUpdater = () -> driverList.forEach(Driver::updateLocation);
+        CompletableFuture<> future
+    }
+    public void publishLocation() {
+
+    }
+
+}
 
 
 
