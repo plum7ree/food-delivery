@@ -1,4 +1,4 @@
-//package com.example.driver;
+package com.example.driver;//package com.example.driver;
 //import lombok.AccessLevel;
 //import lombok.Data;
 //import lombok.Getter;
@@ -93,9 +93,6 @@
 //}
 //
 //
-//
-//
-//
 //public class DriverSimulator {
 //
 //    public void drive() {
@@ -111,3 +108,67 @@
 //        currentLocation
 //    }
 //}
+
+
+import com.example.driver.dto.LocationDto;
+import com.example.route.data.dto.AddressSearchResponseDto;
+import com.example.route.data.dto.AddressSearchRequestDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.geo.Point;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+
+class Address {
+    String address;
+}
+
+
+
+@RequiredArgsConstructor
+class Driver {
+    private final WebClient webClient;
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+
+    void requestToRoute(AddressSearchRequestDto startAddress, AddressSearchRequestDto endAddress) {
+//        webClient.post().uri("/api/route/address/search") {
+//
+//        }
+//        AddressSearchResponseDto startAddress_;
+//        AddressSearchResponseDto destAddress_;
+//        RouteRequestDto requestDto;
+//        requestDto.setStartAddress(startAddress_);
+//        requestDto.setDestAddress(destAddress_);
+//        webClient.post().uri("/api/route")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(requestDto)
+//                .exchange();
+    }
+
+    public void updateCurrLocation(LocationDto locationDto) {
+        webClient.post().uri("api/location/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(locationDto)
+                .exchange()
+                .subscribe();
+
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

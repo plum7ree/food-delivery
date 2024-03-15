@@ -54,6 +54,7 @@ public class LocationController {
     // option 2. Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     //           String userId = authentication.getName();
 
+    
     @PostMapping("/api/driver/location")
     public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) throws IOException {
         log.info("location Dto Received: " + locationDto.toString());

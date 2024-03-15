@@ -31,7 +31,7 @@ class LocationControllerTest {
     @Value("${driver.message}")
     private String driverMessage;
 
-        @Value("${redis.driver-location.key}")
+    @Value("${redis.driver-location.key}")
     private String driverLocationKey;
 
     @Value("${redis.driver-location.fields.location.edge}")

@@ -2,6 +2,8 @@ package com.example.route.config;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.config.CHProfile;
 import com.graphhopper.config.Profile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -22,12 +24,25 @@ public class GraphHopperConfig {
     private static GraphHopper graphHopper;
     private static final String BUCKET_NAME = "<Your S3 Bucket Name>";
     private static final String KEY = "<Your OSM File Key in S3>";
+    private static final Logger log = LoggerFactory.getLogger(GraphHopperConfig.class);
 
+    // 파일 바꿀때마다 mvn clean 해서 cache 지워줘야함 !
     @Bean
     public GraphHopper graphHopper() {
         // 1. Download OSM file from S3
-//        String osmFilePath = downloadFileFromS3(BUCKET_NAME, KEY);
-        URL res  = getClass().getClassLoader().getResource("static/seoul-non-military.osm.pbf");
+        // String osmFilePath = downloadFileFromS3(BUCKET_NAME, KEY);
+
+        // Seoul
+         URL res  = getClass().getClassLoader().getResource("static/seoul-non-military.osm.pbf");
+
+        // NewYork
+        // URL res  = getClass().getClassLoader().getResource("static/new-york-latest.osm.pbf");
+
+        // andorra
+        // https://github.com/graphhopper/graphhopper/blob/master/example/src/main/java/com/graphhopper/example/RoutingExample.java
+        // URL res  = getClass().getClassLoader().getResource("static/andorra-latest.osm.pbf");
+
+        log.info("osm URL: " + res);
 
         // 2. Create GraphHopper instance
         return createGraphHopperInstance(res.getPath());
@@ -50,20 +65,14 @@ public class GraphHopperConfig {
 //        }
 //    }
 
-    // 2. create graphhopper
+
+    // https://github.com/graphhopper/graphhopper/blob/master/example/src/main/java/com/graphhopper/example/RoutingExample.java
     static GraphHopper createGraphHopperInstance(String ghLoc) {
         GraphHopper hopper = new GraphHopper();
         hopper.setOSMFile(ghLoc);
-        // specify where to store graphhopper files
         hopper.setGraphHopperLocation("target/routing-graph-cache");
-
-        // see docs/core/profiles.md to learn more about profiles
         hopper.setProfiles(new Profile("car").setVehicle("car").setTurnCosts(false));
-
-        // this enables speed mode for the profile we called car
         hopper.getCHPreparationHandler().setCHProfiles(new CHProfile("car"));
-
-        // now this can take minutes if it imports or a few seconds for loading of course this is dependent on the area you import
         hopper.importOrLoad();
 
         return hopper;

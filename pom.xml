@@ -13,6 +13,7 @@
         <module>eurekaserver</module>
         <module>driver</module>
         <module>edge-ranker</module>
+        <module>route</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>
