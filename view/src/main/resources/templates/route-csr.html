@@ -29,12 +29,10 @@
                 var destLat = destMarker.getLatLng().lat;
                 var destLon = destMarker.getLatLng().lng;
 
-                fetch('/route/query', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
+                const url = `http://localhost:8072/api/route/query?startLat=${startLat}&startLon=${startLon}&destLat=${destLat}&destLon=${destLon}`;
+
+                fetch(url, {
+                    params: new URLSearchParams({
                         startLat: startLat,
                         startLon: startLon,
                         destLat: destLat,

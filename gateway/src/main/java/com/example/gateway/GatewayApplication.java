@@ -28,7 +28,13 @@ public class GatewayApplication {
                 // .* : 0 개 이상의 문자.
                     .filters(f -> f.rewritePath("/driver/(?<path>.*)", "/${path}")
                         .addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
-                .uri("lb://DRIVER")).build();
+                    .uri("lb://DRIVER"))
+                .route(p-> p.path("/route/**")
+                    .filters(f->f.rewritePath("/driver/(?<path>.*)", "/%{path}")
+                        .addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+                    .uri("lb://ROUTE")).
+                build();
+
     }
 
 }
