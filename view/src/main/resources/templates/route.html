@@ -7,11 +7,18 @@
 </head>
 <body>
     <div id="map" style="height: 500px;"></div>
-
+    <form th:action="@{/route}" method="post">
+        <input type="hidden" id="startLat" name="startLat" />
+        <input type="hidden" id="startLon" name="startLon" />
+        <input type="hidden" id="destLat" name="destLat" />
+        <input type="hidden" id="destLon" name="destLon" />
+        <button type="submit">Get Route</button>
+    </form>
     <script th:inline="javascript">
         /*<![CDATA[*/
         var coordinates = /*[[${coordinates}]]*/ [];
 
+        coordinates = [[37.57524,126.97711], [37.5606, 126.9757]]
         var map = L.map('map').setView([coordinates[0][0], coordinates[0][1]], 13);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
