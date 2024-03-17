@@ -2,7 +2,6 @@ package com.example.driver.controller;
 
 import com.example.driver.dto.LocationDto;
 import com.example.driver.dto.ResponseDto;
-import com.example.driver.transformer.LocationDtoToAvroTransformer;
 import com.example.driver.transformer.LocationToAvroTransformer;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.microservices.demo.kafka.avro.model.LocationAvroModel;
