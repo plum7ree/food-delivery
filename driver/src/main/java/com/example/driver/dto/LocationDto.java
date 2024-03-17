@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class LocationDto {
     float lat;
     float lon;
-    String edgeId;
+    String edgeId; //TODO change to osmId or add nodeId/POI?
     String oldEdgeId;
     String driverId;
 }

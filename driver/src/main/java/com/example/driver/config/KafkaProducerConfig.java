@@ -1,6 +1,7 @@
 package com.example.driver.config;
 
 
+import com.example.kafka.admin.client.KafkaAdminClient;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafka.config.data.KafkaProducerConfigData;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
@@ -25,7 +27,7 @@ public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecor
 
 //    @Value(value = "${kafka-config.bootstrap-servers}")
 //    private String bootstrapAddress;
-
+    private final KafkaAdminClient kafkaAdminClient;
     // Lombok이 final 필드를 초기화하는 생성자를 자동으로 생성
     private final KafkaConfigData kafkaConfigData;
     private final KafkaProducerConfigData kafkaProducerConfigData;

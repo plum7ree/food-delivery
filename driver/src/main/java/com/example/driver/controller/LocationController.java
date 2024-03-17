@@ -2,6 +2,10 @@ package com.example.driver.controller;
 
 import com.example.driver.dto.LocationDto;
 import com.example.driver.dto.ResponseDto;
+import com.example.driver.transformer.LocationDtoToAvroTransformer;
+import com.example.driver.transformer.LocationToAvroTransformer;
+import com.example.kafka.config.data.KafkaConfigData;
+import com.microservices.demo.kafka.avro.model.LocationAvroModel;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.redisson.api.*;
@@ -14,6 +18,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scripting.ScriptSource;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +37,14 @@ import java.util.List;
 public class LocationController {
     private static final Logger log = LoggerFactory.getLogger(LocationController.class);
 
-//    private KafkaTemplate<Long, Object> kafkaProducer;
+    private final KafkaTemplate<Long, LocationAvroModel> kafkaProducer;
+    // figured in configserver's driver.yml
+    private final KafkaConfigData kafkaConfigData;
+
+    private final LocationToAvroTransformer locationToAvroTransformer;
+
+
+
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final RedissonReactiveClient redissonReactiveClient;
@@ -49,14 +61,20 @@ public class LocationController {
      private String countFieldName;
 
 
+
     //TODO userId from security utils
     // option 1. @AuthenticationPrincipal UserDetails userDetails
     // option 2. Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     //           String userId = authentication.getName();
-
-    
+    //TODO
+    // 여기서 바로 레디스로 업데이트 하지말고, kafka 로 보내자. 해당 이벤트를 레디스와 나의 HashMap, TreeSet 이 있는 서비스에서 구독.
+    // 주기적으로 ranking TreeSet 업데이트.
     @PostMapping("/api/driver/location")
     public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) throws IOException {
+        //TODO key based on userId or user location?
+        kafkaProducer.send(kafkaConfigData.getTopicName(), Long.parseLong(locationDto.getDriverId()), locationToAvroTransformer.transform(locationDto));
+
+
         log.info("location Dto Received: " + locationDto.toString());
         String driverId = locationDto.getDriverId(); // Assuming LocationDto contains a driver ID.
         String oldEdgeId = locationDto.getOldEdgeId();
