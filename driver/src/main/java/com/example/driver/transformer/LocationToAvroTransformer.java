@@ -6,6 +6,9 @@ import com.microservices.demo.kafka.avro.model.Coordinates;
 import com.microservices.demo.kafka.avro.model.LocationAvroModel;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 @Component
 public class LocationToAvroTransformer {
 
@@ -17,6 +20,7 @@ public class LocationToAvroTransformer {
                 .setOldEdgeId(locationDto.getOldEdgeId())
                 .setEdgeId(locationDto.getEdgeId())
                 .setCoord(Coordinates.newBuilder().setLat(locationDto.getLat()).setLon(locationDto.getLon()).build())
+                .setCreatedAt(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
                 .build();
     }
 }

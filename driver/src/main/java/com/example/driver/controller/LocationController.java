@@ -4,24 +4,20 @@ import com.example.driver.dto.LocationDto;
 import com.example.driver.dto.ResponseDto;
 import com.example.driver.transformer.LocationToAvroTransformer;
 import com.example.kafka.config.data.KafkaConfigData;
+import com.example.kafkaproducer.KafkaProducer;
 import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.redisson.api.*;
 import org.redisson.client.codec.StringCodec;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.scripting.ScriptSource;
 import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.slf4j.Logger;
@@ -32,11 +28,13 @@ import java.util.Arrays;
 import java.util.List;
 
 @RestController
+// {gateway-server-url}/driver/location/api/...
+@RequestMapping(path="/location/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @RequiredArgsConstructor
 public class LocationController {
     private static final Logger log = LoggerFactory.getLogger(LocationController.class);
 
-    private final KafkaTemplate<Long, LocationAvroModel> kafkaProducer;
+    private final KafkaProducer<Long, LocationAvroModel> kafkaProducer;
     // figured in configserver's driver.yml
     private final KafkaConfigData kafkaConfigData;
 
@@ -68,7 +66,13 @@ public class LocationController {
     //TODO
     // 여기서 바로 레디스로 업데이트 하지말고, kafka 로 보내자. 해당 이벤트를 레디스와 나의 HashMap, TreeSet 이 있는 서비스에서 구독.
     // 주기적으로 ranking TreeSet 업데이트.
-    @PostMapping("/api/driver/location")
+
+
+    @Operation(
+        summary = "update location",
+        description = "POST {gateway-server-url}/driver/location/api/update"
+    )
+    @PostMapping("/update")
     public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) throws IOException {
         //TODO key based on userId or user location?
         kafkaProducer.send(kafkaConfigData.getTopicName(), Long.parseLong(locationDto.getDriverId()), locationToAvroTransformer.transform(locationDto));

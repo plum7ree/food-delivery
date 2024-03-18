@@ -15,7 +15,7 @@
 //import org.springframework.web.bind.annotation.RestController;
 //
 //@RestController
-//@RequestMapping(path="/api", produces = {MediaType.APPLICATION_JSON_VALUE}) // /accounts 로 돌리는건 gateway 에서?
+//@RequestMapping(path="/account/api", produces = {MediaType.APPLICATION_JSON_VALUE}) // /accounts 로 돌리는건 gateway 에서?
 //@Validated
 //@RequiredArgsConstructor
 //public class AccountController {

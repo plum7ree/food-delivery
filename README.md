@@ -64,3 +64,17 @@ helm create <chart-name>
 configserver: 8071   
 driver: 8080
 
+
+
+### Kafka Module Architecture
+<b>Dependencies</b>    
+- KafkaAdminClient, KafkaProducerConfig(KafkaTemplate) <- KafkaProducer/KafkaConsumer <- Apps   
+  - KafkaAdminClient contains `createTopic()`
+  - KafkaProducer contains `onAppCreated(ApplicationStartedEvent)` EventListener, which microservice application's spring context will fire on their app started.
+- KafkaConfigData <- Apps
+  - configserver will feed config data into KafkaConfigData object.
+  - because of `@ConfigurationProperties(prefix = "appname")`
+
+
+### Note
+`@ComponentScan(basePackages={"com.example"})` necessary to use shared classes.

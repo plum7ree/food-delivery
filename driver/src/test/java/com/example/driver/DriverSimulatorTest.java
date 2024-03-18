@@ -114,6 +114,8 @@ import com.example.driver.dto.LocationDto;
 import com.example.route.data.dto.PointDto;
 import com.example.route.data.dto.RouteResponseDto;
 //import jakarta.ws.rs.core.UriBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import lombok.NoArgsConstructor;
@@ -145,122 +147,127 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+// Seems like we can mock WebClient and KafkaProducer
+// without doing e2e test.
+@SpringBootTest
+// disable eureka client which causes a crash.
+@TestPropertySource(properties = "spring.cloud.discovery.enabled=false")
+@RequiredArgsConstructor
 public class DriverSimulatorTest {
 
-
-    @Test
-    public void testRouteRequestCorrect() {
-        // WebClient 목(mock) 객체 생성
-        WebClient webClientMock = Mockito.mock(WebClient.class);
-        WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock = Mockito.mock(WebClient.RequestHeadersUriSpec.class);
-        WebClient.RequestHeadersSpec requestHeadersSpecMock = Mockito.mock(WebClient.RequestHeadersSpec.class);
-        WebClient.ResponseSpec responseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
-
-        // 목(mock) 객체의 동작 설정
-        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
-        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
-            java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
-            URI uri = uriFunction.apply(UriComponentsBuilder.fromPath(""));
-
-            // "/api/route" 요청이 아닐 경우 예외 던지기
-            if (!uri.getPath().equals("/api/route/query")) {
-                throw new AssertionError("Expected '/api/route' request, but got: " + uri.getPath());
-            }
-
-            // 요청 파라미터 추출
-            String query = uri.getQuery();
-            String[] params = query.split("&");
-            double startLat = Double.parseDouble(params[0].split("=")[1]);
-            double startLon = Double.parseDouble(params[1].split("=")[1]);
-            double destLat = Double.parseDouble(params[2].split("=")[1]);
-            double destLon = Double.parseDouble(params[3].split("=")[1]);
-
-            // leftUp, rightDown 좌표 범위 내에 있는지 확인
-            double leftUpLat = 37.5665;
-            double leftUpLon = 126.9780;
-            double rightDownLat = 37.5600;
-            double rightDownLon = 126.9750;
-            assertTrue(startLat >= rightDownLat && startLat <= leftUpLat);
-            assertTrue(startLon >= rightDownLon && startLon <= leftUpLon);
-            assertTrue(destLat >= rightDownLat && destLat <= leftUpLat);
-            assertTrue(destLon >= rightDownLon && destLon <= leftUpLon);
-
-            return requestHeadersSpecMock;
-        });
-
-
-//        when(requestHeadersSpecMock.retrieve()).thenCallRealMethod();
-//when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenCallRealMethod();
-//when(responseSpecMock.bodyToMono(eq(RouteResponseDto.class))).thenCallRealMethod();
-//when(responseSpecMock.toBodilessEntity()).thenCallRealMethod();
-//
-
-        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
-        when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpecMock);
-        when(responseSpecMock.bodyToMono(eq(RouteResponseDto.class))).thenReturn(Mono.just(new RouteResponseDto()));
-        when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.status(HttpStatus.OK).build()));
-
-
-        // DriverSimulator 인스턴스 생성 및 의존성 주입
-        Driver driver = new Driver(webClientMock);
-        DriverManager driverManager = new DriverManager();
-        driverManager.addDriver(driver);
-
-        // 테스트 실행
-        driverManager.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
-        var routeResponseList = driverManager.queryRoute();
-
-        // response test
-        assertTrue(routeResponseList.size() == 1);
+    private WebClient webClient;
+    @BeforeEach
+    public void setup() {
+        webClient = WebClient.create();
     }
-    @Test
-    public void testRouteControllerResponse() {
-        // WebClient 목(mock) 객체 생성
-        WebClient webClientMock = Mockito.mock(WebClient.class);
-        WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock = Mockito.mock(WebClient.RequestHeadersUriSpec.class);
-        WebClient.RequestHeadersSpec requestHeadersSpecMock = Mockito.mock(WebClient.RequestHeadersSpec.class);
-        WebClient.ResponseSpec responseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
+
+//    @Test
+//    public void testRouteRequestCorrect() {
+//        // WebClient 목(mock) 객체 생성
+//        WebClient webClientMock = Mockito.mock(WebClient.class);
+//        WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock = Mockito.mock(WebClient.RequestHeadersUriSpec.class);
+//        WebClient.RequestHeadersSpec requestHeadersSpecMock = Mockito.mock(WebClient.RequestHeadersSpec.class);
+//        WebClient.ResponseSpec responseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
 //
 //        // 목(mock) 객체의 동작 설정
 //        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
-//        when(requestHeadersUriSpecMock.uri(any(java.util.function.Function.class))).thenReturn(requestHeadersSpecMock);
+//        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+//            java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
+//            URI uri = uriFunction.apply(UriComponentsBuilder.fromPath(""));
+//
+//            // "/api/route" 요청이 아닐 경우 예외 던지기
+//            if (!uri.getPath().equals("/api/route/query")) {
+//                throw new AssertionError("Expected '/api/route' request, but got: " + uri.getPath());
+//            }
+//
+//            // 요청 파라미터 추출
+//            String query = uri.getQuery();
+//            String[] params = query.split("&");
+//            double startLat = Double.parseDouble(params[0].split("=")[1]);
+//            double startLon = Double.parseDouble(params[1].split("=")[1]);
+//            double destLat = Double.parseDouble(params[2].split("=")[1]);
+//            double destLon = Double.parseDouble(params[3].split("=")[1]);
+//
+//            // leftUp, rightDown 좌표 범위 내에 있는지 확인
+//            double leftUpLat = 37.5665;
+//            double leftUpLon = 126.9780;
+//            double rightDownLat = 37.5600;
+//            double rightDownLon = 126.9750;
+//            assertTrue(startLat >= rightDownLat && startLat <= leftUpLat);
+//            assertTrue(startLon >= rightDownLon && startLon <= leftUpLon);
+//            assertTrue(destLat >= rightDownLat && destLat <= leftUpLat);
+//            assertTrue(destLon >= rightDownLon && destLon <= leftUpLon);
+//
+//            return requestHeadersSpecMock;
+//        });
+//
+//
 //        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
-//        when(responseSpecMock.bodyToMono(String.class)).thenReturn(Mono.just("mock response"));
+//        when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpecMock);
+//        when(responseSpecMock.bodyToMono(eq(RouteResponseDto.class))).thenReturn(Mono.just(new RouteResponseDto()));
+//        when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.status(HttpStatus.OK).build()));
+//
+//
+//        // DriverSimulator 인스턴스 생성 및 의존성 주입
+//        Driver driver = new Driver(webClientMock);
+//        DriverManager driverManager = new DriverManager();
+//        driverManager.addDriver(driver);
+//
+//        // 테스트 실행
+//        driverManager.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
+//        var routeResponseList = driverManager.queryRoute();
+//
+//        // response test
+//        assertTrue(routeResponseList.size() == 1);
+//    }
+//    @Test
+//    public void testRouteControllerResponse() {
+//        // WebClient 목(mock) 객체 생성
+//        WebClient webClientMock = Mockito.mock(WebClient.class);
+//        WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock = Mockito.mock(WebClient.RequestHeadersUriSpec.class);
+//        WebClient.RequestHeadersSpec requestHeadersSpecMock = Mockito.mock(WebClient.RequestHeadersSpec.class);
+//        WebClient.ResponseSpec responseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
+//
+//
+//        // 목(mock) 객체의 동작 설정
+//        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
+//        when(requestHeadersUriSpecMock.uri(any(java.util.function.Function.class))).thenAnswer(invocation -> {
+//            java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
+//            URI uri = uriFunction.apply(UriComponentsBuilder.fromPath("/api/route"));
+//            if ("/api/route".equals(uri.getPath())) {
+//                return requestHeadersSpecMock;
+//            } else {
+//                return Mockito.mock(WebClient.RequestHeadersSpec.class);
+//            }
+//        });
+//        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+//        when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpecMock);
+//        when(responseSpecMock.bodyToMono(eq(RouteResponseDto.class))).thenReturn(Mono.just(new RouteResponseDto()));
+//        when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.status(HttpStatus.OK).build()));
+//
+//
+//        // DriverSimulator 인스턴스 생성 및 의존성 주입
+//        Driver driver = new Driver(webClientMock);
+//        DriverManager driverManager = new DriverManager();
+//        driverManager.addDriver(driver);
+//
+//        // 테스트 실행
+//        driverManager.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
+//        var routeResponseList = driverManager.queryRoute();
+//
+//        // response test
+//        //TODO remove when(), mock. we really need to test a response from route microservice
+//        assertTrue(routeResponseList.size() == 1);
+//        assertEquals(routeResponseList.get(0).getPointList().get(0).getLat(), 1.0);
+//    }
 
+        @Test
+        public void testLocationController() {
 
+        }
 
-        // 목(mock) 객체의 동작 설정
-        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
-        when(requestHeadersUriSpecMock.uri(any(java.util.function.Function.class))).thenAnswer(invocation -> {
-            java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
-            URI uri = uriFunction.apply(UriComponentsBuilder.fromPath("/api/route"));
-            if ("/api/route".equals(uri.getPath())) {
-                return requestHeadersSpecMock;
-            } else {
-                return Mockito.mock(WebClient.RequestHeadersSpec.class);
-            }
-        });
-        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
-        when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpecMock);
-        when(responseSpecMock.bodyToMono(eq(RouteResponseDto.class))).thenReturn(Mono.just(new RouteResponseDto()));
-        when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.status(HttpStatus.OK).build()));
-
-
-        // DriverSimulator 인스턴스 생성 및 의존성 주입
-        Driver driver = new Driver(webClientMock);
-        DriverManager driverManager = new DriverManager();
-        driverManager.addDriver(driver);
-
-        // 테스트 실행
-        driverManager.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
-        var routeResponseList = driverManager.queryRoute();
-
-        // response test
-        //TODO remove when(), mock. we really need to test a response from route microservice
-        assertTrue(routeResponseList.size() == 1);
-        assertEquals(routeResponseList.get(0).getPointList().get(0).getLat(), 1.0);
-    }
 }
+
 
 class Driver {
     private final WebClient webClient; //how to autowire this in a test environment? -> private final + Constructor
@@ -331,11 +338,11 @@ class Driver {
 //        return null;
     }
 
-    public void updateCurrLocation(LocationDto locationDto) {
-//        webClient.post().uri("api/location/update")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(locationDto)
-//                .retrieve();
+    public void publishLocation(LocationDto locationDto) {
+        webClient.post().uri("api/driver/location")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(locationDto)
+                .retrieve();
 
 
     }

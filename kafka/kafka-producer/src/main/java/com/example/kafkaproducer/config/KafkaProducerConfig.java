@@ -1,5 +1,4 @@
-package com.example.driver.config;
-
+package com.example.kafkaproducer.config;
 
 import com.example.kafka.admin.client.KafkaAdminClient;
 import com.example.kafka.config.data.KafkaConfigData;
