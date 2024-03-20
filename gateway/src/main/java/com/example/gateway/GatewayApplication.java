@@ -36,8 +36,10 @@ public class GatewayApplication {
                 .route(p -> p.path("/route/**")
                         .filters(f -> f.rewritePath("/route/(?<path>.*)", "/${path}")
                                 .addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
-                        .uri("lb://ROUTE")).
-                build();
+                        .uri("lb://ROUTE"))
+                .route(p -> p.path("/socket/**", "/sockjs/**")
+                        .uri("lb://MONITORING"))
+                .build();
 
     }
 

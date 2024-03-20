@@ -46,6 +46,10 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-oauth2-jose</artifactId>
 		</dependency>
+        <dependency> <!--  solve mac DNS error -->
+    <groupId>io.netty</groupId>
+    <artifactId>netty-all</artifactId>
+</dependency>
     </dependencies>
 
     <build>

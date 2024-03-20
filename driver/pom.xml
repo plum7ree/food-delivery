@@ -182,7 +182,7 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
-<dependency>
+<dependency> <!--  solve mac DNS error -->
     <groupId>io.netty</groupId>
     <artifactId>netty-all</artifactId>
 </dependency>

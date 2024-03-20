@@ -1,8 +1,8 @@
 package com.example.driver.controller;
 
-import com.example.driver.dto.LocationDto;
-import com.example.driver.dto.ResponseDto;
-import com.example.driver.transformer.LocationToAvroTransformer;
+import com.example.driver.data.dto.LocationDto;
+import com.example.driver.data.dto.ResponseDto;
+import com.example.driver.data.transformer.LocationToAvroTransformer;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafkaproducer.KafkaProducer;
 import com.microservices.demo.kafka.avro.model.LocationAvroModel;
@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +42,7 @@ public class LocationController {
     // 여기서 바로 레디스로 업데이트 하지말고, kafka 로 보내자. 해당 이벤트를 레디스와 나의 HashMap, TreeSet 이 있는 서비스에서 구독.
     // 주기적으로 ranking TreeSet 업데이트.
 
-
+    // 주의. schema registered 가 잘 되었는가?
     @Operation(
             summary = "update location",
             description = "POST {gateway-server-url}/driver/location/api/update"
@@ -51,6 +50,9 @@ public class LocationController {
     @PostMapping("/update")
     public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) throws IOException {
         //TODO key based on userId or user location?
+        log.info("location update, sending to kafka. topic name: "
+                + kafkaConfigData.getTopicName()
+        +" key: " + Long.parseLong(locationDto.getDriverId()));
         kafkaProducer.send(kafkaConfigData.getTopicName(), Long.parseLong(locationDto.getDriverId()), locationToAvroTransformer.transform(locationDto));
 //
 //

@@ -1,20 +1,13 @@
 package com.example.locationredis;
 
 import com.example.locationredis.config.RedissonConfig;
-import com.example.driver.dto.LocationDto;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
-import org.redisson.RedissonReactive;
 import org.redisson.api.RBucketReactive;
 import org.redisson.api.RedissonReactiveClient;
-import org.redisson.codec.JsonJacksonCodec;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import reactor.core.publisher.Mono;

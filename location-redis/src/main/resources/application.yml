@@ -53,6 +53,10 @@ eureka:
       defaultZone: http://localhost:8070/eureka/
 
 
+#broker:
+#  replay:
+#    host: rabitMQ url
+
 logging:
   pattern:
     level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

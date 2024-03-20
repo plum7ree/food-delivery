@@ -62,7 +62,10 @@ helm create <chart-name>
 ```
 
 configserver: 8071   
-driver: 8080
+locationredis: 8072
+driver: 8090
+monitoring: 8091
+
 
 
 
@@ -93,6 +96,8 @@ driver: 8080
   - import config server url
   - eureka server url
   - actuator setting
+- configserver/app-name.yml setting
+- @ComponentScan in main() **Application.java
 
 2. gateway server
 - route rules

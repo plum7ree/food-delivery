@@ -1,6 +1,6 @@
 package com.example.driver;//package com.example.driver;
 
-import com.example.driver.dto.LocationDto;
+import com.example.driver.data.dto.LocationDto;
 import com.example.route.data.dto.InstructionDto;
 import com.example.route.data.dto.PointDto;
 import com.example.route.data.dto.RouteResponseDto;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -212,7 +211,7 @@ public class DriverSimulatorTest {
      * 순서대로 실행 세팅 해야함.
      */
     @Test
-    public void testRouteRequestCorrect() {
+    public void testRouteRequestE2E() {
 
         // DriverSimulator 인스턴스 생성 및 의존성 주입
 
@@ -395,7 +394,7 @@ class DriverSimulator {
                                 double[] coordinates = {currLat, currLon, targetLat, targetLon};
                                 var distanceInMeter = haversineDistanceInMeter.apply(coordinates);
 
-                                log.info("distance meter: " + distanceInMeter + ", THRESHOLD: " + ARRIVED_THRESHOLD_METER);
+//                                log.info("distance meter: " + distanceInMeter + ", THRESHOLD: " + ARRIVED_THRESHOLD_METER);
                                 //TODO approximate. 위도에 따라 길이가 다르다. 여기선 1m 0.00001 라고 근사함.
                                 while (distanceInMeter > ARRIVED_THRESHOLD_METER) {
                                     // next stream?
@@ -403,7 +402,7 @@ class DriverSimulator {
                                     double theta = Math.atan2(Dy, Dx);
                                     var dy = Math.sin(theta) * VEL;
                                     var dx = Math.cos(theta) * VEL;
-                                    log.info("theta: " + theta + " dy: " + dy + " dx: " + dx);
+//                                    log.info("theta: " + theta + " dy: " + dy + " dx: " + dx);
                                     currLat += dy;
                                     currLon += dx;
 
@@ -427,7 +426,7 @@ class DriverSimulator {
 
                                     coordinates = new double[]{currLat, currLon, targetLat, targetLon};
                                     distanceInMeter = haversineDistanceInMeter.apply(coordinates);
-                                    log.info("distance meter: " + distanceInMeter + ", THRESHOLD: " + ARRIVED_THRESHOLD_METER);
+//                                    log.info("distance meter: " + distanceInMeter + ", THRESHOLD: " + ARRIVED_THRESHOLD_METER);
                                 }
 
                             });
@@ -480,8 +479,18 @@ class DriverSimulator {
         webClient.post().uri(uriBuilder -> uriBuilder.path(Constant.locationPublishPath).build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(locationDto)
-                .retrieve();
+                .retrieve()
+                .onStatus(HttpStatusCode::is2xxSuccessful, clientResponse -> {
+                    log.info("publishLocation req response got 200");
+                    return Mono.empty();
+                })
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
+                        Mono.error(new RuntimeException("4xx Client Error: " + clientResponse.statusCode())))
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
+                        Mono.error(new RuntimeException("5xx Server Error: " + clientResponse.statusCode())))
 
+                .bodyToMono(Void.class)
+                .block();
 
     }
 

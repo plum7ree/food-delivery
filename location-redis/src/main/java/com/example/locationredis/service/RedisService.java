@@ -1,6 +1,6 @@
 package com.example.locationredis.service;
 
-import com.example.driver.dto.LocationDto;
+import com.example.driver.data.dto.LocationDto;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RScript;
 import org.redisson.api.RedissonReactiveClient;

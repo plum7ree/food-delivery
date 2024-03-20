@@ -1,19 +1,5 @@
 
 
-
-redis:
-  driver-location:
-    key: "driver:%s"
-    fields:
-      location:
-        edge: "location:edge" # key(driver:{driverId}), field(location:edge), value(edgeId)
-        coord: "location:coord"
-  edge-count: #TODO move into seperate .yml
-    key: "edge:%s"
-    fields:
-      count: "count" # key(edge:{edgeId}), field(count), value(count)
-
-
 retry-config:
   initial-interval-ms: 1000
   max-interval-ms: 10000
@@ -56,3 +42,5 @@ kafka-consumer-config:
 spring:
   data:
     redis-server: redis://localhost:6379
+
+# rabbitmq config?
