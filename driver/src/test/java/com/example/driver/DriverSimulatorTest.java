@@ -168,7 +168,7 @@ public class DriverSimulatorTest {
         when(requestBodyUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
             java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
             URI uri = uriFunction.apply(UriComponentsBuilder.fromPath(""));
-            log.info("request arrived. path: " + uri.getPath());
+//            log.info("request arrived. path: " + uri.getPath());
             // "/driver/location/api/update" 요청 (POST)
             if (uri.getPath().equals(Constant.locationPublishPath)) {
                 when(requestBodyUriSpecMock.uri(anyString())).thenReturn(requestBodySpecMock);
@@ -177,7 +177,7 @@ public class DriverSimulatorTest {
                 when(requestBodySpecMock.bodyValue(any(LocationDto.class))).thenReturn(requestHeadersSpecMock);
                 when(requestBodySpecMock.bodyValue(any(LocationDto.class))).thenAnswer(invocationOnMock -> {
                     LocationDto locationDto = invocationOnMock.getArgument(0);
-                    log.info("Received LocationDto: " + locationDto);
+//                    log.info("Received LocationDto: " + locationDto);
                     return requestHeadersSpecMock;
                 });
 
@@ -365,9 +365,10 @@ class DriverSimulator {
                                 var currLon = driver.getCurrLon();
                                 var targetLat = p.getLat();
                                 var targetLon = p.getLon();
+                                log.info("new Point. currLat: " + currLat + " currLon: " + currLon + " targetLat: " + targetLat + " targetLon: " + targetLon);
 
-                                double Dx = targetLat - currLat;
-                                double Dy = targetLon - currLon;
+                                double Dy = targetLat - currLat;
+                                double Dx = targetLon - currLon;
 
                                 double VEL = 0.00001; // 1 m/s
                                 double ARRIVED_THRESHOLD_METER = 1; // 1m
@@ -399,11 +400,12 @@ class DriverSimulator {
                                 while (distanceInMeter > ARRIVED_THRESHOLD_METER) {
                                     // next stream?
                                     // speed: 1m/s
-                                    double angle = Dy / Dx;
-                                    var dx = Math.cos(angle) * VEL;
-                                    var dy = Math.sin(angle) * VEL;
-                                    currLat += dx;
-                                    currLon += dy;
+                                    double theta = Math.atan2(Dy, Dx);
+                                    var dy = Math.sin(theta) * VEL;
+                                    var dx = Math.cos(theta) * VEL;
+                                    log.info("theta: " + theta + " dy: " + dy + " dx: " + dx);
+                                    currLat += dy;
+                                    currLon += dx;
 
                                     driver.setCurrLat(currLat);
                                     driver.setCurrLon(currLon);
@@ -420,8 +422,8 @@ class DriverSimulator {
                                     targetLat = p.getLat();
                                     targetLon = p.getLon();
 
-                                    Dx = targetLat - currLat;
-                                    Dy = targetLon - currLon;
+                                    Dy = targetLat - currLat;
+                                    Dx = targetLon - currLon;
 
                                     coordinates = new double[]{currLat, currLon, targetLat, targetLon};
                                     distanceInMeter = haversineDistanceInMeter.apply(coordinates);
@@ -474,7 +476,7 @@ class DriverSimulator {
     }
 
     public void publishLocation(LocationDto locationDto) {
-        log.info("publish location : " + locationDto);
+//        log.info("publish location : " + locationDto);
         webClient.post().uri(uriBuilder -> uriBuilder.path(Constant.locationPublishPath).build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(locationDto)
