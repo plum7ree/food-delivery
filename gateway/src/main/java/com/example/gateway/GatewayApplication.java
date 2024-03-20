@@ -34,7 +34,7 @@ public class GatewayApplication {
                         //TODO 소문자
                         .uri("lb://DRIVER"))
                 .route(p -> p.path("/route/**")
-                        .filters(f -> f.rewritePath("/route/(?<path>.*)", "/%{path}")
+                        .filters(f -> f.rewritePath("/route/(?<path>.*)", "/${path}")
                                 .addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
                         .uri("lb://ROUTE")).
                 build();

@@ -78,3 +78,24 @@ driver: 8080
 
 ### Note
 `@ComponentScan(basePackages={"com.example"})` necessary to use shared classes.
+
+
+
+
+
+### Micro Service Setting
+1. application apps
+- pom.xml   
+  - spring cloud config client
+  - eureka client
+  - open feign
+- application.yml
+  - import config server url
+  - eureka server url
+  - actuator setting
+
+2. gateway server
+- route rules
+
+
+

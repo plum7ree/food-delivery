@@ -1,4 +1,4 @@
-package com.example.driver.config;
+package com.example.locationredis.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
-public class RedisConfig {
+public class RedissonConfig {
 
     @Value("${spring.data.redis-server}")
     private String RedisAddress;

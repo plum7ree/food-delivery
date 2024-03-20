@@ -1,12 +1,8 @@
 package com.example.driver;
 
-import com.example.driver.config.RedisConfig;
-import com.example.driver.dto.ContactInfoDto;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.ComponentScan;
 //import org.springframework.cloud.openfeign.EnableFeignClients;
 

@@ -56,10 +56,10 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
         return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 
-    @Bean
-    public KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry() {
-        return new KafkaListenerEndpointRegistry();
-    }
+//    @Bean
+//    public KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry() {
+//        return new KafkaListenerEndpointRegistry();
+//    }
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<K, V>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<K, V> factory = new ConcurrentKafkaListenerContainerFactory<>();

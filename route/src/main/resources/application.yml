@@ -1,15 +1,12 @@
 
 server:
-  port: 8073
+  port: 8075
 
 spring:
   application:
-    name: "location-redis"
+    name: "route"
   profiles:
     active: native
-#    active: git
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
   config:
     import: "optional:configserver:http://localhost:8071/" # For default and 'native' profile, config will be fetched from config server
   cloud:
@@ -52,7 +49,3 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8070/eureka/
 
-
-logging:
-  pattern:
-    level: "%5p [${spring.application.name},%X{trace_id},%X{span_id}]"

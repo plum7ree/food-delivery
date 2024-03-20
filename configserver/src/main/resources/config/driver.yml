@@ -9,18 +9,6 @@ driver:
     - (123) 456-789
     - (987) 654-321
     -
-redis:
-  driver-location:
-    key: "driver:%s"
-    fields:
-      location:
-        edge: "location:edge" # key(driver:{driverId}), field(location:edge), value(edgeId)
-        coord: "location:coord"
-  edge-count: #TODO move into seperate .yml
-    key: "edge:%s"
-    fields:
-      count: "count" # key(edge:{edgeId}), field(count), value(count)
-
 
 retry-config:
   initial-interval-ms: 1000

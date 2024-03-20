@@ -1,225 +1,235 @@
 package com.example.driver;//package com.example.driver;
-//import lombok.AccessLevel;
-//import lombok.Data;
-//import lombok.Getter;
-//
-//import java.util.Collection;
-//import java.util.Iterator;
-//
-//import static io.restassured.RestAssured.*;
-//import static io.restassured.matcher.RestAssuredMatchers.*;
-//import static org.hamcrest.Matchers.*;
-//
-///**
-// * given velocity, each edge in a path will be divided.
-// * the velocity might be changed.
-// * each edge has angle (ratio)
-// * v^2 = dx^2 + dy^2
-// * dx = sqrt( (1/(a^2+1)) * v^2 )
-// * y = a*x, a = (endY - startY) / (endX - startX)
-// * @param <Path>
-// */
-//@Data
-//public class PathDividerIterator<Path extends Collection<Edge>> implements Iterator<Point> {
-//
-//    Path path;
-//    Long velocity;
-//
-//    @Getter(AccessLevel.NONE)
-//    double dx, dy;
-//    @Getter(AccessLevel.NONE)
-//    double lon, lat;
-//    @Getter(AccessLevel.NONE)
-//    int currEdgeIdx;
-//    @Getter(AccessLevel.NONE)
-//    int currEdgeSegmentIdx;
-//    @Override
-//    public boolean hasNext() {
-//        return currEdgeIdx <= path.size() - 1;
-//    }
-//
-//    @Override
-//    public Point next() {
-//        Edge currEdge = path.at(currEdgeIdx);
-//        double a = (currPoint.getEndY() - currPoint.getStartY()) / (currPoint.getEndX() - currPoint.getStartX());
-//        dx = Math.sqrt( (1/(Math.pow(a,2) + 1)) * Math.pow(velocity,2));
-//        dy = a * dx;
-//        lon += dx;
-//        lat += dy;
-//        // if newLon, newLat exceeds replace with endX, endY
-//        // condition1: newLon이 startX와 endX 사이에 있는지 확인
-//        Supplier<Boolean> condition1 = () -> (newLon >= Math.min(startX, endX) && newLon <= Math.max(startX, endX));
-//
-//        // condition2: newLat이 startY와 endY 사이에 있는지 확인
-//        Supplier<Boolean> condition2 = () -> (newLat >= Math.min(startY, endY) && newLat <= Math.max(startY, endY));
-//
-//        if (condition1.get() && condition2.get()) {
-//            // newLon, newLat가 Edge의 범위 내에 있을 때의 로직
-//        } else {
-//            // newLon, newLat가 Edge의 범위를 벗어났을 때의 로직
-//            return new Point(endX, endY);
-//        }
-//
-//        // Edge 범위 내에 있으면 새로운 Point 반환
-//        return new Point(newLon, newLat);
-//    }
-//
-//}
-//
-//public class Driver {
-//
-//    public currPoint;
-//
-//    private PathDividerIterator pathDivider;
-//
-//    public Point getCurrPoint() {
-//        return currPoint;
-//    }
-//    public void startDrive(Path path) {
-//
-//    }
-//    public currEdgeId() {
-//        return path[currEdgeIdx].id;
-//    }
-//
-//    public void IntervalCb() {
-//        while(pathDivider.hasNext()) {
-//            point = pathDivider.next();
-//
-//        }
-//
-//    }
-//
-//}
-//
-//
-//public class DriverSimulator {
-//
-//    public void drive() {
-//        jsonResponse = request(addressA, addressB);
-//        Path path = Path.convert(jsonResponse.get("path"));
-//        Driver driver = new Driver(path);
-//        driver.startDrive();
-//        addInterval(intervalCb)
-//
-//    }
-//
-//    private void intervalCb() {
-//        currentLocation
-//    }
-//}
-
 
 import com.example.driver.dto.LocationDto;
+import com.example.route.data.dto.InstructionDto;
 import com.example.route.data.dto.PointDto;
 import com.example.route.data.dto.RouteResponseDto;
-//import jakarta.ws.rs.core.UriBuilder;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import lombok.NoArgsConstructor;
+import com.graphhopper.GHRequest;
+import com.graphhopper.GHResponse;
+import com.graphhopper.GraphHopper;
+import com.graphhopper.config.CHProfile;
+import com.graphhopper.config.Profile;
+import com.graphhopper.util.shapes.GHPoint;
+import io.netty.channel.ChannelOption;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import org.springframework.http.HttpStatus;
+import reactor.netty.http.client.HttpClient;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.net.URL;
+import java.time.Duration;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
+
+
+class Constant {
+    public static final String gatewayHost = "localhost";
+    public static final String gatewayPort = "8072";
+    public static final String routeQueryPath = "/route/api/query";
+    public static final String locationPublishPath = "/driver/location/api/update";
+}
 
 // Seems like we can mock WebClient and KafkaProducer
 // without doing e2e test.
-@SpringBootTest
+//@SpringBootTest
 // disable eureka client which causes a crash.
 @TestPropertySource(properties = "spring.cloud.discovery.enabled=false")
 @RequiredArgsConstructor
 public class DriverSimulatorTest {
-
+    private static final Logger log = LoggerFactory.getLogger(DriverSimulatorTest.class);
+    private GraphHopper graphHopper;
     private WebClient webClient;
+
     @BeforeEach
     public void setup() {
-        webClient = WebClient.create();
+        webClient = WebClient.builder()
+                .baseUrl("http://localhost:8072")
+//        .defaultHeaders(headers -> headers.setBasicAuth("username", "password"))
+                .clientConnector(new ReactorClientHttpConnector(HttpClient.create()
+                        .responseTimeout(Duration.ofSeconds(2))
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)))
+                .build();
+
+        URL res = getClass().getClassLoader().getResource("static/seoul-non-military.osm.pbf");
+        var ghLoc = res.getPath();
+        GraphHopper hopper = new GraphHopper();
+        hopper.setOSMFile(ghLoc);
+        hopper.setGraphHopperLocation("target/routing-graph-cache");
+        hopper.setProfiles(new Profile("car").setVehicle("car").setTurnCosts(false));
+        hopper.getCHPreparationHandler().setCHProfiles(new CHProfile("car"));
+        hopper.importOrLoad();
+
+        graphHopper = hopper;
+
+
     }
 
-//    @Test
-//    public void testRouteRequestCorrect() {
-//        // WebClient 목(mock) 객체 생성
-//        WebClient webClientMock = Mockito.mock(WebClient.class);
-//        WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock = Mockito.mock(WebClient.RequestHeadersUriSpec.class);
-//        WebClient.RequestHeadersSpec requestHeadersSpecMock = Mockito.mock(WebClient.RequestHeadersSpec.class);
-//        WebClient.ResponseSpec responseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
-//
-//        // 목(mock) 객체의 동작 설정
-//        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
-//        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
-//            java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
-//            URI uri = uriFunction.apply(UriComponentsBuilder.fromPath(""));
-//
-//            // "/api/route" 요청이 아닐 경우 예외 던지기
-//            if (!uri.getPath().equals("/api/route/query")) {
-//                throw new AssertionError("Expected '/api/route' request, but got: " + uri.getPath());
-//            }
-//
-//            // 요청 파라미터 추출
-//            String query = uri.getQuery();
-//            String[] params = query.split("&");
-//            double startLat = Double.parseDouble(params[0].split("=")[1]);
-//            double startLon = Double.parseDouble(params[1].split("=")[1]);
-//            double destLat = Double.parseDouble(params[2].split("=")[1]);
-//            double destLon = Double.parseDouble(params[3].split("=")[1]);
-//
-//            // leftUp, rightDown 좌표 범위 내에 있는지 확인
-//            double leftUpLat = 37.5665;
-//            double leftUpLon = 126.9780;
-//            double rightDownLat = 37.5600;
-//            double rightDownLon = 126.9750;
-//            assertTrue(startLat >= rightDownLat && startLat <= leftUpLat);
-//            assertTrue(startLon >= rightDownLon && startLon <= leftUpLon);
-//            assertTrue(destLat >= rightDownLat && destLat <= leftUpLat);
-//            assertTrue(destLon >= rightDownLon && destLon <= leftUpLon);
-//
-//            return requestHeadersSpecMock;
-//        });
-//
-//
-//        when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
-//        when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(responseSpecMock);
-//        when(responseSpecMock.bodyToMono(eq(RouteResponseDto.class))).thenReturn(Mono.just(new RouteResponseDto()));
-//        when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.status(HttpStatus.OK).build()));
-//
-//
-//        // DriverSimulator 인스턴스 생성 및 의존성 주입
-//        Driver driver = new Driver(webClientMock);
-//        DriverManager driverManager = new DriverManager();
-//        driverManager.addDriver(driver);
-//
-//        // 테스트 실행
-//        driverManager.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
-//        var routeResponseList = driverManager.queryRoute();
-//
-//        // response test
-//        assertTrue(routeResponseList.size() == 1);
-//    }
+    @Test
+    public void testRouteRequestCorrectWithWebClientMock() {
+        // WebClient 목(mock) 객체 생성
+        WebClient webClientMock = Mockito.mock(WebClient.class);
+        WebClient.RequestHeadersUriSpec requestHeadersUriSpecMock = Mockito.mock(WebClient.RequestHeadersUriSpec.class);
+        WebClient.RequestHeadersSpec requestHeadersSpecMock = Mockito.mock(WebClient.RequestHeadersSpec.class);
+
+        WebClient.RequestBodyUriSpec requestBodyUriSpecMock = Mockito.mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestBodySpec requestBodySpecMock = Mockito.mock(WebClient.RequestBodySpec.class);
+        WebClient.ResponseSpec responseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
+
+        // 목(mock)
+        // 객체의 동작 설정
+        when(webClientMock.get()).thenReturn(requestHeadersUriSpecMock);
+        when(webClientMock.post()).thenReturn(requestBodyUriSpecMock);
+
+        when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
+            URI uri = uriFunction.apply(UriComponentsBuilder.fromPath(""));
+            log.info("request arrived. path: " + uri.getPath());
+
+            // "/api/route" 요청
+            if (uri.getPath().equals(Constant.routeQueryPath)) {
+                log.info("get /route/api/query");
+                //TODO duplicate code in driver/.../RouteController.java
+                // 요청 파라미터 추출
+                String query = uri.getQuery();
+                String[] params = query.split("&");
+                double startLat = Double.parseDouble(params[0].split("=")[1]);
+                double startLon = Double.parseDouble(params[1].split("=")[1]);
+                double destLat = Double.parseDouble(params[2].split("=")[1]);
+                double destLon = Double.parseDouble(params[3].split("=")[1]);
+
+                GHPoint startPoint = new GHPoint();
+                startPoint.lat = startLat;
+                startPoint.lon = startLon;
+
+                GHPoint endPoint = new GHPoint();
+                endPoint.lat = destLat;
+                endPoint.lon = destLon;
+
+                GHRequest req = new GHRequest(startPoint, endPoint).setProfile("car").setLocale(Locale.US);
+                GHResponse res = graphHopper.route(req);
+
+                var bestPath = res.getBest();
+                var points = bestPath.getPoints();
+                var instructions = bestPath.getInstructions();
+
+                var pointDtoList = StreamSupport.stream(Spliterators.spliteratorUnknownSize(points.iterator(), 0), false)
+                        .map(point -> new PointDto(point.getLat(), point.getLon()))
+                        .collect(Collectors.toList());
+
+                var instructionDtoList = StreamSupport.stream(Spliterators.spliteratorUnknownSize(instructions.iterator(), 0), false)
+                        .map(instruction -> new InstructionDto(instruction.getSign(), instruction.getName(), instruction.getDistance(), instruction.getTime()))
+                        .collect(Collectors.toList());
+                    log.info("path : " + pointDtoList);
+
+
+                var routeResponseDto = new RouteResponseDto(pointDtoList, instructionDtoList);
+
+               // Mono.just()로 ResponseEntity를 래핑하고 requestHeadersSpecMock를 반환
+                when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+                when(responseSpecMock.bodyToMono(RouteResponseDto.class)).thenReturn(Mono.just(routeResponseDto));
+                when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.ok().build()));
+                  // onStatus 메서드 체인의 반환 값을 모킹
+                WebClient.ResponseSpec onStatusResponseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
+                when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(onStatusResponseSpecMock);
+                when(onStatusResponseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(onStatusResponseSpecMock);
+                when(onStatusResponseSpecMock.bodyToMono(RouteResponseDto.class)).thenReturn(Mono.just(routeResponseDto));
+
+                return requestHeadersSpecMock;
+            }
+            return requestHeadersSpecMock;
+        });
+
+
+        when(requestBodyUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
+            java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
+            URI uri = uriFunction.apply(UriComponentsBuilder.fromPath(""));
+            log.info("request arrived. path: " + uri.getPath());
+            // "/driver/location/api/update" 요청 (POST)
+            if (uri.getPath().equals(Constant.locationPublishPath)) {
+                when(requestBodyUriSpecMock.uri(anyString())).thenReturn(requestBodySpecMock);
+                when(requestBodySpecMock.accept(any())).thenReturn(requestBodySpecMock);
+                when(requestBodySpecMock.contentType(any(MediaType.class))).thenReturn(requestBodySpecMock);
+                when(requestBodySpecMock.bodyValue(any(LocationDto.class))).thenReturn(requestHeadersSpecMock);
+                when(requestBodySpecMock.bodyValue(any(LocationDto.class))).thenAnswer(invocationOnMock -> {
+                    LocationDto locationDto = invocationOnMock.getArgument(0);
+                    log.info("Received LocationDto: " + locationDto);
+                    return requestHeadersSpecMock;
+                });
+
+                when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
+                when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.ok().build()));
+
+                return requestBodySpecMock;
+            }
+
+            return requestBodyUriSpecMock;
+        });
+
+
+
+        // DriverSimulator 인스턴스 생성 및 의존성 주입
+
+        Driver driver = new Driver("1", 0.0, 0.0);
+        DriverSimulator driverSimulator = new DriverSimulator(webClientMock);
+        driverSimulator.addDriver(driver);
+
+        // 테스트 실행
+        driverSimulator.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
+        var routeResponseList = driverSimulator.run();
+
+        // response test
+        assertEquals(1, routeResponseList.size());
+    }
+
+    /**
+     * Prerequiresite:
+     * redis docker, kafka docker, configserver, eurekaserver, gatewayserver, route, locationredis
+     * 순서대로 실행 세팅 해야함.
+     */
+    @Test
+    public void testRouteRequestCorrect() {
+
+        // DriverSimulator 인스턴스 생성 및 의존성 주입
+
+        Driver driver = new Driver("1", 0.0, 0.0);
+        DriverSimulator driverSimulator = new DriverSimulator(webClient);
+        driverSimulator.addDriver(driver);
+
+        // 테스트 실행
+        driverSimulator.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
+        var routeResponseList = driverSimulator.run();
+
+
+        // response test
+        assertEquals(1, routeResponseList.size());
+    }
+
+
 //    @Test
 //    public void testRouteControllerResponse() {
 //        // WebClient 목(mock) 객체 생성
@@ -261,85 +271,211 @@ public class DriverSimulatorTest {
 //        assertEquals(routeResponseList.get(0).getPointList().get(0).getLat(), 1.0);
 //    }
 
-        @Test
-        public void testLocationController() {
+    @Test
+    public void testLocationController() {
 
-        }
+    }
 
 }
 
-
+@Data
+@RequiredArgsConstructor
 class Driver {
-    private final WebClient webClient; //how to autowire this in a test environment? -> private final + Constructor
-
-    public Driver(WebClient webClient) {
-        this.webClient = webClient;
-    }
+    private String id;
     private Double currLat;
     private Double currLon;
 
+    public Driver(String id, double lat, double lon) {
+        this.id = id;
+        this.currLat = lat;
+        this.currLon = lon;
+    }
 
-    public RouteResponseDto startRoute(double leftUpLat, double leftUpLon, double rightDownLat, double rightDownLon) {
+}
+
+class DriverSimulator {
+    private static final Logger log = LoggerFactory.getLogger(DriverSimulator.class);
+    private final WebClient webClient; //how to autowire this in a test environment? -> private final + Constructor
+    //TODO change this to multi executor
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final List<Driver> driverList = new ArrayList<>();
+    Executor executor = Executors.newWorkStealingPool(100);
+    CompletionService<Void> completionService = new ExecutorCompletionService<Void>(executor);
+    private double leftUpLat, leftUpLon, rightDownLat, rightDownLon;
+
+    public DriverSimulator(WebClient webClient) {
+        this.webClient = webClient;
+    }
+
+    public void addDriver(Driver driver) {
+        driverList.add(driver);
+    }
+
+    public void setAreaForDriving(double leftUpLat, double leftUpLon, double rightDownLat, double rightDownLon) {
+        this.leftUpLat = leftUpLat;
+        this.leftUpLon = leftUpLon;
+        this.rightDownLat = rightDownLat;
+        this.rightDownLon = rightDownLon;
+    }
+
+    public List<RouteResponseDto> run() {
+        List<CompletableFuture<RouteResponseDto>> futures = driverList.stream().map(driver ->
+                        CompletableFuture.supplyAsync(() -> {
+                            var maxCount = 10;
+                            List<PointDto> path = null;
+                            RouteResponseDto routeResponseDto = null;
+                            for (int i = 0; i < maxCount; i++) {
+                                var start = selectRandomCoordinate(leftUpLat, leftUpLon, rightDownLat, rightDownLon);
+                                var dest = selectRandomCoordinate(leftUpLat, leftUpLon, rightDownLat, rightDownLon);
+
+                                //TODO move this injection outside of the scope.
+                                driver.setCurrLat(start.get(0));
+                                driver.setCurrLon(start.get(1));
+
+                                // 광화문 삼거리
+                                // var startLat = 37.57524;
+                                // var startLon = 126.97711;
+                                // 숭례문거리
+                                // var destLat = 37.5606;
+                                // var destLon = 126.9757;
+
+                                var startLat = start.get(0);
+                                var startLon = start.get(1);
+
+                                var destLat = dest.get(0);
+                                var destLon = dest.get(1);
+
+                                var l2Distance = Math.sqrt(Math.pow(destLat - startLat, 2) + Math.pow(destLon - startLon, 2));
+
+
+                                routeResponseDto = queryRoute(startLat, startLon, destLat, destLon);
+
+                                path = routeResponseDto.getPointList();
+                                if (path == null) {
+                                    throw new RuntimeException("path is null");
+                                }
+                                if (path.size() > 0) {
+                                    break;
+                                }
+                            }
+
+                            log.info("getPointList: " + path);
+                            path.stream().forEach(p -> {
+                                var currLat = driver.getCurrLat();
+                                var currLon = driver.getCurrLon();
+                                var targetLat = p.getLat();
+                                var targetLon = p.getLon();
+
+                                double Dx = targetLat - currLat;
+                                double Dy = targetLon - currLon;
+
+                                double VEL = 0.00001; // 1 m/s
+                                double ARRIVED_THRESHOLD_METER = 1; // 1m
+
+                                // var distance = Math.sqrt(Math.pow(Dx, 2) + Math.pow(Dy, 2));
+                                // Haversine 공식
+                                Function<double[], Double> haversineDistanceInMeter = (coordinates) -> {
+                                    double lat1 = coordinates[0];
+                                    double lon1 = coordinates[1];
+                                    double lat2 = coordinates[2];
+                                    double lon2 = coordinates[3];
+
+                                    double R = 6371; // 지구 반지름 (단위: km)
+                                    double dLat = Math.toRadians(lat2 - lat1);
+                                    double dLon = Math.toRadians(lon2 - lon1);
+                                    double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                                            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+                                                    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                                    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                                    double dKm = R * c;
+                                    return dKm * 1000;
+                                };
+
+                                double[] coordinates = {currLat, currLon, targetLat, targetLon};
+                                var distanceInMeter = haversineDistanceInMeter.apply(coordinates);
+
+                                log.info("distance meter: " + distanceInMeter + ", THRESHOLD: " + ARRIVED_THRESHOLD_METER);
+                                //TODO approximate. 위도에 따라 길이가 다르다. 여기선 1m 0.00001 라고 근사함.
+                                while (distanceInMeter > ARRIVED_THRESHOLD_METER) {
+                                    // next stream?
+                                    // speed: 1m/s
+                                    double angle = Dy / Dx;
+                                    var dx = Math.cos(angle) * VEL;
+                                    var dy = Math.sin(angle) * VEL;
+                                    currLat += dx;
+                                    currLon += dy;
+
+                                    driver.setCurrLat(currLat);
+                                    driver.setCurrLon(currLon);
+
+                                    var locationDto = new LocationDto(currLat.floatValue(),
+                                            currLon.floatValue(),
+                                            "",
+                                            "",
+                                            driver.getId());
+
+                                    // publish
+                                    publishLocation(locationDto);
+
+                                    targetLat = p.getLat();
+                                    targetLon = p.getLon();
+
+                                    Dx = targetLat - currLat;
+                                    Dy = targetLon - currLon;
+
+                                    coordinates = new double[]{currLat, currLon, targetLat, targetLon};
+                                    distanceInMeter = haversineDistanceInMeter.apply(coordinates);
+                                    log.info("distance meter: " + distanceInMeter + ", THRESHOLD: " + ARRIVED_THRESHOLD_METER);
+                                }
+
+                            });
+
+                            return routeResponseDto;
+
+                        }, executor))
+                .collect(Collectors.toList());
+
+        var routeResponseDtoList = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .collect(Collectors.toList()));
+
+        return routeResponseDtoList.join();
+    }
+
+
+    public RouteResponseDto queryRoute(double startLat, double startLon, double destLat, double destLon) {
         AtomicBoolean requestSuccess = new AtomicBoolean(true);
-        int maxCount = 10;
-        int index = 0;
-//        while (!requestSuccess.get()) {
-            var start = selectRandomCoordinate(leftUpLat, leftUpLon, rightDownLat, rightDownLon);
-            var dest = selectRandomCoordinate(leftUpLat, leftUpLon, rightDownLat, rightDownLon);
-            //                // 광화문 삼거리
-            //        var startLat = 37.57524;
-            //        var startLon = 126.97711;
-            //        // 숭례문거리
-            //        var destLat = 37.5606;
-            //        var destLon = 126.9757;
-            var startLat = start.get(0);
-            var startLon = start.get(1);
 
-            var destLat = dest.get(0);
-            var destLon = dest.get(1);
-
-            var l2Distance = Math.sqrt(Math.pow(destLat - startLat, 2) + Math.pow(destLon - startLon, 2));
-
-//                if(index++ < maxCount) {
-//                    System.out.println("start: " + start + " , dest: " + dest);
-//                    requestSuccess.set(false);
-//                } else {
-//                    requestSuccess.set(true);
-//                }
-            var routeResponse = webClient.get().uri(uriBuilder -> uriBuilder.path("/api/route/query")
-                            .queryParam("startLat", startLat)
-                            .queryParam("startLon", startLon)
-                            .queryParam("destLat", destLat)
-                            .queryParam("destLon", destLon)
-                            .build())
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
-                            Mono.error(new RuntimeException("4xx Client Error: " + clientResponse.statusCode())))
-                    .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
-                            Mono.error(new RuntimeException("5xx Server Error: " + clientResponse.statusCode())))
-                    .bodyToMono(RouteResponseDto.class)
-                    .doOnError(error -> {
-                        if (error instanceof WebClientResponseException) {
-                            WebClientResponseException ex = (WebClientResponseException) error;
-                            System.out.println("HTTP Status Code: " + ex.getRawStatusCode());
-                            System.out.println("Response Body: " + ex.getResponseBodyAsString());
-                        } else {
-                            System.out.println("An error occurred: " + error.getMessage());
-                        }
-                        System.out.println("Retrying the request...");
-                    })
-                    .retry(3) // 에러 발생 시 최대 3번 재시도
-                    .block();
-            return routeResponse;
-//            var expected = new RouteResponseDto();
-//            expected.setPointList(new ArrayList<>(List.of(new PointDto[]{new PointDto(1.0, 2.0)})));
-//            assertTrue(routeResponse.equals(new RouteResponseDto()));
-//        }
-//        return null;
+        var routeResponse = webClient.get().uri(uriBuilder -> uriBuilder.path(Constant.routeQueryPath)
+                        .queryParam("startLat", startLat)
+                        .queryParam("startLon", startLon)
+                        .queryParam("destLat", destLat)
+                        .queryParam("destLon", destLon)
+                        .build())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
+                        Mono.error(new RuntimeException("4xx Client Error: " + clientResponse.statusCode())))
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
+                        Mono.error(new RuntimeException("5xx Server Error: " + clientResponse.statusCode())))
+                .bodyToMono(RouteResponseDto.class)
+                .doOnError(error -> {
+                    if (error instanceof WebClientResponseException ex) {
+                        System.out.println("HTTP Status Code: " + ex.getRawStatusCode());
+                        System.out.println("Response Body: " + ex.getResponseBodyAsString());
+                    } else {
+                        System.out.println("An error occurred: " + error.getMessage());
+                    }
+                    System.out.println("Retrying the request...");
+                })
+                .retry(3) // 3 retry on error
+                .block();
+        return routeResponse;
     }
 
     public void publishLocation(LocationDto locationDto) {
-        webClient.post().uri("api/driver/location")
+        log.info("publish location : " + locationDto);
+        webClient.post().uri(uriBuilder -> uriBuilder.path(Constant.locationPublishPath).build())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(locationDto)
                 .retrieve();
@@ -365,40 +501,6 @@ class Driver {
         return List.of(randomLat, randomLon);
     }
 
-}
-
-class DriverManager {
-
-
-    //TODO change this to generic executor. and autowire from my setting.
-    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-    Executor executor = Executors.newWorkStealingPool(100);
-    CompletionService<Void> completionService = new ExecutorCompletionService<Void>(executor);
-    private final List<Driver> driverList = new ArrayList<>();
-    public void addDriver(Driver driver) {
-        driverList.add(driver);
-    }
-    private double leftUpLat, leftUpLon, rightDownLat, rightDownLon;
-    public void setAreaForDriving(double leftUpLat, double leftUpLon, double rightDownLat, double rightDownLon) {
-        this.leftUpLat = leftUpLat;
-        this.leftUpLon = leftUpLon;
-        this.rightDownLat = rightDownLat;
-        this.rightDownLon = rightDownLon;
-    }
-    public List<RouteResponseDto> queryRoute() {
-        List<CompletableFuture<RouteResponseDto>> futures = driverList.stream().map(driver ->
-            CompletableFuture.supplyAsync(() -> driver.startRoute(leftUpLat, leftUpLon, rightDownLat, rightDownLon),executor))
-                .collect(Collectors.toList());
-        var routeResponseDtoList = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .thenApply(v -> futures.stream()
-                        .map(CompletableFuture::join)
-                        .collect(Collectors.toList()));
-        return routeResponseDtoList.join();
-    }
-    public void publishLocation() {
-
-
-    }
 
 }
 

@@ -1,6 +1,6 @@
-package com.example.driver.redis;
+package com.example.locationredis;
 
-import com.example.driver.config.RedisConfig;
+import com.example.locationredis.config.RedissonConfig;
 import com.example.driver.dto.LocationDto;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterAll;
@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import static java.lang.Thread.sleep;
 
 @SpringBootTest
-@ContextConfiguration(classes = {RedisConfig.class})
+@ContextConfiguration(classes = {RedissonConfig.class})
 @RequiredArgsConstructor
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // @BeforeAll, @AfterAll
 //@ActiveProfiles("test")

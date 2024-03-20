@@ -1,10 +1,8 @@
 package com.example.locationredis.consumer.impl;
 
-import com.example.kafka.config.data.KafkaConfigData;
-import com.example.kafkaconsumer.config.KafkaConsumerConfig;
-import com.example.locationredis.consumer.KafkaConsumer;
 import com.example.kafka.admin.client.KafkaAdminClient;
-
+import com.example.kafka.config.data.KafkaConfigData;
+import com.example.locationredis.consumer.KafkaConsumer;
 import com.microservices.demo.kafka.avro.model.LocationAvroModel;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,10 +15,6 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
-import org.apache.avro.specific.SpecificRecordBase;
-
-import java.util.List;
-
 
 import java.util.List;
 
@@ -38,12 +32,11 @@ public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
     private final KafkaConfigData kafkaConfig;
 
 
-
     @EventListener
     public void onAppStarted(ApplicationStartedEvent event) {
 //        kafkaAdminClient.checkTopicsCreated();
         LOG.info("Topics with name {} is ready for operations!", kafkaConfig.getTopicNamesToCreate().toArray());
-        kafkaListenerEndpointRegistry.getListenerContainer("twitterAnalyticsTopicListener").start();
+        kafkaListenerEndpointRegistry.getListenerContainer("locationKafkaConsumer").start();
     }
 
     // Kafka Listener consumes "batch" of message.

@@ -18,7 +18,12 @@ import java.util.List;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
+class Constant {
+    public static final String gatewayHost = "localhost";
+    public static final String gatewayPort = "8072";
+    public static final String routeQueryPath = "/route/api/query";
+    public static final String locationPublishPath = "/driver/location/api/update";
+}
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RouteApplicationTests {
@@ -141,7 +146,7 @@ class RouteApplicationTests {
                 new PointDto(37.5605134, 126.9754943),
                 new PointDto(37.56062757847224, 126.97565445864548)));
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/route/query")
+        webTestClient.get().uri(uriBuilder -> uriBuilder.host(Constant.gatewayHost).port(Constant.gatewayPort).path(Constant.routeQueryPath)
                 .queryParam("startLat", startLat)
                 .queryParam("startLon", startLon)
                 .queryParam("destLat", destLat)
