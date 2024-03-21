@@ -1,4 +1,15 @@
 
+
+### Simulation Test
+[DriverSimulatorTest.java](driver/src/test/java/com/example/driver/DriverSimulatorTest.java)   
+
+![Monitoring Drivers Web](readme/driver_simulation.gif)
+
+
+
+### Monitoring View
+
+
 ### kube node environment setting
 we need docker desktop and enable kubernetes
 

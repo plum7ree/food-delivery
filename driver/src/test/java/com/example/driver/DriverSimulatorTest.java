@@ -38,6 +38,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,9 +64,10 @@ public class DriverSimulatorTest {
     private static final Logger log = LoggerFactory.getLogger(DriverSimulatorTest.class);
     private GraphHopper graphHopper;
     private WebClient webClient;
-
+    final int NUM_DRIVER = 40;
     @BeforeEach
     public void setup() {
+
         webClient = WebClient.builder()
                 .baseUrl("http://localhost:8072")
 //        .defaultHeaders(headers -> headers.setBasicAuth("username", "password"))
@@ -89,6 +91,31 @@ public class DriverSimulatorTest {
     }
 
     @Test
+    public void testRouteRequestE2E() {
+
+        // DriverSimulator 인스턴스 생성 및 의존성 주입
+        // DriverSimulator 인스턴스 생성 및 의존성 주입
+        DriverSimulator driverSimulator = new DriverSimulator(webClient);
+
+        // Use IntStream.range() to create 100 drivers
+        IntStream.range(0, NUM_DRIVER).forEach(i -> {
+//            Driver driver = new Driver(String.valueOf(i), 0.0, 0.0);
+                    String driverId = UUID.randomUUID().toString();
+        Driver driver = new Driver(driverId, 0.0, 0.0);
+            driverSimulator.addDriver(driver);
+        });
+
+        // 테스트 실행
+        driverSimulator.setAreaForDriving(37.5784, 126.9255, 37.4842, 127.0842);
+        var routeResponseList = driverSimulator.run();
+
+
+        // response test
+        assertEquals(1, routeResponseList.size());
+    }
+
+
+    @Test
     public void testRouteRequestCorrectWithWebClientMock() {
         // WebClient 목(mock) 객체 생성
         WebClient webClientMock = Mockito.mock(WebClient.class);
@@ -107,11 +134,11 @@ public class DriverSimulatorTest {
         when(requestHeadersUriSpecMock.uri(any(Function.class))).thenAnswer(invocation -> {
             java.util.function.Function<UriComponentsBuilder, URI> uriFunction = invocation.getArgument(0);
             URI uri = uriFunction.apply(UriComponentsBuilder.fromPath(""));
-            log.info("request arrived. path: " + uri.getPath());
+//            log.info("request arrived. path: " + uri.getPath());
 
             // "/api/route" 요청
             if (uri.getPath().equals(Constant.routeQueryPath)) {
-                log.info("get /route/api/query");
+//                log.info("get /route/api/query");
                 //TODO duplicate code in driver/.../RouteController.java
                 // 요청 파라미터 추출
                 String query = uri.getQuery();
@@ -143,7 +170,7 @@ public class DriverSimulatorTest {
                 var instructionDtoList = StreamSupport.stream(Spliterators.spliteratorUnknownSize(instructions.iterator(), 0), false)
                         .map(instruction -> new InstructionDto(instruction.getSign(), instruction.getName(), instruction.getDistance(), instruction.getTime()))
                         .collect(Collectors.toList());
-                    log.info("path : " + pointDtoList);
+//                    log.info("path : " + pointDtoList);
 
 
                 var routeResponseDto = new RouteResponseDto(pointDtoList, instructionDtoList);
@@ -193,9 +220,19 @@ public class DriverSimulatorTest {
 
         // DriverSimulator 인스턴스 생성 및 의존성 주입
 
-        Driver driver = new Driver("1", 0.0, 0.0);
+        Driver driver1 = new Driver("1", 0.0, 0.0);
+        Driver driver2 = new Driver("2", 0.0, 0.0);
+        Driver driver3 = new Driver("3", 0.0, 0.0);
+        Driver driver4 = new Driver("4", 0.0, 0.0);
+        Driver driver5 = new Driver("5", 0.0, 0.0);
+        Driver driver6 = new Driver("6", 0.0, 0.0);
         DriverSimulator driverSimulator = new DriverSimulator(webClientMock);
-        driverSimulator.addDriver(driver);
+        driverSimulator.addDriver(driver1);
+        driverSimulator.addDriver(driver2);
+        driverSimulator.addDriver(driver3);
+        driverSimulator.addDriver(driver4);
+        driverSimulator.addDriver(driver5);
+        driverSimulator.addDriver(driver6);
 
         // 테스트 실행
         driverSimulator.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
@@ -210,23 +247,6 @@ public class DriverSimulatorTest {
      * redis docker, kafka docker, configserver, eurekaserver, gatewayserver, route, locationredis
      * 순서대로 실행 세팅 해야함.
      */
-    @Test
-    public void testRouteRequestE2E() {
-
-        // DriverSimulator 인스턴스 생성 및 의존성 주입
-
-        Driver driver = new Driver("1", 0.0, 0.0);
-        DriverSimulator driverSimulator = new DriverSimulator(webClient);
-        driverSimulator.addDriver(driver);
-
-        // 테스트 실행
-        driverSimulator.setAreaForDriving(37.5665, 126.9780, 37.5600, 126.9750);
-        var routeResponseList = driverSimulator.run();
-
-
-        // response test
-        assertEquals(1, routeResponseList.size());
-    }
 
 
 //    @Test
@@ -324,9 +344,14 @@ class DriverSimulator {
                             List<PointDto> path = null;
                             RouteResponseDto routeResponseDto = null;
                             for (int i = 0; i < maxCount; i++) {
-                                var start = selectRandomCoordinate(leftUpLat, leftUpLon, rightDownLat, rightDownLon);
-                                var dest = selectRandomCoordinate(leftUpLat, leftUpLon, rightDownLat, rightDownLon);
 
+                                // For randomness, we need different input.
+                                var driverId = driver.getId();
+                                long seedId = UUID.fromString(driverId).getLeastSignificantBits();
+
+                                var start = selectRandomCoordinate(seedId, leftUpLat, leftUpLon, rightDownLat, rightDownLon);
+                                var dest = selectRandomCoordinate(seedId*3, leftUpLat, leftUpLon, rightDownLat, rightDownLon);
+                                log.info("driver id: " + driverId + " start point: " + start + " dest point: " + dest);
                                 //TODO move this injection outside of the scope.
                                 driver.setCurrLat(start.get(0));
                                 driver.setCurrLon(start.get(1));
@@ -358,13 +383,13 @@ class DriverSimulator {
                                 }
                             }
 
-                            log.info("getPointList: " + path);
+//                            log.info("getPointList: " + path);
                             path.stream().forEach(p -> {
                                 var currLat = driver.getCurrLat();
                                 var currLon = driver.getCurrLon();
                                 var targetLat = p.getLat();
                                 var targetLon = p.getLon();
-                                log.info("new Point. currLat: " + currLat + " currLon: " + currLon + " targetLat: " + targetLat + " targetLon: " + targetLon);
+//                                log.info("new Point. currLat: " + currLat + " currLon: " + currLon + " targetLat: " + targetLat + " targetLon: " + targetLon);
 
                                 double Dy = targetLat - currLat;
                                 double Dx = targetLon - currLon;
@@ -405,7 +430,7 @@ class DriverSimulator {
 //                                    log.info("theta: " + theta + " dy: " + dy + " dx: " + dx);
                                     currLat += dy;
                                     currLon += dx;
-
+                                    log.info(String.format("currLat : %f, currLon: %f", currLat, currLon));
                                     driver.setCurrLat(currLat);
                                     driver.setCurrLon(currLon);
 
@@ -417,6 +442,11 @@ class DriverSimulator {
 
                                     // publish
                                     publishLocation(locationDto);
+                                    try {
+                                        Thread.sleep(100);
+                                    } catch (InterruptedException e) {
+                                        throw new RuntimeException(e);
+                                    }
 
                                     targetLat = p.getLat();
                                     targetLon = p.getLon();
@@ -481,7 +511,7 @@ class DriverSimulator {
                 .bodyValue(locationDto)
                 .retrieve()
                 .onStatus(HttpStatusCode::is2xxSuccessful, clientResponse -> {
-                    log.info("publishLocation req response got 200");
+//                    log.info("publishLocation req response got 200");
                     return Mono.empty();
                 })
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
@@ -494,9 +524,9 @@ class DriverSimulator {
 
     }
 
-    private List<Double> selectRandomCoordinate(double leftUpLat, double leftUpLon, double rightDownLat, double rightDownLon) {
+    private List<Double> selectRandomCoordinate(long seedId, double leftUpLat, double leftUpLon, double rightDownLat, double rightDownLon) {
         // generate random coord between leftUp coord and rightDown coord.
-        Random random = new Random();
+        Random random = new Random(seedId);
 
         // 좌상단과 우하단 좌표 사이의 위도 범위
         double minLat = Math.min(leftUpLat, rightDownLat);

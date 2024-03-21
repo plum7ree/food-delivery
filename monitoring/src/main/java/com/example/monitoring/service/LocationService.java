@@ -2,6 +2,7 @@ package com.example.monitoring.service;
 
 import com.example.driver.controller.LocationController;
 import com.example.driver.data.dto.LocationDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microservices.demo.kafka.avro.model.LocationAvroModel;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +21,23 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor
 public class LocationService {
     private static final Logger log = LoggerFactory.getLogger(LocationService.class);
-
-    private SimpMessagingTemplate simpMessagingTemplate;
+private final ObjectMapper objectMapper;
+    private final SimpMessagingTemplate simpMessagingTemplate;
     public void sendLocation(LocationDto location) {
         log.info("LocationService websocket sending location");
-        simpMessagingTemplate.convertAndSend(
-                "/topic/location",
-                location.toString()
-        );
+
+        try {
+            String json = objectMapper.writeValueAsString(location);
+            simpMessagingTemplate.convertAndSend(
+                    "/topic/location",
+                    json
+            );
+
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+
     }
+
+
 }

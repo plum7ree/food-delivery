@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 // {gateway-server-url}/driver/location/api/...
@@ -52,8 +53,13 @@ public class LocationController {
         //TODO key based on userId or user location?
         log.info("location update, sending to kafka. topic name: "
                 + kafkaConfigData.getTopicName()
-        +" key: " + Long.parseLong(locationDto.getDriverId()));
-        kafkaProducer.send(kafkaConfigData.getTopicName(), Long.parseLong(locationDto.getDriverId()), locationToAvroTransformer.transform(locationDto));
+        +" key: " + locationDto.getDriverId());
+        // Kafka Key should be Long.
+        // UUID -> Long. there might be a info loss.
+        // ref: https://www.baeldung.com/java-uuid-unique-long-generation
+        String driverId = locationDto.getDriverId().toString();
+        long kafkaKey = UUID.fromString(driverId).getLeastSignificantBits();
+        kafkaProducer.send(kafkaConfigData.getTopicName(), kafkaKey, locationToAvroTransformer.transform(locationDto));
 //
 //
 //        log.info("location Dto Received: " + locationDto.toString());

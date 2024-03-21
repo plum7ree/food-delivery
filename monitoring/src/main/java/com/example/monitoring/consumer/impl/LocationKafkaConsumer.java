@@ -54,7 +54,7 @@ public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
                         @Header(KafkaHeaders.OFFSET) List<Long> offsets) {
         LOG.info("{} number of message received with keys {}, partitions {} and offsets {}, " +
-                        "sending it to database: Thread id {}",
+                        "sending it to websocket: Thread id {}",
                 messages.size(),
                 keys.toString(),
                 partitions.toString(),
@@ -65,7 +65,7 @@ public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
             .map(avro -> new LocationDto()
                             .builder()
                             .lat(avro.getCoord().getLat())
-                            .lon(avro.getCoord().getLat())
+                            .lon(avro.getCoord().getLon())
                             .edgeId(String.valueOf(avro.getEdgeId()))
                             .oldEdgeId(String.valueOf(avro.getOldEdgeId()))
                             .driverId(String.valueOf(avro.getDriverId()))

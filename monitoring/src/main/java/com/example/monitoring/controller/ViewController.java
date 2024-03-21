@@ -14,16 +14,16 @@ public class ViewController {
 
     HashMap<String, LocationDto> locationMap = new HashMap<>();
 //    @MessageMapping("/topic/location")
-//    public driverLocationListenerCb(LocationDto location) {
-//        locationMap [location.getDriverId()]
+//    public void driverLocationListenerCb(LocationDto location) {
+//        locationMap.put(location.getDriverId(), location);
 //    }
 
-	@GetMapping("/")
-	public String listDrivers(Model model) {
-
-        model.addAttribute("locationList", locationMap.values());
-		return "locations";
-	}
+//	@GetMapping("/")
+//	public String listDrivers(Model model) {
+//
+//        model.addAttribute("locationList", locationMap.values());
+//		return "locations";
+//	}
 
 
 

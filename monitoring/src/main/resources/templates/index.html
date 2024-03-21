@@ -1,34 +1,169 @@
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <title>Driver Locations</title>-->
+<!--     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>-->
+<!--    <script th:inline="javascript">-->
+<!--        var stompClient = null;-->
+<!--        var driverRows = new Map();-->
+<!--        connect();-->
+<!--        function connect() {-->
+<!--          stompClient = new window.StompJs.Client({-->
+<!--            webSocketFactory: function () {-->
+<!--              return new WebSocket("ws://localhost:8072/websocket");-->
+<!--            }-->
+<!--          });-->
+<!--          stompClient.onConnect = function (frame) {-->
+<!--            frameHandler(frame)-->
+<!--          };-->
+<!--          stompClient.onWebsocketClose = function () {-->
+<!--            onSocketClose();-->
+<!--          };-->
+
+<!--          stompClient.activate();-->
+<!--        }-->
+
+
+<!--        // 서버에서 보낸 메시지 처리-->
+<!--        function frameHandler(frame) {-->
+<!--            console.log('Connected: ' + frame);-->
+<!--            // 서버로부터 /topic/outgoing 구독-->
+<!--            stompClient.subscribe('/topic/location', function (message) {-->
+<!--                console.log("subscribe cb message: " + (message.body) )-->
+<!--                updateDriverLocation(message.body);-->
+<!--            });-->
+<!--        }-->
+
+<!--        function updateDriverLocation(location) {-->
+<!--            location = JSON.parse(location);-->
+<!--            var table = document.querySelector('table');-->
+<!--            var row = driverRows.get(location.driverId);-->
+
+<!--            if (row) {-->
+<!--                row.cells[1].textContent = location.lat;-->
+<!--                row.cells[2].textContent = location.lon;-->
+<!--                row.cells[3].textContent = location.edgeId;-->
+<!--                row.cells[4].textContent = location.oldEdgeId;-->
+<!--            } else {-->
+<!--                // 새로운 driverId인 경우 새로운 행을 추가-->
+<!--                var newRow = table.insertRow();-->
+<!--                var driverIdCell = newRow.insertCell();-->
+<!--                var latCell = newRow.insertCell();-->
+<!--                var lonCell = newRow.insertCell();-->
+<!--                var edgeIdCell = newRow.insertCell();-->
+<!--                var oldEdgeIdCell = newRow.insertCell();-->
+
+<!--                driverIdCell.textContent = location.driverId;-->
+<!--                latCell.textContent = location.lat;-->
+<!--                lonCell.textContent = location.lon;-->
+<!--                edgeIdCell.textContent = location.edgeId;-->
+<!--                oldEdgeIdCell.textContent = location.oldEdgeId;-->
+
+<!--                driverRows.set(location.driverId, newRow);-->
+<!--            }-->
+<!--        }-->
+<!--    </script>-->
+<!--</head>-->
+<!--<body>-->
+<!--    <h1>Driver Locations</h1>-->
+
+<!--    <table>-->
+<!--        <thead>-->
+<!--            <tr>-->
+<!--                <th>Driver ID</th>-->
+<!--                <th>Latitude</th>-->
+<!--                <th>Longitude</th>-->
+<!--                <th>Edge ID</th>-->
+<!--                <th>Old Edge ID</th>-->
+<!--            </tr>-->
+<!--        </thead>-->
+<!--    </table>-->
+<!--</body>-->
+<!--</html>-->
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Driver Locations</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@5.0.0/bundles/stomp.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <style>
+        #map {
+            height: 600px;
+        }
+    </style>
+    <script th:inline="javascript">
+        var stompClient = null;
+        var driverMarkers = new Map();
+        var map;
+
+        connect();
+
+        function connect() {
+            stompClient = new window.StompJs.Client({
+                webSocketFactory: function () {
+                    return new WebSocket("ws://localhost:8072/websocket");
+                }
+            });
+            stompClient.onConnect = function (frame) {
+                frameHandler(frame)
+            };
+            stompClient.onWebsocketClose = function () {
+                onSocketClose();
+            };
+
+            stompClient.activate();
+        }
+
+        // 서버에서 보낸 메시지 처리
+        function frameHandler(frame) {
+            console.log('Connected: ' + frame);
+            // 서버로부터 /topic/outgoing 구독
+            stompClient.subscribe('/topic/location', function (message) {
+                console.log("subscribe cb message: " + (message.body));
+                updateDriverLocation(message.body);
+            });
+        }
+
+        function updateDriverLocation(location) {
+            location = JSON.parse(location);
+            var marker = driverMarkers.get(location.driverId);
+
+            if (marker) {
+                // 기존 마커 위치 업데이트
+                marker.setLatLng([location.lat, location.lon]);
+            } else {
+                // 새로운 마커 생성
+                marker = L.marker([location.lat, location.lon]).addTo(map);
+                driverMarkers.set(location.driverId, marker);
+            }
+        }
+
+        // 지도 초기화
+        function initMap() {
+            map = L.map('map').setView([37.5665, 126.9780], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+                maxZoom: 18,
+            }).addTo(map);
+        }
+
+        // 페이지 로드 시 지도 초기화
+        window.onload = function () {
+            initMap();
+        };
+    </script>
 </head>
 <body>
+    <h1>Driver Locations</h1>
 
+    <div id="map"></div>
 </body>
-</html>
-
-
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-
-<head th:replace="fragments :: page_head('Home - Shopme Admin', 'none')" />
-
-<body>
-	<div class="container-fluid">
-		<div th:replace="navigation :: menu"></div>
-		<div>
-			<h2>Shopme Control Panel</h2>
-			Welcome <a th:href="@{/account}"
-				sec:authentication="principal.fullname"></a> <span
-				sec:authentication="principal.authorities"></span>
-		</div>
-
-		<div th:replace="fragments :: footer"></div>
-
-	</div>
-</body>
-
 </html>
