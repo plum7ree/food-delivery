@@ -98,6 +98,16 @@ monitoring: 8091
   - actuator setting
 - configserver/app-name.yml setting
 - @ComponentScan in main() **Application.java
+  - must include itself. no Error even though not included.
+  - ``` 
+    // com.example.monitoring
+    @ComponentScan({"com.example.common.data",
+        "com.example.common.config",
+        "com.example.kafka.admin",
+        "com.example.kafka.config.data",
+        "com.example.kafkaconsumer",
+        "com.example.monitoring"} 
+    ```
 
 2. gateway server
 - route rules

@@ -23,7 +23,7 @@ public class LocationService {
 
     private SimpMessagingTemplate simpMessagingTemplate;
     public void sendLocation(LocationDto location) {
-        log.info("sending location");
+        log.info("LocationService websocket sending location");
         simpMessagingTemplate.convertAndSend(
                 "/topic/location",
                 location.toString()

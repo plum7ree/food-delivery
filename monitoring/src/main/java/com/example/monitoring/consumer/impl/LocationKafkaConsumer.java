@@ -24,7 +24,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
-    private static final Logger LOG = LoggerFactory.getLogger(LocationAvroModel.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LocationKafkaConsumer.class);
 
     // @ComponentScan needed!
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
@@ -35,19 +35,20 @@ public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
 
     private final LocationService locationService;
 
-
+    private final String kafkaListenerId = "monitoringServiceKafkaConsumerForLocation";
     @EventListener
     public void onAppStarted(ApplicationStartedEvent event) {
 //        kafkaAdminClient.checkTopicsCreated();
+        LOG.info("Event Started on Monitoring LocationKafkaConsumer!");
         LOG.info("Topics with name {} is ready for operations!", kafkaConfig.getTopicNamesToCreate().toArray());
-        kafkaListenerEndpointRegistry.getListenerContainer("monitoringServiceKafkaConsumerForLocation").start();
+        kafkaListenerEndpointRegistry.getListenerContainer(kafkaListenerId).start();
     }
 
     // Kafka Listener consumes "batch" of message.
     // batch size: max.poll.records
     // If wanna disable, ContainerProperties.setBatchListener(false)
     @Override
-    @KafkaListener(topics = "${kafka-config.topic-name}", autoStartup = "false")
+    @KafkaListener(id = kafkaListenerId, topics = "${kafka-config.topic-name}", autoStartup = "false")
     public void receive(@Payload List<LocationAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
