@@ -1,13 +1,24 @@
 
+### Overview Architecture
+<b>Driver Location Streaming</b>   
+   
+<img src="readme/driver-arch.png" alt="drawing" width="600"/>
 
-### Simulation Test
-[DriverSimulatorTest.java](driver/src/test/java/com/example/driver/DriverSimulatorTest.java)   
 
-![Monitoring Drivers Web](readme/driver_simulation.gif)
+
+
+### Simulation Test   
+- Multiple number of drivers
+- code: [DriverSimulatorTest.java](driver/src/test/java/com/example/driver/DriverSimulatorTest.java)   
 
 
 
 ### Monitoring View
+![Monitoring Drivers Web](readme/driver_simulation.gif)
+- [simple websocket frontend](monitoring/src/main/resources/templates/index.html)   
+- currently STOMP based
+- Todo: RabbitMQ
+
 
 
 ### kube node environment setting
