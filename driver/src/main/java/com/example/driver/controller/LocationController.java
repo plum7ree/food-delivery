@@ -5,7 +5,7 @@ import com.example.driver.data.dto.ResponseDto;
 import com.example.driver.data.transformer.LocationToAvroTransformer;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafkaproducer.KafkaProducer;
-import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+import com.example.kafka.avro.model.LocationAvroModel;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

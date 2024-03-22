@@ -1,0 +1,20 @@
+{"namespace": "com.example.kafka.avro.model",
+  "type": "record",
+  "name": "PaymentResponseAvroModel",
+  "fields": [
+    {"name": "driverId", "type": "string"},
+    {"name": "edgeId", "type": "string"},
+    {"name": "oldEdgeId", "type": "string"},
+    // coord should be a pair of latitude, longitude which is float here
+    {"name": "coord", "type": {
+      "type":"record",
+      "name": "Coordinates",
+      "fields": [
+        {"name":  "lat", "type":  "float"},
+        {"name":  "lon", "type":  "float"}
+      ]
+    }},
+    // logicalType. date, timestamp-millis, timestamp-micros, time-millis, time-micros, decimal,
+    {"name": "createdAt", "type": ["null", "long"], "logicalType": ["null", "date"]}
+  ]
+}

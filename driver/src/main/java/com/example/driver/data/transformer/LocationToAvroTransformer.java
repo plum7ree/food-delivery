@@ -2,8 +2,8 @@ package com.example.driver.data.transformer;
 
 
 import com.example.driver.data.dto.LocationDto;
-import com.microservices.demo.kafka.avro.model.Coordinates;
-import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+import com.example.kafka.avro.model.Coordinates;
+import com.example.kafka.avro.model.LocationAvroModel;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

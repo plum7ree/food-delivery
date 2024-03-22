@@ -81,7 +81,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.example</groupId>
+            <groupId>com.example</groupId>
             <artifactId>kafka-model</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>

@@ -4,7 +4,7 @@ import com.example.driver.controller.LocationController;
 import com.example.driver.data.dto.LocationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+import com.example.kafka.avro.model.LocationAvroModel;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

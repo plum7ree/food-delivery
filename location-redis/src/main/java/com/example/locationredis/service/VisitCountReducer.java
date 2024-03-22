@@ -1,7 +1,7 @@
 //package com.example.locationredis.service;
 //
 //
-//import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+//import com.example.kafka.avro.model.LocationAvroModel;
 //
 //import java.util.List;
 //import java.util.stream.Collectors;
@@ -26,7 +26,7 @@
 //
 //}
 //
-//import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+//import com.example.kafka.avro.model.LocationAvroModel;
 //import org.redisson.api.RedissonClient;
 //
 //import java.util.List;
@@ -82,7 +82,7 @@
 //}
 //
 //
-//import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+//import com.example.kafka.avro.model.LocationAvroModel;
 //import org.redisson.api.RedissonClient;
 //
 //import java.util.HashMap;

@@ -1,6 +1,6 @@
 package com.example.locationredis.service;
 
-import com.microservices.demo.kafka.avro.model.LocationAvroModel;
+import com.example.kafka.avro.model.LocationAvroModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.junit.Test;
