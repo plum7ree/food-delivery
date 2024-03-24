@@ -2,11 +2,11 @@ package com.example.calldomain.service;
 
 import com.example.calldomain.data.dto.CreateCallCommandDto;
 
-public class CallService {
+public class CallCommandService {
 
     private final CreateCallCommandHandler createCallCommandHandler;
 
-    public CallService(CreateCallCommandHandler createCallCommandHandler) {
+    public CallCommandService(CreateCallCommandHandler createCallCommandHandler) {
         this.createCallCommandHandler = createCallCommandHandler;
     }
 

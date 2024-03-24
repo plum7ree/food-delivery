@@ -18,7 +18,7 @@ public class Call extends AggregateRoot<CallId> {
     }
 
 
-    public void pay() {
+    public void updateStateToPaid() {
     }
 
 }
