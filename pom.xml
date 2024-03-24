@@ -7,13 +7,21 @@
         <module>kafka/kafka-model</module>
         <module>kafka/kafka-admin</module>
         <module>kafka/kafka-config-data</module>
+         <module>kafka/kafka-producer</module>
+         <module>kafka/kafka-consumer</module>
         <module>common-config</module>
+        <module>common-data</module>
         <module>configserver</module>
         <module>gateway</module>
         <module>eurekaserver</module>
         <module>driver</module>
         <module>edge-ranker</module>
         <module>route</module>
+        <module>call-service</module>
+        <module>call-service/call-domain</module>
+        <module>call-service/call-dataaccess</module>
+        <module>call-service/call-config-data</module>
+        <module>call-service/call-application</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

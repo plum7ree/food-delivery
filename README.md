@@ -101,13 +101,43 @@ monitoring: 8091
   - because of `@ConfigurationProperties(prefix = "appname")`
 
 
-### Note
+### Note   
+Module   
 `@ComponentScan(basePackages={"com.example"})` necessary to use shared classes.
+```
+// main pom.xml
+// add new modules
+    <modules>
+        <module>kafka</module>
+        <module>kafka/kafka-model</module>
+        <module>kafka/kafka-admin</module>
+        <module>kafka/kafka-config-data</module>
+        ...
+    </modules>
+// sub modules kafka/pom.xml
+    <parent>
+        <artifactId>uber-msa</artifactId>
+        <groupId>com.example</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>kafka</artifactId>
+    
+// sub-sub modules... kafka/kafka-model/.../pom.xml
+    <parent>
+        <artifactId>uber-msa</artifactId>
+        <groupId>com.example</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <artifactId>kafka-model</artifactId>
 
+```
 
+Domain Driven Design   
+- Messaging To Dto   
+  - CallDataMapper   
 
-
-
+  
 ### Micro Service Setting
 1. application apps
 - pom.xml   
