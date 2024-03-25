@@ -8,10 +8,12 @@ import com.example.callapplication.service.publisher.kafka.DriverApprovalRequest
 import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.pattern.SagaStep;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+@Component
 @RequiredArgsConstructor
 public class CallAndDriverSaga implements SagaStep<DriverApprovalResponseDto, EmptyEvent, CallRejectedEvent> {
 

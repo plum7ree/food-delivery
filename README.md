@@ -3,9 +3,11 @@
 <b>Driver Location Streaming</b>   
    
 <img src="readme/driver-arch.png" alt="drawing" width="600"/>
+<p/>
 
-
-### Payment SAGA pattern   
+<b> Domain Driven Design </b>   
+<p/>
+<b> Payment SAGA pattern </b>   
 <img src="readme/call-service-saga.png" alt="drawing" width="600"/>   
 
 

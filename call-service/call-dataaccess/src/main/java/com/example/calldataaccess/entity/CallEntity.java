@@ -14,12 +14,13 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "calls")
 @Entity
+@Table(name = "calls")
 public class CallEntity {
 
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID id;
     private UUID userId;
     private UUID driverId;

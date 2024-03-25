@@ -11,10 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
         "com.example.kafka.admin",
         "com.example.kafka.config.data",
         "com.example.kafkaconsumer",
-        "com.example.kafkaproducer",
-        "com.example.calldomain",
-    "com.example.calldataaccess",
-    "com.example.callconfigdata"})
+        "com.example.kafkaproducer"})
 public class PaymentServiceApplication {
 
     public static void main(String[] args) {
