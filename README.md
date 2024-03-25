@@ -4,13 +4,27 @@
 <b>Overview</b>   
 </p>
 <img src="readme/overview.png" alt="drawing" width="600"/>
+<p><br></p>
 
 <p>
-<b>Driver Location Streaming</b>  
+<b>Driver Location Streaming</b>
 </p>
-
+<p>1. Data Flow</p>
 <img src="readme/driver-arch.png" alt="drawing" width="600"/>
 
+
+<p><br></p>
+
+
+2. Routing Algorithm
+- Contraction Hierarchy (CH)
+- Open Source: Graphhopper
+
+<img src="readme/ch.png" alt="drawing" width="300" />
+
+[Image Source](https://www.researchgate.net/figure/Illustrating-a-Contraction-Hierarchies-query_fig2_275279894)
+
+<p><br></p>
 
 <p>
 <b> Domain Driven Design, Payment SAGA pattern </b> 
