@@ -9,6 +9,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * To use this in a service A,
+ * 1. import dependency into pom.xml
+ * 2. add the package into A's main java file's @ComponentScan
+ * @param <K>
+ * @param <V>
+ */
 @Component
 @RequiredArgsConstructor
 public class KafkaProducer<K, V> {

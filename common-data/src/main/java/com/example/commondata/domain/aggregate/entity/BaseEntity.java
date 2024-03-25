@@ -1,5 +1,7 @@
 package com.example.commondata.domain.aggregate.entity;
 
+import com.example.commondata.domain.aggregate.valueobject.PaymentId;
+
 import java.util.Objects;
 
 public abstract class BaseEntity<ID> {

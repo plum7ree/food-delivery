@@ -7,6 +7,18 @@ services:
       - "6379:6379"
     command: redis-server --loglevel debug
 
+  postgres:
+    image: postgres:latest
+    container_name: ubermsa-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
   configserver:
     image: "lomojiki/uber-msa-configserver"
     container_name: configserver-ms
@@ -81,3 +93,6 @@ services:
 networks:
   uber-msa:
     driver: "bridge"
+
+volumes:
+  postgres-data:

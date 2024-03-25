@@ -1,20 +1,59 @@
-{"namespace": "com.example.kafka.avro.model",
-  "type": "record",
-  "name": "DriverApprovalResponseAvroModel",
-  "fields": [
-    {"name": "driverId", "type": "string"},
-    {"name": "edgeId", "type": "string"},
-    {"name": "oldEdgeId", "type": "string"},
-    // coord should be a pair of latitude, longitude which is float here
-    {"name": "coord", "type": {
-      "type":"record",
-      "name": "Coordinates",
-      "fields": [
-        {"name":  "lat", "type":  "float"},
-        {"name":  "lon", "type":  "float"}
-      ]
-    }},
-    // logicalType. date, timestamp-millis, timestamp-micros, time-millis, time-micros, decimal,
-    {"name": "createdAt", "type": ["null", "long"], "logicalType": ["null", "date"]}
-  ]
+{
+    "namespace": "com.example.kafka.avro.model",
+    "type": "record",
+    "name": "DriverApprovalResponseAvroModel",
+    "fields": [
+        {
+            "name": "id",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            }
+        },
+        {
+            "name": "sagaId",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            }
+        },
+        {
+            "name": "driverId",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            }
+        },
+        {
+            "name": "callId",
+            "type": {
+                "type": "string",
+                "logicalType": "uuid"
+            }
+        },
+        {
+            "name": "createdAt",
+            "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+            }
+        },
+        {
+            "name": "driverApprovalStatus",
+            "type": {
+                  "type": "enum",
+                  "name": "DriverApprovalStatus",
+                  "symbols": ["APPROVED", "REJECTED"]
+               }
+        },
+        {
+            "name": "failureMessages",
+            "type": {
+                "type": "array",
+                "items":{
+                  "type":"string"
+               }
+            }
+        }
+    ]
 }

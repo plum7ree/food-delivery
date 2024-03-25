@@ -2,6 +2,10 @@ package com.example.commondata.domain.aggregate.valueobject;
 
 import java.util.Objects;
 
+/**
+ * getValue will return value of T.
+ * @param <T>
+ */
 public abstract class BaseId<T> {
     private final T value;
 

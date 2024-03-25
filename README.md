@@ -5,6 +5,8 @@
 <img src="readme/driver-arch.png" alt="drawing" width="600"/>
 
 
+### Payment SAGA pattern   
+<img src="readme/call-service-saga.png" alt="drawing" width="600"/>   
 
 
 ### Simulation Test   
@@ -158,7 +160,7 @@ Domain Driven Design
         "com.example.kafka.admin",
         "com.example.kafka.config.data",
         "com.example.kafkaconsumer",
-        "com.example.monitoring"} 
+        "com.example.monitoring"} )
     ```
 
 2. gateway server
