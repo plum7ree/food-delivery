@@ -11,9 +11,12 @@
 <b> Domain Driven Design, Payment SAGA pattern </b> 
 </p>
 <img src="readme/call-service-saga.png" alt="drawing" width="600"/>
-<p>
-TODO: Outbox pattern with Debezium
-</p>
+
+TODO
+1. Outbox pattern with Debezium, Optimistic lock  
+2. Distributed Lock with 쿠폰 발급 시스템  
+
+
 
 ---  
 
