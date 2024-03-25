@@ -1,15 +1,21 @@
 
-### Overview Architecture
-<b>Driver Location Streaming</b>   
-   
+### Overview Architecture  
+<p>
+<b>Driver Location Streaming</b>  
+</p>
+
 <img src="readme/driver-arch.png" alt="drawing" width="600"/>
-<p/>
 
-<b> Domain Driven Design </b>   
-<p/>
-<b> Payment SAGA pattern </b>   
-<img src="readme/call-service-saga.png" alt="drawing" width="600"/>   
 
+<p>
+<b> Domain Driven Design, Payment SAGA pattern </b> 
+</p>
+<img src="readme/call-service-saga.png" alt="drawing" width="600"/>
+<p>
+TODO: Outbox pattern with Debezium
+</p>
+
+---  
 
 ### Simulation Test   
 - Multiple number of drivers
@@ -23,7 +29,7 @@
 - currently STOMP based
 - Todo: RabbitMQ
 
-
+---
 
 ### kube node environment setting
 we need docker desktop and enable kubernetes
@@ -93,7 +99,7 @@ driver: 8090
 monitoring: 8091
 
 
-
+---
 
 ### Kafka Module Architecture
 <b>Dependencies</b>    
@@ -104,6 +110,7 @@ monitoring: 8091
   - configserver will feed config data into KafkaConfigData object.
   - because of `@ConfigurationProperties(prefix = "appname")`
 
+---
 
 ### Note   
 Module   
