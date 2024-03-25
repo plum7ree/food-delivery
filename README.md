@@ -26,12 +26,13 @@ TODO
 ---  
 
 ### Simulation Test   
-- Multiple number of drivers
+- Multiple number of drivers  
+- Generated at Random Location  
 - code: [DriverSimulatorTest.java](driver/src/test/java/com/example/driver/DriverSimulatorTest.java)   
 
 
 
-### Monitoring View
+### Realtime Monitoring View
 ![Monitoring Drivers Web](readme/driver_simulation.gif)
 - [simple websocket frontend](monitoring/src/main/resources/templates/index.html)   
 - currently STOMP based
