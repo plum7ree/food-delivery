@@ -17,6 +17,7 @@
         <module>driver</module>
         <module>edge-ranker</module>
         <module>route</module>
+        <module>location-redis</module>
         <module>call-service</module>
         <module>call-service/call-domain</module>
         <module>call-service/call-dataaccess</module>
