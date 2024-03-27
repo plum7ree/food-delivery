@@ -1,5 +1,6 @@
 package com.example.callapplication.service;
 
+import com.example.callapplication.data.dto.CallResponseDto;
 import com.example.calldomain.data.dto.CreateCallCommandDto;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,7 @@ public class CallCommandService {
         this.createCallCommandHandler = createCallCommandHandler;
     }
 
-    public void createCall(CreateCallCommandDto createCallCommandDto) {
-        createCallCommandHandler.command(createCallCommandDto);
+    public CallResponseDto createCall(CreateCallCommandDto createCallCommandDto) {
+        return createCallCommandHandler.command(createCallCommandDto);
     }
 }

@@ -14,8 +14,8 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class DriverApprovalResponseAvroModel extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -1261870018194730865L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DriverApprovalResponseAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"driverId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"driverApprovalStatus\",\"type\":{\"type\":\"enum\",\"name\":\"DriverApprovalStatus\",\"symbols\":[\"APPROVED\",\"REJECTED\"]}},{\"name\":\"failureMessages\",\"type\":{\"type\":\"array\",\"items\":\"string\"}}]}");
+  private static final long serialVersionUID = 4863611293591536846L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DriverApprovalResponseAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"driverId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"driverApprovalStatus\",\"type\":{\"type\":\"enum\",\"name\":\"DriverApprovalStatus\",\"symbols\":[\"PENDING\",\"APPROVED\",\"REJECTED\"]}},{\"name\":\"failureMessages\",\"type\":\"string\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -80,7 +80,7 @@ static {
    private java.lang.CharSequence callId;
    private java.time.Instant createdAt;
    private com.example.kafka.avro.model.DriverApprovalStatus driverApprovalStatus;
-   private java.util.List<java.lang.CharSequence> failureMessages;
+   private java.lang.CharSequence failureMessages;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -99,7 +99,7 @@ static {
    * @param driverApprovalStatus The new value for driverApprovalStatus
    * @param failureMessages The new value for failureMessages
    */
-  public DriverApprovalResponseAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence driverId, java.lang.CharSequence callId, java.time.Instant createdAt, com.example.kafka.avro.model.DriverApprovalStatus driverApprovalStatus, java.util.List<java.lang.CharSequence> failureMessages) {
+  public DriverApprovalResponseAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence driverId, java.lang.CharSequence callId, java.time.Instant createdAt, com.example.kafka.avro.model.DriverApprovalStatus driverApprovalStatus, java.lang.CharSequence failureMessages) {
     this.id = id;
     this.sagaId = sagaId;
     this.driverId = driverId;
@@ -152,7 +152,7 @@ static {
     case 3: callId = (java.lang.CharSequence)value$; break;
     case 4: createdAt = (java.time.Instant)value$; break;
     case 5: driverApprovalStatus = (com.example.kafka.avro.model.DriverApprovalStatus)value$; break;
-    case 6: failureMessages = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 6: failureMessages = (java.lang.CharSequence)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -263,7 +263,7 @@ static {
    * Gets the value of the 'failureMessages' field.
    * @return The value of the 'failureMessages' field.
    */
-  public java.util.List<java.lang.CharSequence> getFailureMessages() {
+  public java.lang.CharSequence getFailureMessages() {
     return failureMessages;
   }
 
@@ -272,7 +272,7 @@ static {
    * Sets the value of the 'failureMessages' field.
    * @param value the value to set.
    */
-  public void setFailureMessages(java.util.List<java.lang.CharSequence> value) {
+  public void setFailureMessages(java.lang.CharSequence value) {
     this.failureMessages = value;
   }
 
@@ -323,7 +323,7 @@ static {
     private java.lang.CharSequence callId;
     private java.time.Instant createdAt;
     private com.example.kafka.avro.model.DriverApprovalStatus driverApprovalStatus;
-    private java.util.List<java.lang.CharSequence> failureMessages;
+    private java.lang.CharSequence failureMessages;
 
     /** Creates a new Builder */
     private Builder() {
@@ -645,7 +645,7 @@ static {
       * Gets the value of the 'failureMessages' field.
       * @return The value.
       */
-    public java.util.List<java.lang.CharSequence> getFailureMessages() {
+    public java.lang.CharSequence getFailureMessages() {
       return failureMessages;
     }
 
@@ -655,7 +655,7 @@ static {
       * @param value The value of 'failureMessages'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.DriverApprovalResponseAvroModel.Builder setFailureMessages(java.util.List<java.lang.CharSequence> value) {
+    public com.example.kafka.avro.model.DriverApprovalResponseAvroModel.Builder setFailureMessages(java.lang.CharSequence value) {
       validate(fields()[6], value);
       this.failureMessages = value;
       fieldSetFlags()[6] = true;
@@ -692,7 +692,7 @@ static {
         record.callId = fieldSetFlags()[3] ? this.callId : (java.lang.CharSequence) defaultValue(fields()[3]);
         record.createdAt = fieldSetFlags()[4] ? this.createdAt : (java.time.Instant) defaultValue(fields()[4]);
         record.driverApprovalStatus = fieldSetFlags()[5] ? this.driverApprovalStatus : (com.example.kafka.avro.model.DriverApprovalStatus) defaultValue(fields()[5]);
-        record.failureMessages = fieldSetFlags()[6] ? this.failureMessages : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[6]);
+        record.failureMessages = fieldSetFlags()[6] ? this.failureMessages : (java.lang.CharSequence) defaultValue(fields()[6]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;

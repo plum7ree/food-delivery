@@ -14,8 +14,8 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class PaymentResponseAvroModel extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 2761677274698055984L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PaymentResponseAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"paymentId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"userId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"paymentStatus\",\"type\":{\"type\":\"enum\",\"name\":\"PaymentStatus\",\"symbols\":[\"COMPLETED\",\"CANCELLED\",\"FAILED\"]}},{\"name\":\"failureMessages\",\"type\":{\"type\":\"array\",\"items\":\"string\"}}]}");
+  private static final long serialVersionUID = -8884604635348737494L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PaymentResponseAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"paymentId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"userId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"paymentStatus\",\"type\":{\"type\":\"enum\",\"name\":\"PaymentStatus\",\"symbols\":[\"COMPLETED\",\"CANCELLED\",\"FAILED\"]}},{\"name\":\"failureMessages\",\"type\":\"string\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -83,7 +83,7 @@ static {
    private java.nio.ByteBuffer price;
    private java.time.Instant createdAt;
    private com.example.kafka.avro.model.PaymentStatus paymentStatus;
-   private java.util.List<java.lang.CharSequence> failureMessages;
+   private java.lang.CharSequence failureMessages;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -104,7 +104,7 @@ static {
    * @param paymentStatus The new value for paymentStatus
    * @param failureMessages The new value for failureMessages
    */
-  public PaymentResponseAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence paymentId, java.lang.CharSequence userId, java.lang.CharSequence callId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.PaymentStatus paymentStatus, java.util.List<java.lang.CharSequence> failureMessages) {
+  public PaymentResponseAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence paymentId, java.lang.CharSequence userId, java.lang.CharSequence callId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.PaymentStatus paymentStatus, java.lang.CharSequence failureMessages) {
     this.id = id;
     this.sagaId = sagaId;
     this.paymentId = paymentId;
@@ -165,7 +165,7 @@ static {
     case 5: price = (java.nio.ByteBuffer)value$; break;
     case 6: createdAt = (java.time.Instant)value$; break;
     case 7: paymentStatus = (com.example.kafka.avro.model.PaymentStatus)value$; break;
-    case 8: failureMessages = (java.util.List<java.lang.CharSequence>)value$; break;
+    case 8: failureMessages = (java.lang.CharSequence)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -310,7 +310,7 @@ static {
    * Gets the value of the 'failureMessages' field.
    * @return The value of the 'failureMessages' field.
    */
-  public java.util.List<java.lang.CharSequence> getFailureMessages() {
+  public java.lang.CharSequence getFailureMessages() {
     return failureMessages;
   }
 
@@ -319,7 +319,7 @@ static {
    * Sets the value of the 'failureMessages' field.
    * @param value the value to set.
    */
-  public void setFailureMessages(java.util.List<java.lang.CharSequence> value) {
+  public void setFailureMessages(java.lang.CharSequence value) {
     this.failureMessages = value;
   }
 
@@ -372,7 +372,7 @@ static {
     private java.nio.ByteBuffer price;
     private java.time.Instant createdAt;
     private com.example.kafka.avro.model.PaymentStatus paymentStatus;
-    private java.util.List<java.lang.CharSequence> failureMessages;
+    private java.lang.CharSequence failureMessages;
 
     /** Creates a new Builder */
     private Builder() {
@@ -790,7 +790,7 @@ static {
       * Gets the value of the 'failureMessages' field.
       * @return The value.
       */
-    public java.util.List<java.lang.CharSequence> getFailureMessages() {
+    public java.lang.CharSequence getFailureMessages() {
       return failureMessages;
     }
 
@@ -800,7 +800,7 @@ static {
       * @param value The value of 'failureMessages'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.PaymentResponseAvroModel.Builder setFailureMessages(java.util.List<java.lang.CharSequence> value) {
+    public com.example.kafka.avro.model.PaymentResponseAvroModel.Builder setFailureMessages(java.lang.CharSequence value) {
       validate(fields()[8], value);
       this.failureMessages = value;
       fieldSetFlags()[8] = true;
@@ -839,7 +839,7 @@ static {
         record.price = fieldSetFlags()[5] ? this.price : (java.nio.ByteBuffer) defaultValue(fields()[5]);
         record.createdAt = fieldSetFlags()[6] ? this.createdAt : (java.time.Instant) defaultValue(fields()[6]);
         record.paymentStatus = fieldSetFlags()[7] ? this.paymentStatus : (com.example.kafka.avro.model.PaymentStatus) defaultValue(fields()[7]);
-        record.failureMessages = fieldSetFlags()[8] ? this.failureMessages : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[8]);
+        record.failureMessages = fieldSetFlags()[8] ? this.failureMessages : (java.lang.CharSequence) defaultValue(fields()[8]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;

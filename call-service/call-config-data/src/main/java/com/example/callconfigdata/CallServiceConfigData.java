@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "kafka-consumer-config")
+@ConfigurationProperties(prefix = "call-service")
 public class CallServiceConfigData {
     String paymentRequestTopicName;
     String paymentResponseTopicName;

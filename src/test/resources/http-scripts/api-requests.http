@@ -1,0 +1,62 @@
+###
+GET http://localhost:8080/rider/path?startX=1.0&startY=1.0&destX=0.0&destY=0.0
+
+###
+GET http://localhost:8080/rider/path
+
+###
+GET http://localhost:8080/rider/path
+
+###
+GET http://localhost:8080/rider/path
+
+###
+GET http://localhost:8080/rider/path
+
+###
+GET http://localhost:8080/rider/path
+
+###
+GET http://localhost:8080/rider/path
+
+###
+GET http://localhost:8090/api/contact-info
+
+
+###
+POST http://localhost:8090/api/driver/location
+
+###
+POST http://localhost:8090/api/driver/location
+
+###
+POST http://localhost:8072/driver/location/api/update
+Content-Type: application/json
+
+{
+    "lat": 1.0,
+    "lon": 1.0,
+    "edgeId": "1000",
+    "oldEdgeId": "999",
+    "driverId": "100"
+}
+
+
+###
+GET http://localhost:8072/route/api/query?startLat=37.564902366024384&startLon=126.97670057064717&destLat=37.56343884506724&destLon=126.97670715173366
+
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}

@@ -186,6 +186,20 @@
     <groupId>io.netty</groupId>
     <artifactId>netty-all</artifactId>
 </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>common-data</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>kafka-consumer</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+
 
     </dependencies>
 

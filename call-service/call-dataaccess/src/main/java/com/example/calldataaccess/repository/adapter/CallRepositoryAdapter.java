@@ -20,6 +20,21 @@ public class CallRepositoryAdapter {
     }
 
     public Optional<Call> findById(CallId callId) {
-        return callRepository.findById(callId.getValue()).map(dataMapper::callEntityToCall);
+        return callRepository.findById(callId.getValue())
+                .map(dataMapper::callEntityToCall);
     }
+
+    public Call save(Call val) {
+
+        var entity = dataMapper.callToCallEntity(val);
+        callRepository.saveWithCast(entity.getId(),
+                            entity.getUserId(),
+                            entity.getDriverId(),
+                            entity.getPrice(),
+                            entity.getCallStatus().toString(),
+                            entity.getFailureMessages());
+        return val;
+    }
+
+
 }

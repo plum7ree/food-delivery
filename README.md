@@ -34,6 +34,8 @@
 TODO
 1. Outbox pattern with Debezium, Optimistic lock  
 2. Distributed Lock with 쿠폰 발급 시스템  
+3. Rollback entire call request on too late response from driver or payment
+4. handle the duplicated different call request from a user
 
 
 

@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 
-
-
 @Component
 @RequiredArgsConstructor
 public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallCreatedEvent> {
@@ -25,14 +23,14 @@ public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallCre
 
     @Override
     public void publish(CallCreatedEvent domainEvent) {
-        String orderId = domainEvent.getCall().getId().getValue().toString();
+        String callId = domainEvent.getCall().getId().getValue().toString();
 
-            PaymentRequestAvroModel paymentRequestAvroModel = callMessagingDataMapper
-                    .callCreatedEventToPaymentRequestAvroModel(domainEvent);
-
-            kafkaProducer.send(callServiceConfigData.getPaymentRequestTopicName(),
-                    orderId,
-                    paymentRequestAvroModel);
+        PaymentRequestAvroModel paymentRequestAvroModel = callMessagingDataMapper
+                .callCreatedEventToPaymentRequestAvroModel(domainEvent);
+        log.info("kafka producer send. topic name: {} key: {}", callServiceConfigData.getPaymentRequestTopicName(), callId);
+        kafkaProducer.send(callServiceConfigData.getPaymentRequestTopicName(),
+                callId,
+                paymentRequestAvroModel);
 
 
     }

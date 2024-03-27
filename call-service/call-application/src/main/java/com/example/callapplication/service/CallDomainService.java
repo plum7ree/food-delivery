@@ -7,22 +7,25 @@ import com.example.calldomain.data.event.EmptyEvent;
 import com.example.commondata.domain.event.publisher.DomainEventPublisher;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 @Component
 public class CallDomainService {
 
 
     CallPaidEvent processCallPaid(Call call, DomainEventPublisher<CallPaidEvent> domainEventPublisher) {
-        call.updateStateToPaid();
-        return new CallPaidEvent(call, domainEventPublisher);
+        call.updateStatusToPaid();
+        return new CallPaidEvent(call, ZonedDateTime.now(ZoneId.of("UTC")), domainEventPublisher);
     }
 
     public CallRejectedEvent processCallRejected(Call call) {
-        call.updateStateToRejected();
-        return new CallRejectedEvent(call);
+        call.updateStatusToRejected();
+        return new CallRejectedEvent(call, ZonedDateTime.now(ZoneId.of("UTC")));
     }
 
     public EmptyEvent processCallApproved(Call call) {
-        call.updateStateToApproved();
+        call.updateStatusToApproved();
         return new EmptyEvent();
     }
 }

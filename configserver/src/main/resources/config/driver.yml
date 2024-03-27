@@ -1,14 +1,16 @@
 
+server:
+  #TODO do we need to unify this into 8080 in docker environment?
+  port: 8091
 
-driver:
-  message: "Please Contact this phone number for QA support"
-  contactDetails:
-    name: "x"
-    email: "x@company.com"
-  onCallSupport:
-    - (123) 456-789
-    - (987) 654-321
-    -
+
+spring:
+  application:
+    name: "driver-service"
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
+
+
 
 retry-config:
   initial-interval-ms: 1000
@@ -39,6 +41,5 @@ kafka-producer-config:
   request-timeout-ms: 60000
   retry-count: 5
 
-spring:
-  data:
-    redis-server: redis://localhost:6379
+
+

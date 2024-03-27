@@ -1,0 +1,149 @@
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "7dc53df5-703e-49b3-8670-b1c468f47f1f",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "a4f8c2c0-854c-4a19-9275-3fd831c2a47d",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "b9a9c9e1-d9d5-4165-9c97-1a9f1e4f6b28",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "c5b9d4a7-4b9e-4c7d-8f4e-7c9f1c2d8a7b",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "3f3a3e3c-2a1b-4d4e-9f9a-7e5d1f5a5c5d",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "1a1b1c1d-2e2f-4a4b-8c8d-5e5f6a6b7c7d",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "f1e2d3c4-b5a6-9807-1a2b-3c4d5e6f7a8b",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}
+
+###
+POST http://localhost:8074/api/call
+Content-Type: application/json
+
+{
+  "userId": "c3b2a190-8d7e-4f5a-9b1c-3d2e1f0a9b8c",
+  "driverId": "6ba7b810-9dad-11d1-80b4-00c04fd430c9",
+  "price": 1999,
+  "address": {
+    "street": "123 Main St",
+    "postalCode": "12345",
+    "city": "Anytown"
+  }
+}

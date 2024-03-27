@@ -7,17 +7,18 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-    @ComponentScan({"com.example.common.data",
+@ComponentScan({"com.example.common.data",
         "com.example.common.config",
-            "com.example.commondata",
+        "com.example.commondata",
         "com.example.kafka.admin",
         "com.example.kafka.config.data",
         "com.example.kafkaconsumer",
         "com.example.kafkaproducer",
-            "com.example.callapplication",
         "com.example.calldomain",
-    "com.example.calldataaccess",
-    "com.example.callconfigdata"})
+        "com.example.calldataaccess",
+        "com.example.callconfigdata",
+        "com.example.callapplication",
+})
 @EnableJpaRepositories(basePackages = "com.example.calldataaccess.repository")
 @EntityScan(basePackages = "com.example.calldataaccess.entity")
 public class CallApplication {

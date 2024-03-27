@@ -14,8 +14,8 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class PaymentRequestAvroModel extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -3849182462968601349L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PaymentRequestAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"userId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"paymentOrderStatus\",\"type\":{\"type\":\"enum\",\"name\":\"PaymentOrderStatus\",\"symbols\":[\"PENDING\",\"CANCELLED\"]}}]}");
+  private static final long serialVersionUID = 5874008367895737169L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"PaymentRequestAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"userId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"paymentStatus\",\"type\":{\"type\":\"enum\",\"name\":\"PaymentStatus\",\"symbols\":[\"COMPLETED\",\"PENDING\",\"CANCELLED\"]}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
@@ -81,7 +81,7 @@ static {
    private java.lang.CharSequence callId;
    private java.nio.ByteBuffer price;
    private java.time.Instant createdAt;
-   private com.example.kafka.avro.model.PaymentOrderStatus paymentOrderStatus;
+   private com.example.kafka.avro.model.PaymentStatus paymentStatus;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -98,16 +98,16 @@ static {
    * @param callId The new value for callId
    * @param price The new value for price
    * @param createdAt The new value for createdAt
-   * @param paymentOrderStatus The new value for paymentOrderStatus
+   * @param paymentStatus The new value for paymentStatus
    */
-  public PaymentRequestAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence userId, java.lang.CharSequence callId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.PaymentOrderStatus paymentOrderStatus) {
+  public PaymentRequestAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence userId, java.lang.CharSequence callId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.PaymentStatus paymentStatus) {
     this.id = id;
     this.sagaId = sagaId;
     this.userId = userId;
     this.callId = callId;
     this.price = price;
     this.createdAt = createdAt.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
-    this.paymentOrderStatus = paymentOrderStatus;
+    this.paymentStatus = paymentStatus;
   }
 
   public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
@@ -121,7 +121,7 @@ static {
     case 3: return callId;
     case 4: return price;
     case 5: return createdAt;
-    case 6: return paymentOrderStatus;
+    case 6: return paymentStatus;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -153,7 +153,7 @@ static {
     case 3: callId = (java.lang.CharSequence)value$; break;
     case 4: price = (java.nio.ByteBuffer)value$; break;
     case 5: createdAt = (java.time.Instant)value$; break;
-    case 6: paymentOrderStatus = (com.example.kafka.avro.model.PaymentOrderStatus)value$; break;
+    case 6: paymentStatus = (com.example.kafka.avro.model.PaymentStatus)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -261,20 +261,20 @@ static {
   }
 
   /**
-   * Gets the value of the 'paymentOrderStatus' field.
-   * @return The value of the 'paymentOrderStatus' field.
+   * Gets the value of the 'paymentStatus' field.
+   * @return The value of the 'paymentStatus' field.
    */
-  public com.example.kafka.avro.model.PaymentOrderStatus getPaymentOrderStatus() {
-    return paymentOrderStatus;
+  public com.example.kafka.avro.model.PaymentStatus getPaymentStatus() {
+    return paymentStatus;
   }
 
 
   /**
-   * Sets the value of the 'paymentOrderStatus' field.
+   * Sets the value of the 'paymentStatus' field.
    * @param value the value to set.
    */
-  public void setPaymentOrderStatus(com.example.kafka.avro.model.PaymentOrderStatus value) {
-    this.paymentOrderStatus = value;
+  public void setPaymentStatus(com.example.kafka.avro.model.PaymentStatus value) {
+    this.paymentStatus = value;
   }
 
   /**
@@ -324,7 +324,7 @@ static {
     private java.lang.CharSequence callId;
     private java.nio.ByteBuffer price;
     private java.time.Instant createdAt;
-    private com.example.kafka.avro.model.PaymentOrderStatus paymentOrderStatus;
+    private com.example.kafka.avro.model.PaymentStatus paymentStatus;
 
     /** Creates a new Builder */
     private Builder() {
@@ -361,8 +361,8 @@ static {
         this.createdAt = data().deepCopy(fields()[5].schema(), other.createdAt);
         fieldSetFlags()[5] = other.fieldSetFlags()[5];
       }
-      if (isValidValue(fields()[6], other.paymentOrderStatus)) {
-        this.paymentOrderStatus = data().deepCopy(fields()[6].schema(), other.paymentOrderStatus);
+      if (isValidValue(fields()[6], other.paymentStatus)) {
+        this.paymentStatus = data().deepCopy(fields()[6].schema(), other.paymentStatus);
         fieldSetFlags()[6] = other.fieldSetFlags()[6];
       }
     }
@@ -397,8 +397,8 @@ static {
         this.createdAt = data().deepCopy(fields()[5].schema(), other.createdAt);
         fieldSetFlags()[5] = true;
       }
-      if (isValidValue(fields()[6], other.paymentOrderStatus)) {
-        this.paymentOrderStatus = data().deepCopy(fields()[6].schema(), other.paymentOrderStatus);
+      if (isValidValue(fields()[6], other.paymentStatus)) {
+        this.paymentStatus = data().deepCopy(fields()[6].schema(), other.paymentStatus);
         fieldSetFlags()[6] = true;
       }
     }
@@ -643,41 +643,41 @@ static {
     }
 
     /**
-      * Gets the value of the 'paymentOrderStatus' field.
+      * Gets the value of the 'paymentStatus' field.
       * @return The value.
       */
-    public com.example.kafka.avro.model.PaymentOrderStatus getPaymentOrderStatus() {
-      return paymentOrderStatus;
+    public com.example.kafka.avro.model.PaymentStatus getPaymentStatus() {
+      return paymentStatus;
     }
 
 
     /**
-      * Sets the value of the 'paymentOrderStatus' field.
-      * @param value The value of 'paymentOrderStatus'.
+      * Sets the value of the 'paymentStatus' field.
+      * @param value The value of 'paymentStatus'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.PaymentRequestAvroModel.Builder setPaymentOrderStatus(com.example.kafka.avro.model.PaymentOrderStatus value) {
+    public com.example.kafka.avro.model.PaymentRequestAvroModel.Builder setPaymentStatus(com.example.kafka.avro.model.PaymentStatus value) {
       validate(fields()[6], value);
-      this.paymentOrderStatus = value;
+      this.paymentStatus = value;
       fieldSetFlags()[6] = true;
       return this;
     }
 
     /**
-      * Checks whether the 'paymentOrderStatus' field has been set.
-      * @return True if the 'paymentOrderStatus' field has been set, false otherwise.
+      * Checks whether the 'paymentStatus' field has been set.
+      * @return True if the 'paymentStatus' field has been set, false otherwise.
       */
-    public boolean hasPaymentOrderStatus() {
+    public boolean hasPaymentStatus() {
       return fieldSetFlags()[6];
     }
 
 
     /**
-      * Clears the value of the 'paymentOrderStatus' field.
+      * Clears the value of the 'paymentStatus' field.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.PaymentRequestAvroModel.Builder clearPaymentOrderStatus() {
-      paymentOrderStatus = null;
+    public com.example.kafka.avro.model.PaymentRequestAvroModel.Builder clearPaymentStatus() {
+      paymentStatus = null;
       fieldSetFlags()[6] = false;
       return this;
     }
@@ -693,7 +693,7 @@ static {
         record.callId = fieldSetFlags()[3] ? this.callId : (java.lang.CharSequence) defaultValue(fields()[3]);
         record.price = fieldSetFlags()[4] ? this.price : (java.nio.ByteBuffer) defaultValue(fields()[4]);
         record.createdAt = fieldSetFlags()[5] ? this.createdAt : (java.time.Instant) defaultValue(fields()[5]);
-        record.paymentOrderStatus = fieldSetFlags()[6] ? this.paymentOrderStatus : (com.example.kafka.avro.model.PaymentOrderStatus) defaultValue(fields()[6]);
+        record.paymentStatus = fieldSetFlags()[6] ? this.paymentStatus : (com.example.kafka.avro.model.PaymentStatus) defaultValue(fields()[6]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;

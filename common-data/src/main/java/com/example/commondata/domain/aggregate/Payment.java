@@ -15,6 +15,7 @@ import java.util.UUID;
 
 // https://www.baeldung.com/lombok-builder-inheritance
 
+@Getter
 public class Payment extends AggregateRoot<PaymentId>{
     private CallId callId;
     private UserId userId;
@@ -25,6 +26,7 @@ public class Payment extends AggregateRoot<PaymentId>{
         callId = builder.callId;
         userId = builder.userId;
         price = builder.price;
+        paymentStatus = builder.paymentStatus;
     }
 
     public static Builder builder() {

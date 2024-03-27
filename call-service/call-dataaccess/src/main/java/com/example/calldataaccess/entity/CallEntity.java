@@ -2,6 +2,7 @@ package com.example.calldataaccess.entity;
 
 import com.example.commondata.domain.aggregate.valueobject.CallStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -20,13 +21,16 @@ public class CallEntity {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @NotNull
+    @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
     private UUID userId;
     private UUID driverId;
     private BigDecimal price;
+
     @Enumerated(EnumType.STRING)
-    private CallStatus orderStatus;
+    @Column(columnDefinition = "call_schema.call_status_enum")
+    private CallStatus callStatus;
     private String failureMessages;
 
     @Override

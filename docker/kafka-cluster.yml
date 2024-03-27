@@ -14,6 +14,7 @@ services:
       ZOOKEEPER_SYNC_LIMIT: 2
       ZOOKEEPER_SERVERS: zookeeper:2888:3888
 
+  # docker-compose up -d schema-registry : 기존 스키마 삭제.
   schema-registry:
     image: confluentinc/cp-schema-registry:latest
     hostname: schema-registry
@@ -30,7 +31,6 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka-broker-2:9092,LISTENER_LOCAL://localhost:29092 # for kafka 7.0.0
       SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
       SCHEMA_REGISTRY_DEBUG: 'true'
-
   kafka-broker-1:
     image: confluentinc/cp-kafka:latest
     hostname: kafka-broker-1
@@ -45,7 +45,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_COMPRESSION_TYPE: producer
-
+    volumes:
+      - "./volumes/kafka/broker-1:/var/lib/kafka/data"
   kafka-broker-2:
     image: confluentinc/cp-kafka:latest
     hostname: kafka-broker-2
@@ -60,7 +61,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_COMPRESSION_TYPE: producer
-
+    volumes:
+      - "./volumes/kafka/broker-2:/var/lib/kafka/data"
   kafka-broker-3:
     image: confluentinc/cp-kafka:latest
     hostname: kafka-broker-3
@@ -75,7 +77,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_COMPRESSION_TYPE: producer
-
+    volumes:
+      - "./volumes/kafka/broker-3:/var/lib/kafka/data"
 networks:
   uber-msa:
     driver: "bridge"

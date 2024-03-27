@@ -1,5 +1,6 @@
 package com.example.calldomain.data.dto;
 
+import com.example.kafka.avro.model.DriverApprovalStatus;
 import com.example.kafka.avro.model.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +16,9 @@ import java.util.List;
 public class DriverApprovalResponseDto {
     private String id;
     private String sagaId;
-    private String orderId;
+    private String callId;
     private String driverId;
     private Instant createdAt;
-    private PaymentStatus driverApprovalStatus;
-    private List<String> failureMessages;
+    private DriverApprovalStatus driverApprovalStatus;
+    private String failureMessages;
 }

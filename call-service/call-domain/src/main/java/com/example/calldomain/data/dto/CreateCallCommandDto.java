@@ -14,11 +14,11 @@ import java.util.UUID;
 @Builder
 public class CreateCallCommandDto {
     @NotNull
-    private final UUID customerId;
+    private final UUID userId;
     @NotNull
-    private final UUID restaurantId;
+    private final UUID driverId;
     @NotNull
-    private final BigDecimal price;
+    private final BigDecimal price; //TODO how to add info of currency? won, dollars...
     @NotNull
     private final Address address;
 }

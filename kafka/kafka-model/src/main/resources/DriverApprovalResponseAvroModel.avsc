@@ -43,16 +43,13 @@
             "type": {
                   "type": "enum",
                   "name": "DriverApprovalStatus",
-                  "symbols": ["APPROVED", "REJECTED"]
+                  "symbols": ["PENDING", "APPROVED", "REJECTED"]
                }
         },
         {
             "name": "failureMessages",
             "type": {
-                "type": "array",
-                "items":{
-                  "type":"string"
-               }
+                "type": "string"
             }
         }
     ]

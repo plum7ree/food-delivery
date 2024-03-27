@@ -3,6 +3,7 @@ package com.example.kafkaproducer.config;
 import com.example.kafka.admin.client.KafkaAdminClient;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafka.config.data.KafkaProducerConfigData;
+import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -42,6 +43,7 @@ public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecor
         props.put(ProducerConfig.ACKS_CONFIG, kafkaProducerConfigData.getAcks());
         props.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, kafkaProducerConfigData.getRequestTimeoutMs());
         props.put(ProducerConfig.RETRIES_CONFIG, kafkaProducerConfigData.getRetryCount());
+
         return props;
     }
 

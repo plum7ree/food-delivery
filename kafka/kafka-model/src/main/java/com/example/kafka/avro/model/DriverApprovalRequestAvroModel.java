@@ -14,11 +14,15 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = 5728287158398872962L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DriverApprovalRequestAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"driverId\",\"type\":\"string\"},{\"name\":\"edgeId\",\"type\":\"string\"},{\"name\":\"oldEdgeId\",\"type\":\"string\"},{\"name\":\"coord\",\"type\":{\"type\":\"record\",\"name\":\"Coordinates\",\"fields\":[{\"name\":\"lat\",\"type\":\"float\"},{\"name\":\"lon\",\"type\":\"float\"}]}},{\"name\":\"createdAt\",\"type\":[\"null\",\"long\"],\"logicalType\":[\"null\",\"date\"]}]}");
+  private static final long serialVersionUID = 102136040096450650L;
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"DriverApprovalRequestAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"driverId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"driverApprovalStatus\",\"type\":{\"type\":\"enum\",\"name\":\"DriverApprovalStatus\",\"symbols\":[\"PENDING\",\"APPROVED\",\"REJECTED\"]}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static SpecificData MODEL$ = new SpecificData();
+static {
+    MODEL$.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimestampMillisConversion());
+    MODEL$.addLogicalTypeConversion(new org.apache.avro.Conversions.DecimalConversion());
+  }
 
   private static final BinaryMessageEncoder<DriverApprovalRequestAvroModel> ENCODER =
       new BinaryMessageEncoder<DriverApprovalRequestAvroModel>(MODEL$, SCHEMA$);
@@ -71,11 +75,13 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
     return DECODER.decode(b);
   }
 
+   private java.lang.CharSequence id;
+   private java.lang.CharSequence sagaId;
    private java.lang.CharSequence driverId;
-   private java.lang.CharSequence edgeId;
-   private java.lang.CharSequence oldEdgeId;
-   private com.example.kafka.avro.model.Coordinates coord;
-   private java.lang.Long createdAt;
+   private java.lang.CharSequence callId;
+   private com.example.kafka.avro.model.DriverApprovalStatus driverApprovalStatus;
+   private java.nio.ByteBuffer price;
+   private java.time.Instant createdAt;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -86,18 +92,22 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
 
   /**
    * All-args constructor.
+   * @param id The new value for id
+   * @param sagaId The new value for sagaId
    * @param driverId The new value for driverId
-   * @param edgeId The new value for edgeId
-   * @param oldEdgeId The new value for oldEdgeId
-   * @param coord The new value for coord
+   * @param callId The new value for callId
+   * @param driverApprovalStatus The new value for driverApprovalStatus
+   * @param price The new value for price
    * @param createdAt The new value for createdAt
    */
-  public DriverApprovalRequestAvroModel(java.lang.CharSequence driverId, java.lang.CharSequence edgeId, java.lang.CharSequence oldEdgeId, com.example.kafka.avro.model.Coordinates coord, java.lang.Long createdAt) {
+  public DriverApprovalRequestAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence driverId, java.lang.CharSequence callId, com.example.kafka.avro.model.DriverApprovalStatus driverApprovalStatus, java.nio.ByteBuffer price, java.time.Instant createdAt) {
+    this.id = id;
+    this.sagaId = sagaId;
     this.driverId = driverId;
-    this.edgeId = edgeId;
-    this.oldEdgeId = oldEdgeId;
-    this.coord = coord;
-    this.createdAt = createdAt;
+    this.callId = callId;
+    this.driverApprovalStatus = driverApprovalStatus;
+    this.price = price;
+    this.createdAt = createdAt.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
   }
 
   public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
@@ -105,26 +115,81 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
   // Used by DatumWriter.  Applications should not call.
   public java.lang.Object get(int field$) {
     switch (field$) {
-    case 0: return driverId;
-    case 1: return edgeId;
-    case 2: return oldEdgeId;
-    case 3: return coord;
-    case 4: return createdAt;
+    case 0: return id;
+    case 1: return sagaId;
+    case 2: return driverId;
+    case 3: return callId;
+    case 4: return driverApprovalStatus;
+    case 5: return price;
+    case 6: return createdAt;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
+  }
+
+  private static final org.apache.avro.Conversion<?>[] conversions =
+      new org.apache.avro.Conversion<?>[] {
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      new org.apache.avro.data.TimeConversions.TimestampMillisConversion(),
+      null
+  };
+
+  @Override
+  public org.apache.avro.Conversion<?> getConversion(int field) {
+    return conversions[field];
   }
 
   // Used by DatumReader.  Applications should not call.
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-    case 0: driverId = (java.lang.CharSequence)value$; break;
-    case 1: edgeId = (java.lang.CharSequence)value$; break;
-    case 2: oldEdgeId = (java.lang.CharSequence)value$; break;
-    case 3: coord = (com.example.kafka.avro.model.Coordinates)value$; break;
-    case 4: createdAt = (java.lang.Long)value$; break;
+    case 0: id = (java.lang.CharSequence)value$; break;
+    case 1: sagaId = (java.lang.CharSequence)value$; break;
+    case 2: driverId = (java.lang.CharSequence)value$; break;
+    case 3: callId = (java.lang.CharSequence)value$; break;
+    case 4: driverApprovalStatus = (com.example.kafka.avro.model.DriverApprovalStatus)value$; break;
+    case 5: price = (java.nio.ByteBuffer)value$; break;
+    case 6: createdAt = (java.time.Instant)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
+  }
+
+  /**
+   * Gets the value of the 'id' field.
+   * @return The value of the 'id' field.
+   */
+  public java.lang.CharSequence getId() {
+    return id;
+  }
+
+
+  /**
+   * Sets the value of the 'id' field.
+   * @param value the value to set.
+   */
+  public void setId(java.lang.CharSequence value) {
+    this.id = value;
+  }
+
+  /**
+   * Gets the value of the 'sagaId' field.
+   * @return The value of the 'sagaId' field.
+   */
+  public java.lang.CharSequence getSagaId() {
+    return sagaId;
+  }
+
+
+  /**
+   * Sets the value of the 'sagaId' field.
+   * @param value the value to set.
+   */
+  public void setSagaId(java.lang.CharSequence value) {
+    this.sagaId = value;
   }
 
   /**
@@ -145,61 +210,61 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
   }
 
   /**
-   * Gets the value of the 'edgeId' field.
-   * @return The value of the 'edgeId' field.
+   * Gets the value of the 'callId' field.
+   * @return The value of the 'callId' field.
    */
-  public java.lang.CharSequence getEdgeId() {
-    return edgeId;
+  public java.lang.CharSequence getCallId() {
+    return callId;
   }
 
 
   /**
-   * Sets the value of the 'edgeId' field.
+   * Sets the value of the 'callId' field.
    * @param value the value to set.
    */
-  public void setEdgeId(java.lang.CharSequence value) {
-    this.edgeId = value;
+  public void setCallId(java.lang.CharSequence value) {
+    this.callId = value;
   }
 
   /**
-   * Gets the value of the 'oldEdgeId' field.
-   * @return The value of the 'oldEdgeId' field.
+   * Gets the value of the 'driverApprovalStatus' field.
+   * @return The value of the 'driverApprovalStatus' field.
    */
-  public java.lang.CharSequence getOldEdgeId() {
-    return oldEdgeId;
+  public com.example.kafka.avro.model.DriverApprovalStatus getDriverApprovalStatus() {
+    return driverApprovalStatus;
   }
 
 
   /**
-   * Sets the value of the 'oldEdgeId' field.
+   * Sets the value of the 'driverApprovalStatus' field.
    * @param value the value to set.
    */
-  public void setOldEdgeId(java.lang.CharSequence value) {
-    this.oldEdgeId = value;
+  public void setDriverApprovalStatus(com.example.kafka.avro.model.DriverApprovalStatus value) {
+    this.driverApprovalStatus = value;
   }
 
   /**
-   * Gets the value of the 'coord' field.
-   * @return The value of the 'coord' field.
+   * Gets the value of the 'price' field.
+   * @return The value of the 'price' field.
    */
-  public com.example.kafka.avro.model.Coordinates getCoord() {
-    return coord;
+  public java.nio.ByteBuffer getPrice() {
+    return price;
   }
 
 
   /**
-   * Sets the value of the 'coord' field.
+   * Sets the value of the 'price' field.
    * @param value the value to set.
    */
-  public void setCoord(com.example.kafka.avro.model.Coordinates value) {
-    this.coord = value;
+  public void setPrice(java.nio.ByteBuffer value) {
+    this.price = value;
   }
 
   /**
    * Gets the value of the 'createdAt' field.
    * @return The value of the 'createdAt' field.
    */
-  public java.lang.Long getCreatedAt() {
+  public java.time.Instant getCreatedAt() {
     return createdAt;
   }
 
@@ -208,8 +273,8 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
    * Sets the value of the 'createdAt' field.
    * @param value the value to set.
    */
-  public void setCreatedAt(java.lang.Long value) {
-    this.createdAt = value;
+  public void setCreatedAt(java.time.Instant value) {
+    this.createdAt = value.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
   }
 
   /**
@@ -253,12 +318,13 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<DriverApprovalRequestAvroModel>
     implements org.apache.avro.data.RecordBuilder<DriverApprovalRequestAvroModel> {
 
+    private java.lang.CharSequence id;
+    private java.lang.CharSequence sagaId;
     private java.lang.CharSequence driverId;
-    private java.lang.CharSequence edgeId;
-    private java.lang.CharSequence oldEdgeId;
-    private com.example.kafka.avro.model.Coordinates coord;
-    private com.example.kafka.avro.model.Coordinates.Builder coordBuilder;
-    private java.lang.Long createdAt;
+    private java.lang.CharSequence callId;
+    private com.example.kafka.avro.model.DriverApprovalStatus driverApprovalStatus;
+    private java.nio.ByteBuffer price;
+    private java.time.Instant createdAt;
 
     /** Creates a new Builder */
     private Builder() {
@@ -271,28 +337,33 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
      */
     private Builder(com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder other) {
       super(other);
-      if (isValidValue(fields()[0], other.driverId)) {
-        this.driverId = data().deepCopy(fields()[0].schema(), other.driverId);
+      if (isValidValue(fields()[0], other.id)) {
+        this.id = data().deepCopy(fields()[0].schema(), other.id);
         fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
-      if (isValidValue(fields()[1], other.edgeId)) {
-        this.edgeId = data().deepCopy(fields()[1].schema(), other.edgeId);
+      if (isValidValue(fields()[1], other.sagaId)) {
+        this.sagaId = data().deepCopy(fields()[1].schema(), other.sagaId);
         fieldSetFlags()[1] = other.fieldSetFlags()[1];
       }
-      if (isValidValue(fields()[2], other.oldEdgeId)) {
-        this.oldEdgeId = data().deepCopy(fields()[2].schema(), other.oldEdgeId);
+      if (isValidValue(fields()[2], other.driverId)) {
+        this.driverId = data().deepCopy(fields()[2].schema(), other.driverId);
         fieldSetFlags()[2] = other.fieldSetFlags()[2];
       }
-      if (isValidValue(fields()[3], other.coord)) {
-        this.coord = data().deepCopy(fields()[3].schema(), other.coord);
+      if (isValidValue(fields()[3], other.callId)) {
+        this.callId = data().deepCopy(fields()[3].schema(), other.callId);
         fieldSetFlags()[3] = other.fieldSetFlags()[3];
       }
-      if (other.hasCoordBuilder()) {
-        this.coordBuilder = com.example.kafka.avro.model.Coordinates.newBuilder(other.getCoordBuilder());
-      }
-      if (isValidValue(fields()[4], other.createdAt)) {
-        this.createdAt = data().deepCopy(fields()[4].schema(), other.createdAt);
+      if (isValidValue(fields()[4], other.driverApprovalStatus)) {
+        this.driverApprovalStatus = data().deepCopy(fields()[4].schema(), other.driverApprovalStatus);
         fieldSetFlags()[4] = other.fieldSetFlags()[4];
+      }
+      if (isValidValue(fields()[5], other.price)) {
+        this.price = data().deepCopy(fields()[5].schema(), other.price);
+        fieldSetFlags()[5] = other.fieldSetFlags()[5];
+      }
+      if (isValidValue(fields()[6], other.createdAt)) {
+        this.createdAt = data().deepCopy(fields()[6].schema(), other.createdAt);
+        fieldSetFlags()[6] = other.fieldSetFlags()[6];
       }
     }
 
@@ -302,27 +373,114 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
      */
     private Builder(com.example.kafka.avro.model.DriverApprovalRequestAvroModel other) {
       super(SCHEMA$);
-      if (isValidValue(fields()[0], other.driverId)) {
-        this.driverId = data().deepCopy(fields()[0].schema(), other.driverId);
+      if (isValidValue(fields()[0], other.id)) {
+        this.id = data().deepCopy(fields()[0].schema(), other.id);
         fieldSetFlags()[0] = true;
       }
-      if (isValidValue(fields()[1], other.edgeId)) {
-        this.edgeId = data().deepCopy(fields()[1].schema(), other.edgeId);
+      if (isValidValue(fields()[1], other.sagaId)) {
+        this.sagaId = data().deepCopy(fields()[1].schema(), other.sagaId);
         fieldSetFlags()[1] = true;
       }
-      if (isValidValue(fields()[2], other.oldEdgeId)) {
-        this.oldEdgeId = data().deepCopy(fields()[2].schema(), other.oldEdgeId);
+      if (isValidValue(fields()[2], other.driverId)) {
+        this.driverId = data().deepCopy(fields()[2].schema(), other.driverId);
         fieldSetFlags()[2] = true;
       }
-      if (isValidValue(fields()[3], other.coord)) {
-        this.coord = data().deepCopy(fields()[3].schema(), other.coord);
+      if (isValidValue(fields()[3], other.callId)) {
+        this.callId = data().deepCopy(fields()[3].schema(), other.callId);
         fieldSetFlags()[3] = true;
       }
-      this.coordBuilder = null;
-      if (isValidValue(fields()[4], other.createdAt)) {
-        this.createdAt = data().deepCopy(fields()[4].schema(), other.createdAt);
+      if (isValidValue(fields()[4], other.driverApprovalStatus)) {
+        this.driverApprovalStatus = data().deepCopy(fields()[4].schema(), other.driverApprovalStatus);
         fieldSetFlags()[4] = true;
       }
+      if (isValidValue(fields()[5], other.price)) {
+        this.price = data().deepCopy(fields()[5].schema(), other.price);
+        fieldSetFlags()[5] = true;
+      }
+      if (isValidValue(fields()[6], other.createdAt)) {
+        this.createdAt = data().deepCopy(fields()[6].schema(), other.createdAt);
+        fieldSetFlags()[6] = true;
+      }
+    }
+
+    /**
+      * Gets the value of the 'id' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getId() {
+      return id;
+    }
+
+
+    /**
+      * Sets the value of the 'id' field.
+      * @param value The value of 'id'.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setId(java.lang.CharSequence value) {
+      validate(fields()[0], value);
+      this.id = value;
+      fieldSetFlags()[0] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'id' field has been set.
+      * @return True if the 'id' field has been set, false otherwise.
+      */
+    public boolean hasId() {
+      return fieldSetFlags()[0];
+    }
+
+
+    /**
+      * Clears the value of the 'id' field.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearId() {
+      id = null;
+      fieldSetFlags()[0] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'sagaId' field.
+      * @return The value.
+      */
+    public java.lang.CharSequence getSagaId() {
+      return sagaId;
+    }
+
+
+    /**
+      * Sets the value of the 'sagaId' field.
+      * @param value The value of 'sagaId'.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setSagaId(java.lang.CharSequence value) {
+      validate(fields()[1], value);
+      this.sagaId = value;
+      fieldSetFlags()[1] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'sagaId' field has been set.
+      * @return True if the 'sagaId' field has been set, false otherwise.
+      */
+    public boolean hasSagaId() {
+      return fieldSetFlags()[1];
+    }
+
+
+    /**
+      * Clears the value of the 'sagaId' field.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearSagaId() {
+      sagaId = null;
+      fieldSetFlags()[1] = false;
+      return this;
     }
 
     /**
@@ -340,9 +498,9 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
       * @return This builder.
       */
     public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setDriverId(java.lang.CharSequence value) {
-      validate(fields()[0], value);
+      validate(fields()[2], value);
       this.driverId = value;
-      fieldSetFlags()[0] = true;
+      fieldSetFlags()[2] = true;
       return this;
     }
 
@@ -351,7 +509,7 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
       * @return True if the 'driverId' field has been set, false otherwise.
       */
     public boolean hasDriverId() {
-      return fieldSetFlags()[0];
+      return fieldSetFlags()[2];
     }
 
 
@@ -361,163 +519,127 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
       */
     public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearDriverId() {
       driverId = null;
-      fieldSetFlags()[0] = false;
-      return this;
-    }
-
-    /**
-      * Gets the value of the 'edgeId' field.
-      * @return The value.
-      */
-    public java.lang.CharSequence getEdgeId() {
-      return edgeId;
-    }
-
-
-    /**
-      * Sets the value of the 'edgeId' field.
-      * @param value The value of 'edgeId'.
-      * @return This builder.
-      */
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setEdgeId(java.lang.CharSequence value) {
-      validate(fields()[1], value);
-      this.edgeId = value;
-      fieldSetFlags()[1] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'edgeId' field has been set.
-      * @return True if the 'edgeId' field has been set, false otherwise.
-      */
-    public boolean hasEdgeId() {
-      return fieldSetFlags()[1];
-    }
-
-
-    /**
-      * Clears the value of the 'edgeId' field.
-      * @return This builder.
-      */
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearEdgeId() {
-      edgeId = null;
-      fieldSetFlags()[1] = false;
-      return this;
-    }
-
-    /**
-      * Gets the value of the 'oldEdgeId' field.
-      * @return The value.
-      */
-    public java.lang.CharSequence getOldEdgeId() {
-      return oldEdgeId;
-    }
-
-
-    /**
-      * Sets the value of the 'oldEdgeId' field.
-      * @param value The value of 'oldEdgeId'.
-      * @return This builder.
-      */
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setOldEdgeId(java.lang.CharSequence value) {
-      validate(fields()[2], value);
-      this.oldEdgeId = value;
-      fieldSetFlags()[2] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'oldEdgeId' field has been set.
-      * @return True if the 'oldEdgeId' field has been set, false otherwise.
-      */
-    public boolean hasOldEdgeId() {
-      return fieldSetFlags()[2];
-    }
-
-
-    /**
-      * Clears the value of the 'oldEdgeId' field.
-      * @return This builder.
-      */
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearOldEdgeId() {
-      oldEdgeId = null;
       fieldSetFlags()[2] = false;
       return this;
     }
 
     /**
-      * Gets the value of the 'coord' field.
+      * Gets the value of the 'callId' field.
       * @return The value.
       */
-    public com.example.kafka.avro.model.Coordinates getCoord() {
-      return coord;
+    public java.lang.CharSequence getCallId() {
+      return callId;
     }
 
 
     /**
-      * Sets the value of the 'coord' field.
-      * @param value The value of 'coord'.
+      * Sets the value of the 'callId' field.
+      * @param value The value of 'callId'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setCoord(com.example.kafka.avro.model.Coordinates value) {
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setCallId(java.lang.CharSequence value) {
       validate(fields()[3], value);
-      this.coordBuilder = null;
-      this.coord = value;
+      this.callId = value;
       fieldSetFlags()[3] = true;
       return this;
     }
 
     /**
-      * Checks whether the 'coord' field has been set.
-      * @return True if the 'coord' field has been set, false otherwise.
+      * Checks whether the 'callId' field has been set.
+      * @return True if the 'callId' field has been set, false otherwise.
       */
-    public boolean hasCoord() {
+    public boolean hasCallId() {
       return fieldSetFlags()[3];
     }
 
-    /**
-     * Gets the Builder instance for the 'coord' field and creates one if it doesn't exist yet.
-     * @return This builder.
-     */
-    public com.example.kafka.avro.model.Coordinates.Builder getCoordBuilder() {
-      if (coordBuilder == null) {
-        if (hasCoord()) {
-          setCoordBuilder(com.example.kafka.avro.model.Coordinates.newBuilder(coord));
-        } else {
-          setCoordBuilder(com.example.kafka.avro.model.Coordinates.newBuilder());
-        }
-      }
-      return coordBuilder;
-    }
 
     /**
-     * Sets the Builder instance for the 'coord' field
-     * @param value The builder instance that must be set.
-     * @return This builder.
-     */
-
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setCoordBuilder(com.example.kafka.avro.model.Coordinates.Builder value) {
-      clearCoord();
-      coordBuilder = value;
+      * Clears the value of the 'callId' field.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearCallId() {
+      callId = null;
+      fieldSetFlags()[3] = false;
       return this;
     }
 
     /**
-     * Checks whether the 'coord' field has an active Builder instance
-     * @return True if the 'coord' field has an active Builder instance
-     */
-    public boolean hasCoordBuilder() {
-      return coordBuilder != null;
+      * Gets the value of the 'driverApprovalStatus' field.
+      * @return The value.
+      */
+    public com.example.kafka.avro.model.DriverApprovalStatus getDriverApprovalStatus() {
+      return driverApprovalStatus;
+    }
+
+
+    /**
+      * Sets the value of the 'driverApprovalStatus' field.
+      * @param value The value of 'driverApprovalStatus'.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setDriverApprovalStatus(com.example.kafka.avro.model.DriverApprovalStatus value) {
+      validate(fields()[4], value);
+      this.driverApprovalStatus = value;
+      fieldSetFlags()[4] = true;
+      return this;
     }
 
     /**
-      * Clears the value of the 'coord' field.
+      * Checks whether the 'driverApprovalStatus' field has been set.
+      * @return True if the 'driverApprovalStatus' field has been set, false otherwise.
+      */
+    public boolean hasDriverApprovalStatus() {
+      return fieldSetFlags()[4];
+    }
+
+
+    /**
+      * Clears the value of the 'driverApprovalStatus' field.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearCoord() {
-      coord = null;
-      coordBuilder = null;
-      fieldSetFlags()[3] = false;
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearDriverApprovalStatus() {
+      driverApprovalStatus = null;
+      fieldSetFlags()[4] = false;
+      return this;
+    }
+
+    /**
+      * Gets the value of the 'price' field.
+      * @return The value.
+      */
+    public java.nio.ByteBuffer getPrice() {
+      return price;
+    }
+
+
+    /**
+      * Sets the value of the 'price' field.
+      * @param value The value of 'price'.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setPrice(java.nio.ByteBuffer value) {
+      validate(fields()[5], value);
+      this.price = value;
+      fieldSetFlags()[5] = true;
+      return this;
+    }
+
+    /**
+      * Checks whether the 'price' field has been set.
+      * @return True if the 'price' field has been set, false otherwise.
+      */
+    public boolean hasPrice() {
+      return fieldSetFlags()[5];
+    }
+
+
+    /**
+      * Clears the value of the 'price' field.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearPrice() {
+      price = null;
+      fieldSetFlags()[5] = false;
       return this;
     }
 
@@ -525,7 +647,7 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
       * Gets the value of the 'createdAt' field.
       * @return The value.
       */
-    public java.lang.Long getCreatedAt() {
+    public java.time.Instant getCreatedAt() {
       return createdAt;
     }
 
@@ -535,10 +657,10 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
       * @param value The value of 'createdAt'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setCreatedAt(java.lang.Long value) {
-      validate(fields()[4], value);
-      this.createdAt = value;
-      fieldSetFlags()[4] = true;
+    public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder setCreatedAt(java.time.Instant value) {
+      validate(fields()[6], value);
+      this.createdAt = value.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
+      fieldSetFlags()[6] = true;
       return this;
     }
 
@@ -547,7 +669,7 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
       * @return True if the 'createdAt' field has been set, false otherwise.
       */
     public boolean hasCreatedAt() {
-      return fieldSetFlags()[4];
+      return fieldSetFlags()[6];
     }
 
 
@@ -556,8 +678,7 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
       * @return This builder.
       */
     public com.example.kafka.avro.model.DriverApprovalRequestAvroModel.Builder clearCreatedAt() {
-      createdAt = null;
-      fieldSetFlags()[4] = false;
+      fieldSetFlags()[6] = false;
       return this;
     }
 
@@ -566,20 +687,13 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
     public DriverApprovalRequestAvroModel build() {
       try {
         DriverApprovalRequestAvroModel record = new DriverApprovalRequestAvroModel();
-        record.driverId = fieldSetFlags()[0] ? this.driverId : (java.lang.CharSequence) defaultValue(fields()[0]);
-        record.edgeId = fieldSetFlags()[1] ? this.edgeId : (java.lang.CharSequence) defaultValue(fields()[1]);
-        record.oldEdgeId = fieldSetFlags()[2] ? this.oldEdgeId : (java.lang.CharSequence) defaultValue(fields()[2]);
-        if (coordBuilder != null) {
-          try {
-            record.coord = this.coordBuilder.build();
-          } catch (org.apache.avro.AvroMissingFieldException e) {
-            e.addParentField(record.getSchema().getField("coord"));
-            throw e;
-          }
-        } else {
-          record.coord = fieldSetFlags()[3] ? this.coord : (com.example.kafka.avro.model.Coordinates) defaultValue(fields()[3]);
-        }
-        record.createdAt = fieldSetFlags()[4] ? this.createdAt : (java.lang.Long) defaultValue(fields()[4]);
+        record.id = fieldSetFlags()[0] ? this.id : (java.lang.CharSequence) defaultValue(fields()[0]);
+        record.sagaId = fieldSetFlags()[1] ? this.sagaId : (java.lang.CharSequence) defaultValue(fields()[1]);
+        record.driverId = fieldSetFlags()[2] ? this.driverId : (java.lang.CharSequence) defaultValue(fields()[2]);
+        record.callId = fieldSetFlags()[3] ? this.callId : (java.lang.CharSequence) defaultValue(fields()[3]);
+        record.driverApprovalStatus = fieldSetFlags()[4] ? this.driverApprovalStatus : (com.example.kafka.avro.model.DriverApprovalStatus) defaultValue(fields()[4]);
+        record.price = fieldSetFlags()[5] ? this.price : (java.nio.ByteBuffer) defaultValue(fields()[5]);
+        record.createdAt = fieldSetFlags()[6] ? this.createdAt : (java.time.Instant) defaultValue(fields()[6]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;
@@ -607,89 +721,6 @@ public class DriverApprovalRequestAvroModel extends org.apache.avro.specific.Spe
     READER$.read(this, SpecificData.getDecoder(in));
   }
 
-  @Override protected boolean hasCustomCoders() { return true; }
-
-  @Override public void customEncode(org.apache.avro.io.Encoder out)
-    throws java.io.IOException
-  {
-    out.writeString(this.driverId);
-
-    out.writeString(this.edgeId);
-
-    out.writeString(this.oldEdgeId);
-
-    this.coord.customEncode(out);
-
-    if (this.createdAt == null) {
-      out.writeIndex(0);
-      out.writeNull();
-    } else {
-      out.writeIndex(1);
-      out.writeLong(this.createdAt);
-    }
-
-  }
-
-  @Override public void customDecode(org.apache.avro.io.ResolvingDecoder in)
-    throws java.io.IOException
-  {
-    org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
-    if (fieldOrder == null) {
-      this.driverId = in.readString(this.driverId instanceof Utf8 ? (Utf8)this.driverId : null);
-
-      this.edgeId = in.readString(this.edgeId instanceof Utf8 ? (Utf8)this.edgeId : null);
-
-      this.oldEdgeId = in.readString(this.oldEdgeId instanceof Utf8 ? (Utf8)this.oldEdgeId : null);
-
-      if (this.coord == null) {
-        this.coord = new com.example.kafka.avro.model.Coordinates();
-      }
-      this.coord.customDecode(in);
-
-      if (in.readIndex() != 1) {
-        in.readNull();
-        this.createdAt = null;
-      } else {
-        this.createdAt = in.readLong();
-      }
-
-    } else {
-      for (int i = 0; i < 5; i++) {
-        switch (fieldOrder[i].pos()) {
-        case 0:
-          this.driverId = in.readString(this.driverId instanceof Utf8 ? (Utf8)this.driverId : null);
-          break;
-
-        case 1:
-          this.edgeId = in.readString(this.edgeId instanceof Utf8 ? (Utf8)this.edgeId : null);
-          break;
-
-        case 2:
-          this.oldEdgeId = in.readString(this.oldEdgeId instanceof Utf8 ? (Utf8)this.oldEdgeId : null);
-          break;
-
-        case 3:
-          if (this.coord == null) {
-            this.coord = new com.example.kafka.avro.model.Coordinates();
-          }
-          this.coord.customDecode(in);
-          break;
-
-        case 4:
-          if (in.readIndex() != 1) {
-            in.readNull();
-            this.createdAt = null;
-          } else {
-            this.createdAt = in.readLong();
-          }
-          break;
-
-        default:
-          throw new java.io.IOException("Corrupt ResolvingDecoder.");
-        }
-      }
-    }
-  }
 }
 
 

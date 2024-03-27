@@ -20,19 +20,19 @@ spring:
 
   datasource:
     # currentSchema: call
-    # binaryTransfer, ??? ?????? ???
+    # binaryTransfer
     # reWriteBatchedInserts: batch optimization
     #TODO CQRS possible with replica DB? access conflict with user micro service?
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=user&binaryTransfer=true&reWriteBatchedInserts=true
+    url: jdbc:postgresql://localhost:5432/db?currentSchema=call_schema&binaryTransfer=true&reWriteBatchedInserts=true
     username: admin
     password: 1234
     driver-class-name: org.postgresql.Driver
-#  sql:
-#    init:
-#      platform: postgres
-#      schema-locations: classpath:init-schema.sql
-#      data-locations: classpath:init-data.sql
-#      mode: always
+  sql:
+    init:
+      platform: postgres
+      schema-locations: classpath:init-schema.sql
+      data-locations: classpath:init-data.sql
+      mode: always
 
 
 retry-config:
@@ -74,7 +74,11 @@ retry-config:
 #    serviceUrl:
 #      defaultZone: http://localhost:8070/eureka/
 
-
+call-service:
+  payment-request-topic-name: payment-request-topic
+  payment-response-topic-name: payment-response-topic
+  driver-approval-request-topic-name: driver-approval-request-topic
+  driver-approval-response-topic-name: driver-approval-response-topic
 
 
 kafka-config:
@@ -90,7 +94,7 @@ kafka-config:
   replication-factor: 3
 
 kafka-producer-config:
-  key-serializer-class: org.apache.kafka.common.serialization.LongSerializer
+  key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
   value-serializer-class: io.confluent.kafka.serializers.KafkaAvroSerializer
   compression-type: snappy
   acks: all
@@ -99,18 +103,12 @@ kafka-producer-config:
   linger-ms: 5
   request-timeout-ms: 60000
   retry-count: 5
-  topic-name:
-    payment-request-topic: payment-request-topic
-    driver-approval-request-topic: driver-approval-request-topic
 
 kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-  payment-consumer-group-id: payment-topic-consumer
-  driver-approval-consumer-group-id: driver-approval-topic-consumer
-  topic-name:
-    payment-response-topic: payment-response-topic
-    driver-approval-response-topic:  driver-approval-response-topic
+  payment-consumer-group-id: payment-topic-consumer-group-id
+  driver-approval-consumer-group-id: driver-approval-topic-consumer-group-id
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true

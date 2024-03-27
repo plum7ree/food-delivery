@@ -16,11 +16,11 @@ import java.util.List;
 public class PaymentResponseDto {
     private String id;
     private String sagaId;
-    private String orderId;
+    private String callId;
     private String paymentId;
-    private String customerId;
+    private String driverId;
     private BigDecimal price;
     private Instant createdAt;
     private PaymentStatus paymentStatus;
-    private List<String> failureMessages;
+    private String failureMessages;
 }
