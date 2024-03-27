@@ -6,12 +6,12 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan({"com.example.common.data",
-    "com.example.commondata",
-"com.example.common.config",
-"com.example.kafka.admin",
-"com.example.kafka.config.data",
-"com.example.kafkaconsumer",
-"com.example.kafkaproducer",
+        "com.example.commondata",
+        "com.example.common.config",
+        "com.example.kafka.admin",
+        "com.example.kafka.config.data",
+        "com.example.kafkaconsumer",
+        "com.example.kafkaproducer",
         "com.example.paymentservice"
 })
 public class PaymentServiceApplication {

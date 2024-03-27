@@ -5,41 +5,30 @@ import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
 import com.example.commondata.domain.aggregate.valueobject.UserId;
-import com.example.kafka.admin.client.KafkaAdminClient;
 import com.example.kafka.avro.model.PaymentRequestAvroModel;
 import com.example.kafka.avro.model.PaymentResponseAvroModel;
 import com.example.kafka.avro.model.PaymentStatus;
-import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafkaconsumer.KafkaConsumer;
-//import com.example.kafkaproducer.KafkaProducer;
-
 import com.example.kafkaproducer.KafkaProducer;
 import com.example.paymentservice.config.CallServiceConfigData;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.apache.avro.Conversions;
 import org.apache.avro.Conversions.DecimalConversion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.core.annotation.Order;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.context.event.EventListener;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.stereotype.Service;
 
 
 @Service
@@ -47,7 +36,7 @@ import org.springframework.stereotype.Service;
 public class PaymentRequestKafkaListener implements KafkaConsumer<PaymentRequestAvroModel> {
     private static final Logger log = LoggerFactory.getLogger(PaymentRequestKafkaListener.class);
 
-        private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+    private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
 
     private final KafkaProducer<String, PaymentResponseAvroModel> paymentReponseKafkaProducer;
@@ -61,15 +50,15 @@ public class PaymentRequestKafkaListener implements KafkaConsumer<PaymentRequest
 
     @EventListener
     public void OnAppStarted(ApplicationStartedEvent event) {
-            log.info("on app started!");
-            log.info("consumer group id: {}", consumerGroupId);
+        log.info("on app started!");
+        log.info("consumer group id: {}", consumerGroupId);
         kafkaListenerEndpointRegistry.getListenerContainer(consumerGroupId).start();
     }
 
 
     @Override
     @KafkaListener(id = "${kafka-consumer-config.consumer-group-id}",
-                topics = "${call-service.payment-request-topic-name}")
+            topics = "${call-service.payment-request-topic-name}")
     public void receive(@Payload List<PaymentRequestAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
@@ -99,7 +88,7 @@ public class PaymentRequestKafkaListener implements KafkaConsumer<PaymentRequest
                     .setId(paymentDto.getId().getValue().toString())
                     .setPrice(decimalConversion.toBytes(paymentDto.getPrice().getAmount(),
                             PaymentResponseAvroModel.getClassSchema().getField("price").schema(),
-                            PaymentResponseAvroModel.getClassSchema().getField("price").schema().getLogicalType()) )
+                            PaymentResponseAvroModel.getClassSchema().getField("price").schema().getLogicalType()))
                     .setSagaId("")
                     .setUserId(paymentDto.getUserId().getValue().toString())
                     .setFailureMessages("")

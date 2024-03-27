@@ -39,7 +39,7 @@ public class GatewayApplication {
                         .uri("lb://ROUTE"))
                 .route(p -> p.path("/websocket/**")
                         .uri("lb:ws://MONITORING"))
-                .route(p->p.path("/sockjs/**")
+                .route(p -> p.path("/sockjs/**")
                         .uri("lb://MONITORING"))
                 .build();
 

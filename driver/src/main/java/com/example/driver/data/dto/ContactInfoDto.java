@@ -3,12 +3,11 @@ package com.example.driver.data.dto;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 import java.util.Map;
 
-@ConfigurationProperties(prefix="driver")
+@ConfigurationProperties(prefix = "driver")
 @Getter
 @Setter
 public class ContactInfoDto {

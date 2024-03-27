@@ -3,7 +3,6 @@ package com.example.locationredis;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
 
 @SpringBootApplication
 // make sure kafka.producer "not" included.
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Component;
         "com.example.kafka.admin",
         "com.example.kafka.config.data",
         "com.example.kafkaconsumer",
-        "com.example.locationredis"} )
+        "com.example.locationredis"})
 public class LocationRedisApplication {
 
     public static void main(String[] args) {

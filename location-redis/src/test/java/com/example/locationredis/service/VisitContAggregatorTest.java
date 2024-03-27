@@ -1,26 +1,16 @@
 package com.example.locationredis.service;
 
-import com.example.kafka.avro.model.LocationAvroModel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class VisitContAggregatorTest {
-        @Data
-        @AllArgsConstructor
-        class Model {
-            int driverId;
-            int currEdgeId;
-            int oldEdgeId;
-        }
-
-
-
     @Test
     public void testBasicAggregate() {
 //        // 방법 1: Arrays.asList() 사용
@@ -40,16 +30,16 @@ public class VisitContAggregatorTest {
 
 
         List<Model> list = Arrays.asList(
-                new Model(1,100, 99),
-                new Model(1,101, 100),
+                new Model(1, 100, 99),
+                new Model(1, 101, 100),
                 new Model(1, 102, 101),
-                new Model(2,103,102)
+                new Model(2, 103, 102)
         );
         var grouped = list.stream().collect(
-        Collectors.groupingBy(
-                Model::getDriverId,
-                Collectors.mapping(model -> model, Collectors.toList())
-        ));
+                Collectors.groupingBy(
+                        Model::getDriverId,
+                        Collectors.mapping(model -> model, Collectors.toList())
+                ));
         System.out.println(grouped);
         //  {   1=[Model(id=1, incr=1), Model(id=1, incr=-1)],
         //      2=[Model(id=2, incr=1), Model(id=2, incr=-2)],
@@ -68,18 +58,18 @@ public class VisitContAggregatorTest {
 
 
         // 2. grouping by result -> counting()
-         Map<Integer, Long> visitCounts = list.stream()
-           .collect(Collectors.groupingBy(
-                   Model::getCurrEdgeId,
-                   Collectors.counting()
-           ))
-           .entrySet().stream()
-           .collect(Collectors.toMap(
-                   Map.Entry::getKey,
-                   entry -> entry.getValue() - list.stream()
-                           .filter(model -> model.getOldEdgeId() == entry.getKey())
-                           .count()
-           ));
+        Map<Integer, Long> visitCounts = list.stream()
+                .collect(Collectors.groupingBy(
+                        Model::getCurrEdgeId,
+                        Collectors.counting()
+                ))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> entry.getValue() - list.stream()
+                                .filter(model -> model.getOldEdgeId() == entry.getKey())
+                                .count()
+                ));
 
 
 //        grouped.entrySet().stream()
@@ -102,6 +92,14 @@ public class VisitContAggregatorTest {
 //                        Long::sum
 //                ));
 
+    }
+
+    @Data
+    @AllArgsConstructor
+    class Model {
+        int driverId;
+        int currEdgeId;
+        int oldEdgeId;
     }
 
 }

@@ -1,5 +1,5 @@
+### Overview Architecture
 
-### Overview Architecture  
 <p>
 <b>Overview</b>   
 </p>
@@ -15,8 +15,8 @@
 
 <p><br></p>
 
-
 2. Routing Algorithm
+
 - Contraction Hierarchy (CH)
 - Open Source: Graphhopper
 
@@ -32,34 +32,36 @@
 <img src="readme/call-service-saga.png" alt="drawing" width="600"/>
 
 TODO
-1. Outbox pattern with Debezium, Optimistic lock  
-2. Distributed Lock with 쿠폰 발급 시스템  
+
+1. Outbox pattern with Debezium, Optimistic lock
+2. Distributed Lock with 쿠폰 발급 시스템
 3. Rollback entire call request on too late response from driver or payment
 4. handle the duplicated different call request from a user
 
-
-
 ---  
 
-### Simulation Test   
-- Multiple number of drivers  
-- Generated at Random Location  
-- code: [DriverSimulatorTest.java](driver/src/test/java/com/example/driver/DriverSimulatorTest.java)   
+### Simulation Test
 
-
+- Multiple number of drivers
+- Generated at Random Location
+- code: [DriverSimulatorTest.java](driver/src/test/java/com/example/driver/DriverSimulatorTest.java)
 
 ### Realtime Monitoring View
+
 ![Monitoring Drivers Web](readme/driver_simulation.gif)
-- [simple websocket frontend](monitoring/src/main/resources/templates/index.html)   
+
+- [simple websocket frontend](monitoring/src/main/resources/templates/index.html)
 - currently STOMP based
 - Todo: RabbitMQ
 
 ---
 
 ### kube node environment setting
+
 we need docker desktop and enable kubernetes
 
 ### build & run order
+
 ```shell
 # all micorservices and obersavation apps
 # docker image build with Google Jib added in pom.xml
@@ -100,20 +102,23 @@ helm uninstall <cluster-name>
 cd environment
 helm install uber-msa /prod-env
 ```
+
 <br/>
 
 ### Start order in local IDE environment for dev
+
 1. configserver
 2. eureka
 3. micro services
 4. gateway server
-<br/>
+   <br/>
 
 ### Helm
 
 <b> container ports </b>   
 
 create new chart
+
 ```shell
 helm create <chart-name>
 ```
@@ -127,19 +132,24 @@ monitoring: 8091
 ---
 
 ### Kafka Module Architecture
-<b>Dependencies</b>    
-- KafkaAdminClient, KafkaProducerConfig(KafkaTemplate) <- KafkaProducer/KafkaConsumer <- Apps   
-  - KafkaAdminClient contains `createTopic()`
-  - KafkaProducer contains `onAppCreated(ApplicationStartedEvent)` EventListener, which microservice application's spring context will fire on their app started.
+
+<b>Dependencies</b>
+
+- KafkaAdminClient, KafkaProducerConfig(KafkaTemplate) <- KafkaProducer/KafkaConsumer <- Apps
+    - KafkaAdminClient contains `createTopic()`
+    - KafkaProducer contains `onAppCreated(ApplicationStartedEvent)` EventListener, which microservice application's
+      spring context will fire on their app started.
 - KafkaConfigData <- Apps
-  - configserver will feed config data into KafkaConfigData object.
-  - because of `@ConfigurationProperties(prefix = "appname")`
+    - configserver will feed config data into KafkaConfigData object.
+    - because of `@ConfigurationProperties(prefix = "appname")`
 
 ---
 
-### Note   
+### Note
+
 Module   
 `@ComponentScan(basePackages={"com.example"})` necessary to use shared classes.
+
 ```
 // main pom.xml
 // add new modules
@@ -169,25 +179,27 @@ Module
 
 ```
 
-Domain Driven Design   
-- Messaging To Dto   
-  - CallDataMapper   
+Domain Driven Design
 
-  
+- Messaging To Dto
+    - CallDataMapper
+
 ### Micro Service Setting
+
 1. application apps
-- pom.xml   
-  - spring cloud config client
-  - eureka client
-  - open feign
+
+- pom.xml
+    - spring cloud config client
+    - eureka client
+    - open feign
 - application.yml
-  - import config server url
-  - eureka server url
-  - actuator setting
+    - import config server url
+    - eureka server url
+    - actuator setting
 - configserver/app-name.yml setting
 - @ComponentScan in main() **Application.java
-  - must include itself. no Error even though not included.
-  - ``` 
+    - must include itself. no Error even though not included.
+    - ``` 
     // com.example.monitoring
     @ComponentScan({"com.example.common.data",
         "com.example.common.config",
@@ -198,6 +210,7 @@ Domain Driven Design
     ```
 
 2. gateway server
+
 - route rules
 
 

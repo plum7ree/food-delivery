@@ -1,4 +1,3 @@
-
 server:
   #TODO do we need to unify this into 8080 in docker environment?
   port: 8091

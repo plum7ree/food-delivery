@@ -6,20 +6,22 @@ import com.example.calldomain.data.dto.DriverApprovalResponseDto;
 import com.example.calldomain.data.dto.PaymentResponseDto;
 import com.example.calldomain.data.event.CallCreatedEvent;
 import com.example.calldomain.data.event.CallPaidEvent;
-import com.example.commondata.domain.aggregate.valueobject.*;
+import com.example.commondata.domain.aggregate.valueobject.CallStatus;
+import com.example.commondata.domain.aggregate.valueobject.DriverId;
+import com.example.commondata.domain.aggregate.valueobject.Money;
+import com.example.commondata.domain.aggregate.valueobject.UserId;
 import com.example.kafka.avro.model.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.Conversions;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Component("callDomainDataMapper")
 @RequiredArgsConstructor
 public class DataMapper {
     private final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
+
     public Call createCallCommandDtoToCall(CreateCallCommandDto createCallCommandDto) {
         return Call.builder()
                 .driverId(new DriverId(createCallCommandDto.getDriverId()))
@@ -43,6 +45,7 @@ public class DataMapper {
                 .setCreatedAt(domainEvent.getCreatedAt().toInstant())
                 .build();
     }
+
     public DriverApprovalRequestAvroModel callPaidEventToDriverApprovalRequestAvroModel(CallPaidEvent domainEvent) {
         var call = domainEvent.getCall();
         return DriverApprovalRequestAvroModel.newBuilder()
@@ -57,7 +60,8 @@ public class DataMapper {
                 .setCreatedAt(domainEvent.getCreatedAt().toInstant())
                 .build();
     }
-    public PaymentResponseDto paymentResponseAvroToPaymentResponseDto(PaymentResponseAvroModel model ) {
+
+    public PaymentResponseDto paymentResponseAvroToPaymentResponseDto(PaymentResponseAvroModel model) {
         return PaymentResponseDto.builder()
                 .id(model.getId().toString())
                 .sagaId(model.getSagaId().toString())
@@ -66,8 +70,8 @@ public class DataMapper {
                 .paymentStatus(PaymentStatus.valueOf(
                         model.getPaymentStatus().name()))
                 .price(decimalConversion.fromBytes(model.getPrice(),
-                            model.getSchema().getField("price").schema(),
-                            model.getSchema().getField("price").schema().getLogicalType()))
+                        model.getSchema().getField("price").schema(),
+                        model.getSchema().getField("price").schema().getLogicalType()))
                 .createdAt(model.getCreatedAt())
                 .failureMessages(model.getFailureMessages().toString())
                 .build();

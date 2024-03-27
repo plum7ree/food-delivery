@@ -42,8 +42,8 @@ import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 
@@ -62,9 +62,10 @@ class Constant {
 @RequiredArgsConstructor
 public class DriverSimulatorTest {
     private static final Logger log = LoggerFactory.getLogger(DriverSimulatorTest.class);
+    final int NUM_DRIVER = 40;
     private GraphHopper graphHopper;
     private WebClient webClient;
-    final int NUM_DRIVER = 40;
+
     @BeforeEach
     public void setup() {
 
@@ -100,8 +101,8 @@ public class DriverSimulatorTest {
         // Use IntStream.range() to create 100 drivers
         IntStream.range(0, NUM_DRIVER).forEach(i -> {
 //            Driver driver = new Driver(String.valueOf(i), 0.0, 0.0);
-                    String driverId = UUID.randomUUID().toString();
-        Driver driver = new Driver(driverId, 0.0, 0.0);
+            String driverId = UUID.randomUUID().toString();
+            Driver driver = new Driver(driverId, 0.0, 0.0);
             driverSimulator.addDriver(driver);
         });
 
@@ -175,11 +176,11 @@ public class DriverSimulatorTest {
 
                 var routeResponseDto = new RouteResponseDto(pointDtoList, instructionDtoList);
 
-               // Mono.just()로 ResponseEntity를 래핑하고 requestHeadersSpecMock를 반환
+                // Mono.just()로 ResponseEntity를 래핑하고 requestHeadersSpecMock를 반환
                 when(requestHeadersSpecMock.retrieve()).thenReturn(responseSpecMock);
                 when(responseSpecMock.bodyToMono(RouteResponseDto.class)).thenReturn(Mono.just(routeResponseDto));
                 when(responseSpecMock.toBodilessEntity()).thenReturn(Mono.just(ResponseEntity.ok().build()));
-                  // onStatus 메서드 체인의 반환 값을 모킹
+                // onStatus 메서드 체인의 반환 값을 모킹
                 WebClient.ResponseSpec onStatusResponseSpecMock = Mockito.mock(WebClient.ResponseSpec.class);
                 when(responseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(onStatusResponseSpecMock);
                 when(onStatusResponseSpecMock.onStatus(any(Predicate.class), any(Function.class))).thenReturn(onStatusResponseSpecMock);
@@ -215,7 +216,6 @@ public class DriverSimulatorTest {
 
             return requestBodyUriSpecMock;
         });
-
 
 
         // DriverSimulator 인스턴스 생성 및 의존성 주입
@@ -289,7 +289,6 @@ public class DriverSimulatorTest {
 //        assertTrue(routeResponseList.size() == 1);
 //        assertEquals(routeResponseList.get(0).getPointList().get(0).getLat(), 1.0);
 //    }
-
     @Test
     public void testLocationController() {
 
@@ -350,7 +349,7 @@ class DriverSimulator {
                                 long seedId = UUID.fromString(driverId).getLeastSignificantBits();
 
                                 var start = selectRandomCoordinate(seedId, leftUpLat, leftUpLon, rightDownLat, rightDownLon);
-                                var dest = selectRandomCoordinate(seedId*3, leftUpLat, leftUpLon, rightDownLat, rightDownLon);
+                                var dest = selectRandomCoordinate(seedId * 3, leftUpLat, leftUpLon, rightDownLat, rightDownLon);
                                 log.info("driver id: " + driverId + " start point: " + start + " dest point: " + dest);
                                 //TODO move this injection outside of the scope.
                                 driver.setCurrLat(start.get(0));

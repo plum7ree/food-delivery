@@ -26,7 +26,7 @@ public class CallAndDriverSaga implements SagaStep<DriverApprovalResponseDto, Em
     public EmptyEvent process(DriverApprovalResponseDto data) {
         var callId = new CallId(UUID.fromString(data.getCallId()));
         var callFound = callRepositoryAdapter.findById(callId);
-        if(callFound.isEmpty()) {
+        if (callFound.isEmpty()) {
             throw new RuntimeException("Call with id " + data.getCallId() + " could not be found!");
         }
         var event = callDomainService.processCallApproved(callFound.get());

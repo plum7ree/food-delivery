@@ -31,7 +31,8 @@ public class DriverApprovalResponseKafkaListener implements KafkaConsumer<Driver
 
     @Value("${kafka-consumer-config.driver-approval-consumer-group-id}")
     private String consumerGroupId;
-        @EventListener
+
+    @EventListener
     public void OnAppStarted(ApplicationStartedEvent event) {
         log.info("on app started!");
         log.info("consumer group id: {}", consumerGroupId);

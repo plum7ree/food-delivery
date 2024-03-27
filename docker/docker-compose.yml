@@ -34,8 +34,8 @@ services:
     extends:
       file: common-config.yml
       service: microservice-base-config
-#    environment:
-#      OTEL_SERVICE_NAME: "configserver"
+  #    environment:
+  #      OTEL_SERVICE_NAME: "configserver"
 
   eurekaserver:
     image: "lomojiki/uber-msa-eurekaserver"
@@ -53,7 +53,7 @@ services:
       service: microservice-configserver-config
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"
-#      OTEL_SERVICE_NAME: "eurekaserver"
+  #      OTEL_SERVICE_NAME: "eurekaserver"
 
   gateway:
     image: "lomojiki/uber-msa-gateway"
@@ -65,9 +65,9 @@ services:
         condition: service_healthy
     environment:
       SPRING_APPLICATION_NAME: "gateway"
-#      OTEL_SERVICE_NAME: "gateway"
+      #      OTEL_SERVICE_NAME: "gateway"
       # keycloak necessary
-#      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
+    #      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
     extends:
       file: common-config.yml
       service: microservice-eureka-config

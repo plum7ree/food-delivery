@@ -1,7 +1,7 @@
-
 after running `helm install uber-msa prod-env`
 
 to see cluster with a dash UI, please run this
+
 ```
 ### dashboard 세팅
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml

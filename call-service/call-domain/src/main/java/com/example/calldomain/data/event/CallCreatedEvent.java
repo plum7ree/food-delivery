@@ -1,8 +1,6 @@
 package com.example.calldomain.data.event;
 
 import com.example.calldomain.data.aggregate.Call;
-import com.example.commondata.domain.event.DomainEvent;
-import com.example.commondata.domain.event.publisher.DomainEventPublisher;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "kafka-streams-config")
 public class KafkaStreamsConfigData {
     private String applicationID;
-	private String inputTopicName;
-	private String outputTopicName;
+    private String inputTopicName;
+    private String outputTopicName;
 }

@@ -1,17 +1,20 @@
 package com.example.commondata.domain.aggregate;
 
-import com.example.commondata.domain.aggregate.valueobject.*;
+import com.example.commondata.domain.aggregate.valueobject.CallId;
+import com.example.commondata.domain.aggregate.valueobject.DriverApprovalId;
+import com.example.commondata.domain.aggregate.valueobject.DriverId;
+import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.kafka.avro.model.DriverApprovalStatus;
-import com.example.kafka.avro.model.PaymentStatus;
 import lombok.Getter;
 
 @Getter
-public class DriverApproval extends AggregateRoot<DriverApprovalId>{
+public class DriverApproval extends AggregateRoot<DriverApprovalId> {
     private CallId callId;
     private DriverId driverId;
     private Money price;
     private DriverApprovalStatus status;
-     private DriverApproval(Builder builder) {
+
+    private DriverApproval(Builder builder) {
         setId(builder.id);
         callId = builder.callId;
         driverId = builder.driverId;

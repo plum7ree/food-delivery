@@ -36,6 +36,7 @@ public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
     private final LocationService locationService;
 
     private final String kafkaListenerId = "monitoringServiceKafkaConsumerForLocation";
+
     @EventListener
     public void onAppStarted(ApplicationStartedEvent event) {
 //        kafkaAdminClient.checkTopicsCreated();
@@ -61,16 +62,16 @@ public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
                 offsets.toString(),
                 Thread.currentThread().getId());
 
-            messages.stream()
-            .map(avro -> new LocationDto()
-                            .builder()
-                            .lat(avro.getCoord().getLat())
-                            .lon(avro.getCoord().getLon())
-                            .edgeId(String.valueOf(avro.getEdgeId()))
-                            .oldEdgeId(String.valueOf(avro.getOldEdgeId()))
-                            .driverId(String.valueOf(avro.getDriverId()))
-                            .build())
-            .forEach(locationService::sendLocation);
+        messages.stream()
+                .map(avro -> new LocationDto()
+                        .builder()
+                        .lat(avro.getCoord().getLat())
+                        .lon(avro.getCoord().getLon())
+                        .edgeId(String.valueOf(avro.getEdgeId()))
+                        .oldEdgeId(String.valueOf(avro.getOldEdgeId()))
+                        .driverId(String.valueOf(avro.getDriverId()))
+                        .build())
+                .forEach(locationService::sendLocation);
     }
 
 }

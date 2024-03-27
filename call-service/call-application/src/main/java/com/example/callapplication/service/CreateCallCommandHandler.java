@@ -1,15 +1,12 @@
 package com.example.callapplication.service;
 
 import com.example.callapplication.data.dto.CallResponseDto;
-import com.example.callapplication.service.listener.kafka.PaymentResponseKafkaListener;
 import com.example.callapplication.service.publisher.kafka.PaymentRequestKafkaProducer;
 import com.example.calldomain.data.dto.CreateCallCommandDto;
 import com.example.calldomain.data.event.CallCreatedEvent;
 import com.example.calldomain.data.mapper.DataMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component

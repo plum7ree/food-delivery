@@ -4,7 +4,8 @@ CREATE SCHEMA call_schema;
 
 -- uuid-ossp extension 설치
 -- uuid_generate_v4() 함수를 통해 Version 4 UUID를 생성
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA call_schema;
+CREATE
+EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA call_schema;
 
 -- enum type 생성
 DROP TYPE IF EXISTS call_schema.call_status_enum;
@@ -18,11 +19,11 @@ DROP TABLE IF EXISTS call_schema.calls CASCADE;
 -- ex) ARRAY['Payment processing failed', 'Insufficient funds', 'Order cancelled']
 CREATE TABLE call_schema.calls
 (
-    id uuid NOT NULL,
-    user_id uuid NOT NULL,
-    driver_id uuid NOT NULL,
-    price numeric(10, 2) NOT NULL,
-    call_status call_schema.call_status_enum NOT NULL,
+    id               uuid                         NOT NULL,
+    user_id          uuid                         NOT NULL,
+    driver_id        uuid                         NOT NULL,
+    price            numeric(10, 2)               NOT NULL,
+    call_status      call_schema.call_status_enum NOT NULL,
     failure_messages character varying COLLATE pg_catalog."default",
     CONSTRAINT call_pkey PRIMARY KEY (id)
 );

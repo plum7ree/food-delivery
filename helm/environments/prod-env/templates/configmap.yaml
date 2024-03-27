@@ -1,1 +1,1 @@
-{{- template "common.configmap" . -}}
+{ { - template "common.configmap" . - } }

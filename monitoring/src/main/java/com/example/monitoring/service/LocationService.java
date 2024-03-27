@@ -21,8 +21,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @RequiredArgsConstructor
 public class LocationService {
     private static final Logger log = LoggerFactory.getLogger(LocationService.class);
-private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
     private final SimpMessagingTemplate simpMessagingTemplate;
+
     public void sendLocation(LocationDto location) {
         log.info("LocationService websocket sending location");
 

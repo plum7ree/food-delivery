@@ -1,10 +1,10 @@
 spring:
   application:
     name: user
-#  cloud:
-#    config:
-#      import:
-#        configserver:
+  #  cloud:
+  #    config:
+  #      import:
+  #        configserver:
 
   jpa:
     hibernate.ddl-auto: none

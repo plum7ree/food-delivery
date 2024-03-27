@@ -1,6 +1,5 @@
 package com.example.callapplication.service;
 
-import com.example.callapplication.service.listener.kafka.PaymentResponseKafkaListener;
 import com.example.callapplication.service.publisher.kafka.DriverApprovalRequestKafkaProducer;
 import com.example.calldataaccess.repository.adapter.CallRepositoryAdapter;
 import com.example.calldomain.data.dto.PaymentResponseDto;

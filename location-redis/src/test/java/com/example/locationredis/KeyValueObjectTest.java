@@ -37,12 +37,13 @@ public class KeyValueObjectTest {
         StepVerifier.create(set.concatWith(get)).verifyComplete();
 
     }
+
     @Test
     public void keyValExpiryTest() {
         RBucketReactive<String> bucket = redissonReactiveClient.getBucket("user:1:name");
         Mono<Void> set = bucket.set("sam10sec");
-        Mono<Void> set1 = bucket.set("sam1sec",1, TimeUnit.SECONDS);
-        Mono<Void> set2 = bucket.set("sam2sec",2, TimeUnit.SECONDS);
+        Mono<Void> set1 = bucket.set("sam1sec", 1, TimeUnit.SECONDS);
+        Mono<Void> set2 = bucket.set("sam2sec", 2, TimeUnit.SECONDS);
         Mono<Void> get = bucket.get().doOnNext(System.out::println).then();
 //        첫 번째 스트림(set)이 완료된 후에 두 번째 스트림(get)을 구독하고 실행
 //        onComplete 시그널을 발행)할 것을 기대
@@ -52,7 +53,7 @@ public class KeyValueObjectTest {
         try {
             sleep(1500);
 
-        } catch(Exception e) {
+        } catch (Exception e) {
 
         }
         // extend

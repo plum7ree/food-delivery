@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class KafkaAdminClient {
-        private static final Logger log = LoggerFactory.getLogger(KafkaAdminClient.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaAdminClient.class);
 
     private final KafkaConfigData kafkaConfigData;
     private final AdminClient adminClient;
@@ -37,8 +37,6 @@ public class KafkaAdminClient {
             throw new KafkaException("Error on creating topics: ", t);
         }
     }
-
-
 
 
 }

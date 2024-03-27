@@ -1,4 +1,3 @@
-
 server:
   port: 8074
 
@@ -6,8 +5,8 @@ spring:
   application:
     name: call-application
 
-#  autoconfigure:
-#    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
+  #  autoconfigure:
+  #    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
 
 
   jpa:

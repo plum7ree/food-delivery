@@ -28,11 +28,11 @@ public class CallRepositoryAdapter {
 
         var entity = dataMapper.callToCallEntity(val);
         callRepository.saveWithCast(entity.getId(),
-                            entity.getUserId(),
-                            entity.getDriverId(),
-                            entity.getPrice(),
-                            entity.getCallStatus().toString(),
-                            entity.getFailureMessages());
+                entity.getUserId(),
+                entity.getDriverId(),
+                entity.getPrice(),
+                entity.getCallStatus().toString(),
+                entity.getFailureMessages());
         return val;
     }
 

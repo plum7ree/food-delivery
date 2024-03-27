@@ -10,10 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
-import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
 import java.io.Serializable;
@@ -56,7 +54,7 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
         return new DefaultKafkaConsumerFactory<>(consumerConfigs());
     }
 
-//    @Bean
+    //    @Bean
 //    public KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry() {
 //        return new KafkaListenerEndpointRegistry();
 //    }

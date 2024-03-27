@@ -1,4 +1,3 @@
-
 server:
   port: 8073
 
@@ -7,7 +6,7 @@ spring:
     name: "location-redis"
   profiles:
     active: native
-#    active: git
+  #    active: git
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
   config:

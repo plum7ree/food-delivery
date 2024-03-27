@@ -3,9 +3,9 @@ package com.example.driver.controller;
 import com.example.driver.data.dto.LocationDto;
 import com.example.driver.data.dto.ResponseDto;
 import com.example.driver.data.transformer.LocationToAvroTransformer;
+import com.example.kafka.avro.model.LocationAvroModel;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafkaproducer.KafkaProducer;
-import com.example.kafka.avro.model.LocationAvroModel;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class LocationController {
         //TODO key based on userId or user location?
         log.info("location update, sending to kafka. topic name: "
                 + kafkaConfigData.getTopicName()
-        +" key: " + locationDto.getDriverId());
+                + " key: " + locationDto.getDriverId());
         // Kafka Key should be Long.
         // UUID -> Long. there might be a info loss.
         // ref: https://www.baeldung.com/java-uuid-unique-long-generation

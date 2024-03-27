@@ -27,17 +27,7 @@ public class Call extends AggregateRoot<CallId> {
     private CallStatus callStatus;
 
 
-    public void updateStatusToPaid() {
-        callStatus = CallStatus.PAID;
-    }
-
-    public void updateStatusToRejected() {
-    }
-
-    public void updateStatusToApproved() {
-    }
-
-     private Call(Call.Builder builder) {
+    private Call(Call.Builder builder) {
         setId(builder.callId);
         driverId = builder.driverId;
         userId = builder.userId;
@@ -46,8 +36,18 @@ public class Call extends AggregateRoot<CallId> {
         callStatus = builder.callStatus;
     }
 
-        public static Builder builder() {
+    public static Builder builder() {
         return new Call.Builder();
+    }
+
+    public void updateStatusToPaid() {
+        callStatus = CallStatus.PAID;
+    }
+
+    public void updateStatusToRejected() {
+    }
+
+    public void updateStatusToApproved() {
     }
 
     public void validateCall() {
@@ -64,9 +64,9 @@ public class Call extends AggregateRoot<CallId> {
 
     public static final class Builder {
         private CallId callId;
-        private  UserId userId;
-        private  DriverId driverId;
-        private  Money price;
+        private UserId userId;
+        private DriverId driverId;
+        private Money price;
 
         private TrackingId trackingId;
         private CallStatus callStatus;

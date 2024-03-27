@@ -1,6 +1,9 @@
 package com.example.route.controller;
 
-import com.example.route.data.dto.*;
+import com.example.route.data.dto.AddressSearchRequestDto;
+import com.example.route.data.dto.InstructionDto;
+import com.example.route.data.dto.PointDto;
+import com.example.route.data.dto.RouteResponseDto;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -21,7 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @RestController
-@RequestMapping(path="/api", produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @RequiredArgsConstructor
 public class RouteController {
     private static final Logger log = LoggerFactory.getLogger(RouteController.class);
@@ -44,7 +47,7 @@ public class RouteController {
                                                         @RequestParam Double destLat,
                                                         @RequestParam Double destLon
     ) {
-        log.info("coord: " + startLat + " "+ startLon + " "+ destLat + " "+ destLon + " ");
+        log.info("coord: " + startLat + " " + startLon + " " + destLat + " " + destLon + " ");
         GHPoint startPoint = new GHPoint();
         startPoint.lat = startLat;
         startPoint.lon = startLon;

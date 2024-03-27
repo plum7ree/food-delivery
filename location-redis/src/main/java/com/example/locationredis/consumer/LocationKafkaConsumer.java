@@ -1,8 +1,8 @@
 package com.example.locationredis.consumer;
 
 import com.example.kafka.admin.client.KafkaAdminClient;
-import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafka.avro.model.LocationAvroModel;
+import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafkaconsumer.KafkaConsumer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

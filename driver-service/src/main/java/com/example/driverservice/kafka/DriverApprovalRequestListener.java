@@ -36,30 +36,25 @@ public class DriverApprovalRequestListener implements KafkaConsumer<DriverApprov
 
 
     private final CallServiceConfigData driverConfigData;
-
+    private final KafkaProducer<String, DriverApprovalResponseAvroModel> driverApprovalResponseKafkaProducer;
+    // utils
+    private final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
     @Value("${kafka-consumer-config.consumer-group-id}")
     private String consumerGroupId;
 
-
-    private final KafkaProducer<String, DriverApprovalResponseAvroModel> driverApprovalResponseKafkaProducer;
-
-    // utils
-    private final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
-
-
     @EventListener
     public void OnAppStarted(ApplicationStartedEvent event) {
-            log.info("on app started!");
-            log.info("consumer group id: {} topic: {} ", consumerGroupId,  driverConfigData.getDriverApprovalRequestTopicName());
+        log.info("on app started!");
+        log.info("consumer group id: {} topic: {} ", consumerGroupId, driverConfigData.getDriverApprovalRequestTopicName());
         kafkaListenerEndpointRegistry.getListenerContainer(consumerGroupId).start();
     }
 
 
     @Override
     @KafkaListener(id = "${kafka-consumer-config.consumer-group-id}",
-                topics = "${call-service.driver-approval-request-topic-name}")
+            topics = "${call-service.driver-approval-request-topic-name}")
     public void receive(List<DriverApprovalRequestAvroModel> messages, List<String> keys, List<Integer> partitions, List<Long> offsets) {
-            messages.forEach(avroModel -> {
+        messages.forEach(avroModel -> {
             log.info("driver approval request receive called.");
             //TODO save into DB
             var dto = DriverApproval.builder()
@@ -87,8 +82,8 @@ public class DriverApprovalRequestListener implements KafkaConsumer<DriverApprov
                     .setCreatedAt(now.toInstant())
                     .build();
 
-            log.info("dto response producer send: {}",  driverConfigData.getDriverApprovalResponseTopicName());
-            driverApprovalResponseKafkaProducer.send( driverConfigData.getDriverApprovalResponseTopicName(),
+            log.info("dto response producer send: {}", driverConfigData.getDriverApprovalResponseTopicName());
+            driverApprovalResponseKafkaProducer.send(driverConfigData.getDriverApprovalResponseTopicName(),
                     avroModel.getCallId().toString(),
                     response);
         });

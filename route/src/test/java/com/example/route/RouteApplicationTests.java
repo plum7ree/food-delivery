@@ -1,6 +1,5 @@
 package com.example.route;
 
-import com.example.route.data.dto.AddressDto;
 import com.example.route.data.dto.PointDto;
 import com.example.route.data.dto.RouteResponseDto;
 import com.graphhopper.GHRequest;
@@ -11,13 +10,13 @@ import com.graphhopper.util.shapes.GHPoint;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class Constant {
     public static final String gatewayHost = "localhost";
     public static final String gatewayPort = "8072";
@@ -93,7 +92,7 @@ class RouteApplicationTests {
         var pointList = bestPath.getPoints();
         var instructionList = bestPath.getInstructions();
 
-         System.out.println("bestPath: " + bestPath + " pointList: " + pointList + " instructionList: " + instructionList);
+        System.out.println("bestPath: " + bestPath + " pointList: " + pointList + " instructionList: " + instructionList);
         // bestPath 의 데이터 형식
         // node 갯수; pointList, instruction
         // bestPath:
@@ -147,11 +146,11 @@ class RouteApplicationTests {
                 new PointDto(37.56062757847224, 126.97565445864548)));
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.host(Constant.gatewayHost).port(Constant.gatewayPort).path(Constant.routeQueryPath)
-                .queryParam("startLat", startLat)
-                .queryParam("startLon", startLon)
-                .queryParam("destLat", destLat)
-                .queryParam("destLon", destLon)
-                .build())
+                        .queryParam("startLat", startLat)
+                        .queryParam("startLon", startLon)
+                        .queryParam("destLat", destLat)
+                        .queryParam("destLon", destLon)
+                        .build())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(RouteResponseDto.class)

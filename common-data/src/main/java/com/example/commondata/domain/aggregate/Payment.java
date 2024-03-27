@@ -5,23 +5,18 @@ import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
 import com.example.commondata.domain.aggregate.valueobject.UserId;
 import com.example.kafka.avro.model.PaymentStatus;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-
-import java.time.ZonedDateTime;
-import java.util.UUID;
 
 // https://www.baeldung.com/lombok-builder-inheritance
 
 @Getter
-public class Payment extends AggregateRoot<PaymentId>{
+public class Payment extends AggregateRoot<PaymentId> {
     private CallId callId;
     private UserId userId;
     private Money price;
     private PaymentStatus paymentStatus;
-     private Payment(Builder builder) {
+
+    private Payment(Builder builder) {
         setId(builder.paymentId);
         callId = builder.callId;
         userId = builder.userId;

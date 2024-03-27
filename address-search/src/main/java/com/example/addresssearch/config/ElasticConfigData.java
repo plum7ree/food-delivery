@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Data
 @Configuration
-@ConfigurationProperties(prefix="address-search-elastic-config")
+@ConfigurationProperties(prefix = "address-search-elastic-config")
 public class ElasticConfigData {
     private String indexName;
     private String connectionUrl;

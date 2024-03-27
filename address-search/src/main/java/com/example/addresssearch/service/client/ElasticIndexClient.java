@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 public class ElasticIndexClient {
 
 
-
 //    public List<String> save(List<AddressIndexModel> documents) {
 //        List<IndexQuery> indexQueries = elasticIndexUtil.getIndexQueries(documents);
 //        List<String> documentIds = elasticsearchOperations.bulkIndex(

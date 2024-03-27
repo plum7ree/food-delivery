@@ -34,16 +34,17 @@ POST http://localhost:8072/driver/location/api/update
 Content-Type: application/json
 
 {
-    "lat": 1.0,
-    "lon": 1.0,
-    "edgeId": "1000",
-    "oldEdgeId": "999",
-    "driverId": "100"
+  "lat": 1.0,
+  "lon": 1.0,
+  "edgeId": "1000",
+  "oldEdgeId": "999",
+  "driverId": "100"
 }
 
 
 ###
-GET http://localhost:8072/route/api/query?startLat=37.564902366024384&startLon=126.97670057064717&destLat=37.56343884506724&destLon=126.97670715173366
+GET http://localhost:8072/route/api/query?startLat=37.564902366024384&startLon=126.97670057064717&
+    destLat=37.56343884506724&destLon=126.97670715173366
 
 
 ###

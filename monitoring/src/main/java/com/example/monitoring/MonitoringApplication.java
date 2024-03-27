@@ -10,7 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
         "com.example.kafka.admin",
         "com.example.kafka.config.data",
         "com.example.kafkaconsumer",
-        "com.example.monitoring"} )
+        "com.example.monitoring"})
 public class MonitoringApplication {
 
     public static void main(String[] args) {

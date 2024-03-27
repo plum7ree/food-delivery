@@ -3,7 +3,6 @@ package com.example.kafkaproducer.config;
 import com.example.kafka.admin.client.KafkaAdminClient;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafka.config.data.KafkaProducerConfigData;
-import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -22,7 +21,7 @@ import java.util.Map;
 // V: avro's SpecificRecordBase
 public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecordBase> {
 
-//    @Value(value = "${kafka-config.bootstrap-servers}")
+    //    @Value(value = "${kafka-config.bootstrap-servers}")
 //    private String bootstrapAddress;
     private final KafkaAdminClient kafkaAdminClient;
     // Lombok이 final 필드를 초기화하는 생성자를 자동으로 생성

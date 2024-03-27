@@ -1,6 +1,3 @@
-
-
-
 redis:
   driver-location:
     key: "driver:%s"

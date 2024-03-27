@@ -1,4 +1,3 @@
-
 server:
   port: 8077
 
@@ -21,7 +20,7 @@ retry-config:
 
 call-service:
   driver-approval-request-topic-name: driver-approval-request-topic
-  driver-approval-response-topic-name:  driver-approval-response-topic
+  driver-approval-response-topic-name: driver-approval-response-topic
 
 kafka-config:
   bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
@@ -29,7 +28,7 @@ kafka-config:
   schema-registry-url: http://localhost:8081
   topic-names-to-create:
     - driver-approval-request-topic
-    -  driver-approval-response-topic
+    - driver-approval-response-topic
   num-of-partitions: 3
   replication-factor: 3
 
