@@ -5,6 +5,9 @@ spring:
   #    config:
   #      import:
   #        configserver:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
+
 
   jpa:
     hibernate.ddl-auto: none
