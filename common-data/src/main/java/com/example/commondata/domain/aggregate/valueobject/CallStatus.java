@@ -5,6 +5,9 @@ public enum CallStatus {
     PAID,
     APPROVED,
     CANCELLED,
-    CANCELLING;
+    CANCELLING,
+    USER_CANCELLED,
+    PAYMENT_CANCELLED,
+    DRIVER_REJECTED
 
 }
