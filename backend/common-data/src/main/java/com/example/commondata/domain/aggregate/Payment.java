@@ -5,6 +5,7 @@ import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
 import com.example.commondata.domain.aggregate.valueobject.UserId;
 import com.example.kafka.avro.model.PaymentStatus;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 
 // https://www.baeldung.com/lombok-builder-inheritance
@@ -14,6 +15,10 @@ public class Payment extends AggregateRoot<PaymentId> {
     private CallId callId;
     private UserId userId;
     private Money price;
+    private String type;
+    private String orderId;
+    @Transient
+    private String paymentKey;
     private PaymentStatus paymentStatus;
 
     private Payment(Builder builder) {
