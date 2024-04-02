@@ -50,7 +50,7 @@ TODO
 
 ![Monitoring Drivers Web](readme/driver_simulation.gif)
 
-- [simple websocket frontend](monitoring/src/main/resources/templates/index.html)
+- [simple websocket frontend](backend/monitoring/src/main/resources/templates/index.html)
 - currently STOMP based
 - Todo: RabbitMQ
 
