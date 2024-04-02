@@ -1,4 +1,4 @@
-package com.example.gateway.data.entity;
+package com.example.user.data.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

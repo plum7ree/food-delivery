@@ -1,4 +1,4 @@
-package com.example.gateway.data.dto;
+package com.example.user.data.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
