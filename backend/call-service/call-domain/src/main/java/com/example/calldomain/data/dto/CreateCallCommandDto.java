@@ -20,8 +20,8 @@ public class CreateCallCommandDto {
     private final BigDecimal price; //TODO how to add info of currency? won, dollars...
     @NotNull
     private final Address address;
-    private final String paymentType;
-    private final String paymentOrderId;
-    private final String paymentAmount;
-    private final String paymentKey;
+
+    private final PaymentRequestDto payment;
+
+    private final RouteRequestDto route;
 }
