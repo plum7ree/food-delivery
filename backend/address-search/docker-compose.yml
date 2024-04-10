@@ -1,0 +1,15 @@
+version: '3'
+services:
+  dev:
+    build: .
+    volumes:
+      - ./:/app
+    command: sh
+    ports:
+      - "8000:8000"
+
+  prod:
+    build: .
+    command: python app.py
+    ports:
+      - "8000:8000"
