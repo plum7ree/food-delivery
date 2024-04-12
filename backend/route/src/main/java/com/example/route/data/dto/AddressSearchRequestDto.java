@@ -10,7 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressSearchRequestDto {
-    AddressDto start;
-    AddressDto dest;
-    AddressDto curr;
+    String address;
 }
