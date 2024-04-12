@@ -4,7 +4,8 @@ from elasticsearch.helpers import bulk, BulkIndexError
 
 import elasticsearch_dsl
 
-CREATE_INDEX_FLAG = True
+CREATE_INDEX_FLAG = False
+print("flags. CREATE INDEX FLAG: {}".format(CREATE_INDEX_FLAG))
 
 ELASTIC_PASSWORD = "6fX0s0E23oIeF4BGkYY9"
 ELASTIC_USERNAME = "elastic"
@@ -158,8 +159,8 @@ def index_data(es, row_list):
             'remarks': row[23]
         }
         # remove field which value is None.
-        doc = {k: v for k, v in doc.items() if v is not None}
-
+        doc = {k: v for k, v in doc.items() if v is not None and v != ''}
+        # print(doc)
         action = {
             '_index': INDEX_NAME,
             '_source': doc
@@ -247,6 +248,18 @@ search_results = es.search(index=INDEX_NAME, body={
     "from": 0,
     "size": 10
 })
+
+
+# number of distinct postal_code
+
+
+# number of distinct postal_code SQL version.
+# SELECT postal_code, COUNT(*) AS count
+# FROM table_name
+# WHERE postal_code IS NOT NULL
+# GROUP BY postal_code
+# ORDER BY count DESC;
+
 
 import json
 pretty_json = json.dumps(search_results.body, indent=4,  ensure_ascii=False)

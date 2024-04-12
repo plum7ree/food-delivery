@@ -66,23 +66,30 @@ class AddressHandler(osm.SimpleHandler):
             }
         })
 
+        self.data_count = 0
+
     def node(self, n):
+        self.data_count += 1
         global DEBUG_COUNT
-        if 'addr:housenumber' in n.tags and 'addr:street' in n.tags:
+        if 'addr:postcode' in n.tags:
             address = {
-                'housenumber': n.tags['addr:housenumber'],
-                'street': n.tags['addr:street'],
+                'housenumber': n.tags.get('addr:housenumber',''),
+                'street': n.tags.get('addr:street',''),
                 'city': n.tags.get('addr:city', ''),
                 'postal_code': n.tags.get('addr:postcode', ''),
                 'lat': n.location.lat,
                 'lon': n.location.lon,
                 'osmid': n.id
             }
-            self.row_list.append(address)
+            doc = {k: v for k, v in address.items() if v is not None and v != ''}
+            # print(doc)
+            self.row_list.append(doc)
 
 
     def update(self):
         batch = list()
+        print(self.data_count)
+        print(len(self.row_list))
         for row in self.row_list:
 
             action = {
@@ -90,7 +97,8 @@ class AddressHandler(osm.SimpleHandler):
                 '_source': row
             }
             batch.append(action)
-            if len(self.addresses) >= self.bulk_size:
+            if len(batch) >= self.bulk_size:
+                print(batch)
                 try:
                     bulk(self.es, batch)
                 except BulkIndexError as e:
@@ -103,8 +111,7 @@ class AddressHandler(osm.SimpleHandler):
 def create_index(osm_file, es):
     handler = AddressHandler(es)
     handler.apply_file(osm_file)
-    if handler.addresses:
-        handler.bulk_update()
+    handler.update()
 
 
 
@@ -135,10 +142,4 @@ search_results = es.search(index=INDEX_NAME, body={
     })
 
 # [hit['_source'] for hit in search_results['hits']['hits']]
-if search_results:
-    for addr in search_results:
-        print(f"주소: {addr['street']} {addr['housenumber']}, {addr['city']} {addr['postcode']}")
-        print(f"위도: {addr['lat']}, 경도: {addr['lon']}")
-        print("---")
-else:
-    print("검색 결과가 없습니다.")
+print(search_results)
