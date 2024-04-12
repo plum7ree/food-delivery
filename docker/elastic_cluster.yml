@@ -18,6 +18,10 @@ services:
       - data01_7_17_4_new:/usr/share/elasticsearch/data
     ports:
       - 9200:9200
+    command: >
+      /bin/bash -c "if ! /usr/share/elasticsearch/bin/elasticsearch-plugin list | grep -q 'analysis-nori'; then /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-nori --batch; fi 
+      && /usr/local/bin/docker-entrypoint.sh"
+
   elastic-2:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     environment:
@@ -33,6 +37,9 @@ services:
         hard: -1
     volumes:
       - data02_7_17_4_new:/usr/share/elasticsearch/data
+    command: >
+      /bin/bash -c "if ! /usr/share/elasticsearch/bin/elasticsearch-plugin list | grep -q 'analysis-nori'; then /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-nori --batch; fi 
+      && /usr/local/bin/docker-entrypoint.sh"
   elastic-3:
     image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     environment:
@@ -48,6 +55,9 @@ services:
         hard: -1
     volumes:
       - data03_7_17_4_new:/usr/share/elasticsearch/data
+    command: >
+      /bin/bash -c "if ! /usr/share/elasticsearch/bin/elasticsearch-plugin list | grep -q 'analysis-nori'; then /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-nori --batch; fi 
+      && /usr/local/bin/docker-entrypoint.sh"
   kibana:
     image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
     ports:
@@ -58,8 +68,6 @@ services:
       - elastic-3
     environment:
       ELASTICSEARCH_HOSTS: http://host.docker.internal:9200
-
-
   logstash:
     image: docker.elastic.co/logstash/logstash:${ELASTIC_VERSION}
     command: logstash -f /etc/logstash/conf.d/logback.conf
