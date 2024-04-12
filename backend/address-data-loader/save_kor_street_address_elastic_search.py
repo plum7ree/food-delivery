@@ -4,7 +4,7 @@ from elasticsearch.helpers import bulk, BulkIndexError
 
 import elasticsearch_dsl
 
-CREATE_INDEX_FLAG = False
+CREATE_INDEX_FLAG = True
 
 ELASTIC_PASSWORD = "6fX0s0E23oIeF4BGkYY9"
 ELASTIC_USERNAME = "elastic"
@@ -157,6 +157,9 @@ def index_data(es, row_list):
             'bld_name_for_city_county_district': row[22],
             'remarks': row[23]
         }
+        # remove field which value is None.
+        doc = {k: v for k, v in doc.items() if v is not None}
+
         action = {
             '_index': INDEX_NAME,
             '_source': doc

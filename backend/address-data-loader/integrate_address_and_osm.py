@@ -29,6 +29,7 @@ osm_query = {
 
 # osm 인덱스에서 postal_code와 osmid를 가져와 딕셔너리로 변환
 osm_codes = {}
+#TODO this only updates 1000. do scroll api.
 scan_result = helpers.scan(es, index="osm", query=osm_query, size=1000)
 for hit in scan_result:
     print(hit)
