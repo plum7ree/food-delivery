@@ -4,12 +4,13 @@ services:
     build: .
     volumes:
       - ./:/app
-    command: sh
     ports:
       - "8000:8000"
+    network_mode: host
 
   prod:
     build: .
-    command: python app.py
+    command: python3 app.py
     ports:
       - "8000:8000"
+
