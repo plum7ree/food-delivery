@@ -1,12 +1,14 @@
 package com.example.route.controller;
+import brave.Response;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
-import com.example.route.data.dto.AddressSearchRequestDto;
-import com.example.route.data.dto.InstructionDto;
-import com.example.route.data.dto.PointDto;
-import com.example.route.data.dto.RouteResponseDto;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.search.TotalHits;
+import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
+import com.example.route.data.dto.*;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
@@ -14,6 +16,7 @@ import com.graphhopper.util.shapes.GHPoint;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Spliterators;
@@ -31,15 +35,15 @@ import java.util.stream.StreamSupport;
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @RequiredArgsConstructor
+@Slf4j
 public class RouteController {
-    private static final Logger log = LoggerFactory.getLogger(RouteController.class);
 
     @Autowired
     private GraphHopper graphHopper;
 
     @Autowired
-    private ElasticsearchClient elasticsearchClient;
-        private static final String INDEX_NAME = "address";
+    private ElasticsearchClient esClient;
+    private static final String INDEX_NAME = "osm";
 
 
     @Operation(
@@ -91,64 +95,48 @@ public class RouteController {
     }
 
     @GetMapping("/address/search")
-    public void searchAddress(@RequestParam String text) {
-        MultiMatchQuery multiMatchQuery = MultiMatchQuery.of(q -> q
-                .query(text)
-                .fields(List.of("city_county_district", "eup_myeon_dong", "ri", "road_name"))
-                .fuzziness("1")
-                .prefixLength(2)
-        )._toQuery().multiMatch();
+    public ResponseEntity<OsmDto> searchAddress(@RequestParam String text) throws IOException {
 
-        Query queryDsl = Query.of(q -> q
-                .multiMatch(multiMatchQuery)
-        ).
-
-        SearchRequest searchRequest = SearchRequest.of(r -> r
-                .index(INDEX_NAME)
-                .query(queryDsl)
-                .from(0)
-                .size(10)
+        SearchResponse<OsmDto> response = esClient.search(s -> s
+            .index(INDEX_NAME)
+            .query(q -> q
+                .multiMatch(t -> t
+                    .fields("name", "street", "city")
+                    .query(text)
+                )
+            ),
+            OsmDto.class
         );
 
-        SearchResponse<JsonData> searchResponse = elasticsearchClient.search(searchRequest, JsonData.class);
-        return searchResponse.hits().hits().stream()
-                .map(hit -> hit.source())
-                .toList();
 
+        TotalHits total = response.hits().total();
+        boolean isExactResult = total.relation() == TotalHitsRelation.Eq;
 
+        if (isExactResult) {
+            log.info("There are " + total.value() + " results");
+        } else {
+            log.info("There are more than " + total.value() + " results");
+        }
 
-String searchText = "bike";
+        List<Hit<OsmDto>> hits = response.hits().hits();
+        for (Hit<OsmDto> hit: hits) {
+            OsmDto osmDto = hit.source();
+            log.info("Found product " + osmDto.toString() + ", score " + hit.score());
+        }
+        if (hits.size() > 0) {
+            var bestScoreOsmDto = hits.get(0).source();
+            return ResponseEntity.ok(OsmDto.builder()
+                    .name(bestScoreOsmDto.getName())
+                    .city(bestScoreOsmDto.getCity())
+                    .street(bestScoreOsmDto.getStreet())
+                    .osmid(bestScoreOsmDto.getOsmid())
+                    .lat(bestScoreOsmDto.getLat())
+                    .lon(bestScoreOsmDto.getLon()).build());
 
-SearchResponse<Product> response = esClient.search(s -> s
-    .index("products")
-    .query(q -> q
-        .match(t -> t
-            .field("name")
-            .query(searchText)
-        )
-    ),
-    Product.class
-);
-
-TotalHits total = response.hits().total();
-boolean isExactResult = total.relation() == TotalHitsRelation.Eq;
-
-if (isExactResult) {
-    logger.info("There are " + total.value() + " results");
-} else {
-    logger.info("There are more than " + total.value() + " results");
-}
-
-List<Hit<Product>> hits = response.hits().hits();
-for (Hit<Product> hit: hits) {
-    Product product = hit.source();
-    logger.info("Found product " + product.getSku() + ", score " + hit.score());
-}
-
+        }
+        return ResponseEntity.status(400).body(null);
 
     }
 
-     @GetMapping("/address/search")
-    public void getOsmId(@RequestParam String text) {
 
 }

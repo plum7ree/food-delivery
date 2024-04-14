@@ -38,3 +38,6 @@ build/
 
 /docker-compose/prometheus/**
 /docker-compose/grafana/**
+
+### venv
+**/venv/
