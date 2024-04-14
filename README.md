@@ -127,7 +127,7 @@ configserver: 8071
 locationredis: 8072
 driver: 8090
 monitoring: 8091
-
+route: 8075
 
 ---
 

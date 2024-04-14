@@ -2,7 +2,7 @@ services:
 
   redis:
     image: redis:latest
-    container_name: ubermsa-redis
+    container_name: redis
     ports:
       - "6379:6379"
     command: redis-server --loglevel debug
@@ -10,7 +10,7 @@ services:
   # TODO master-slave(replica), event sourcing
   postgres:
     image: postgres:latest
-    container_name: ubermsa-postgres
+    container_name: postgres
     ports:
       - "5432:5432"
     environment:
@@ -22,7 +22,7 @@ services:
 
   configserver:
     image: "lomojiki/uber-msa-configserver"
-    container_name: configserver-ms
+    container_name: configserver
     ports:
       - "8071:8071"
     healthcheck:
@@ -39,7 +39,7 @@ services:
 
   eurekaserver:
     image: "lomojiki/uber-msa-eurekaserver"
-    container_name: eurekaserver-ms
+    container_name: eurekaserver
     ports:
       - "8070:8070"
     healthcheck:
@@ -57,7 +57,7 @@ services:
 
   gateway:
     image: "lomojiki/uber-msa-gateway"
-    container_name: gateway-ms
+    container_name: gateway
     ports:
       - "8072:8072"
     depends_on:
@@ -74,7 +74,7 @@ services:
 
   driver:
     image: "lomojiki/uber-msa-driver"
-    container_name: accounts-ms
+    container_name: driver
     healthcheck:
       test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
       interval: 20s
@@ -89,6 +89,20 @@ services:
       file: common-config.yml
       service: microservice-eureka-config
 
+  route:
+    image: "lomojiki/uber-msa-route"
+    container_name: route
+    healthcheck:
+      test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      interval: 20s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    environment:
+      SPRING_APPLICATION_NAME: "route"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
 # communication between microservices.
 # bridge, host, overlay, macvlan, none
 networks:
