@@ -7,7 +7,7 @@ INDEX_NAME = 'osm'
 bulk_size = 100
 DEBUG_COUNT = 2
 ENABLE_ELASTIC_SEARCH_FLAG = True
-CREATE_INDEX_FLAG = False
+CREATE_INDEX_FLAG = True
 
 # osm data tags
 # 건물 관련 태그:
