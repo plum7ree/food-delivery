@@ -35,6 +35,7 @@ public class SecurityConfig {
                             "/register",
                             "/driver/**",
                             "/route/**",
+                            "/user/**",
                             "/websocket/**",
                             "/sockjs/**"
                     ).permitAll()

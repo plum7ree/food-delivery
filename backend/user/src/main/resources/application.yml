@@ -1,36 +1,81 @@
+server:
+  port: 8077
+
 spring:
   application:
-    name: user
-  #  cloud:
-  #    config:
-  #      import:
-  #        configserver:
+    name: "user"
+  profiles:
+    active: native
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
+  config:
+    import: "optional:configserver:http://localhost:8071/" # For default and 'native' profile, config will be fetched from config server
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
 
 
-  jpa:
-    hibernate.ddl-auto: none
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-  database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+# spring-boot-starter-actuator
+# application monitoring
+management:
+  # spring boot 2.x 버전에선 필요. 그 이후는 불필요
+  endpoints:
+    web:
+      exposure:
+        include: "*" # health, info, ...
+  health:
+    readiness-state: # Exposes the ?Readiness? application availability state.
+      enabled: true
+    liveness-state: # Exposes the ?Liveness? application availability state.
+      enabled: true
+  endpoint:
+    shutdown: # enable shutdown application
+      enabled: true
+    heath:
+      probes:
+        # provide information about their internal state with Container Probes.
+        # https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints.kubernetes-probes
+        # not only kubernetes, any environment.
+        enabled: true
+  info: # https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints.info.auto-configured-info-contributors
+    env: # Exposes any property from the Environment whose name starts with info..
+      enabled: true
+  metrics: # https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.metrics.customizing.common-tags
+    tags:
+      application: ${spring.application.name}
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/db?currentSchema=user_schema&binaryTransfer=true&reWriteBatchedInserts=true
-    username: admin
-    password: 1234
-    driver-class-name: org.postgresql.Driver
-  sql:
-    init:
-      platform: postgres
-      schema-locations: classpath:init-schema.sql
-      data-locations: classpath:init-data.sql
-      mode: always
+eureka:
+  instance:
+    # https://cloud.spring.io/spring-cloud-netflix/multi/multi_spring-cloud-eureka-server.html#spring-cloud-eureka-server-prefer-ip-address
+    # if we want ip address more than host name.
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
 
-  thymeleaf:
-    cache: false
+
+#  jpa:
+#    hibernate.ddl-auto: none
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#  database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/db?currentSchema=user_schema&binaryTransfer=true&reWriteBatchedInserts=true
+#    username: admin
+#    password: 1234
+#    driver-class-name: org.postgresql.Driver
+#  sql:
+#    init:
+#      platform: postgres
+#      schema-locations: classpath:init-schema.sql
+#      data-locations: classpath:init-data.sql
+#      mode: always
 
 logging:
   level:

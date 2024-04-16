@@ -16,12 +16,26 @@ const UberLikeApp = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(null);
   const [routeData, setRouteData] = useState(null);
+  const [profilePictureUrl, setProfilePictureUrl] = useState(null); // 프로필 사진 상태 추가
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const currentPositionMarkerRef = useRef(null);
   const polylineRef = useRef(null);
 
-  
+  // update profile
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        const response = await axiosInstance.get("/user/api/profile-picture");
+        console.log("profile picture : ", response.data);
+        // 프로필 사진을 받아와서 상태에 설정
+        setProfilePictureUrl(response.data);
+      } catch (error) {
+        console.error("Error fetching profile picture:", error);
+      }
+    };
+    fetchProfilePicture(); // 프로필 사진 가져오기 함수 호출
+  }, []);
 
   useEffect(() => {
     if (mapRef.isInitialized) return;
@@ -191,9 +205,11 @@ const UberLikeApp = () => {
           </div>
           {/* 추가 탭 */}
         </div>
-        <div className="profile-picture" />
+        <div className="profile-picture">
+        {profilePictureUrl && <img src={profilePictureUrl} alt="Profile"/>}
+        </div>
       </header>
-      <div className="top-container">
+  <div className="top-container">
         <div className="map-container">
           <div className="search-bar">
             <form onSubmit={handleSearch}>

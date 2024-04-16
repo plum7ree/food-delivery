@@ -11,6 +11,7 @@
         <module>kafka/kafka-consumer</module>
         <module>common-config</module>
         <module>common-data</module>
+        <module>common-aws-util</module>
         <module>configserver</module>
         <module>gateway</module>
         <module>eurekaserver</module>
