@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableConfigurationProperties()
-@ComponentScan(basePackages = {"com.example"})
+@ComponentScan(basePackages = {"com.example.user", "com.example.commonawsutil"})
 public class UserApplication {
 
     public static void main(String[] args) {

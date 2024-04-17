@@ -24,7 +24,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
-@RequiredArgsConstructor
 @Slf4j
 public class ProfileController {
 
@@ -32,7 +31,12 @@ public class ProfileController {
     // @Value("${aws.s3.bucketName}")
     String bucketName = "";
     String keyName = "k-userprofile/userid1.png";
-    private final static S3Client s3Client = S3Client.create();
+
+    private final S3Client s3Client;
+
+    ProfileController(S3Client s3Client) {
+        this.s3Client = s3Client;
+    }
 
     @PostMapping("/profile-picture")
     public void uploadProfilePicture(@RequestParam("file") MultipartFile file) {
