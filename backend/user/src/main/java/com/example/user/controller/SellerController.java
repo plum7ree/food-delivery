@@ -2,9 +2,10 @@ package com.example.user.controller;
 
 
 import com.example.commonawsutil.s3.UrlUtils;
-import lombok.RequiredArgsConstructor;
+import com.example.user.data.dto.RestaurantDto;
+import com.example.user.data.entity.Restaurant;
+import com.example.user.data.repository.RestaurantRepository;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,8 +29,11 @@ public class SellerController {
 
     private final S3Client s3Client;
 
-    SellerController(S3Client s3Client) {
+    private final RestaurantRepository restaurantRepository;
+
+    SellerController(S3Client s3Client, RestaurantRepository restaurantRepository) {
         this.s3Client = s3Client;
+        this.restaurantRepository = restaurantRepository;
     }
 
     //TODO what if load balancer brings a user into wrong instance?
@@ -65,7 +70,7 @@ public class SellerController {
     }
 
     @PostMapping("/restaurant-picture-resized")
-    public void uploadProfilePictureResized(@RequestParam("file") MultipartFile file) {
+    public void uploadProfilePictureResized(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId) {
         var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
 
         // Check if the bucket exists, create it if not
@@ -104,10 +109,19 @@ public class SellerController {
         return resizedImage;
     }
     @PostMapping("/register/restaurant")
-    public void registerRestuarant() {
+    public void registerRestaurant(@RequestParam("sessionId") String sessionId, @org.springframework.web.bind.annotation.RequestBody RestaurantDto restaurantDto) {
         // uploaded restaurant picture
         //TODO if user cancelled register restaurant, we should mark or delete an image.
-        
+        var id = sessionIdToRestaurantIdMap.get(sessionId);
+        var restaurantEntity = Restaurant.builder()
+                .id(id)
+                .userId("this_user")
+                .name(restaurantDto.getName())
+                .type(restaurantDto.getType())
+                .openTime(restaurantDto.getOpenTime())
+                .closeTime(restaurantDto.getCloseTime())
+                .build();
+        restaurantRepository.save(restaurantEntity);
     }
 
     @PostMapping("/register/{restaurantId}/menu")

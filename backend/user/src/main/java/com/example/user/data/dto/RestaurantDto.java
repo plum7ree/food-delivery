@@ -13,7 +13,7 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class RestaurantDto {
     String id;
-    String ownerId;
+    String userId;
     String name;
     String type;
 

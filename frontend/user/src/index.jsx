@@ -5,7 +5,7 @@ import App from "./App";
 // import Login from "./Login";
 // import TossPay from "./TossPay";
 import UberLikeApp from "./UberLikeApp";
-import EatsMain from "./EatsMain";
+import EatsMain from "./eats/EatsMain";
 
 const rootElement = document.getElementById("root");
 const root = createRoot(rootElement);

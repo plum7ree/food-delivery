@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./styles.css";
 import UberLikeApp from "./UberLikeApp";
-import EatsMain from "./EatsMain";
+import EatsMain from "./eats/EatsMain";
 
 export default function App() {
   const [appMode, setAppMode] = useState(null);
