@@ -1,11 +1,7 @@
-package com.example.user.data.entity;
+package com.example.commondata.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalTime;
 
@@ -14,6 +10,8 @@ import java.time.LocalTime;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "restaurants")
 public class Restaurant {
 
@@ -21,8 +19,9 @@ public class Restaurant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
-    @Column(nullable = false, unique = true)
-    private String userId;
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
 
     private String name;
     private String type;
@@ -39,3 +38,6 @@ public class Restaurant {
     // address Address // address should be value class?
     // private List<Grade> grades
 }
+
+// mapped super class
+// table per class

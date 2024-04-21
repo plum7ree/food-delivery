@@ -1,14 +1,16 @@
-package com.example.user.controller;
+package com.example.restaurant.controller;
 
 
 import com.example.commonawsutil.s3.UrlUtils;
-import com.example.user.data.dto.RestaurantDto;
-import com.example.user.data.entity.Restaurant;
-import com.example.user.data.repository.RestaurantRepository;
+import com.example.restaurant.data.dto.RestaurantDto;
+import com.example.restaurant.data.entity.Restaurant;
+import com.example.restaurant.data.repository.RestaurantRepository;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.Response;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -21,6 +23,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController("/api/seller")
 public class SellerController {
@@ -109,7 +113,8 @@ public class SellerController {
         return resizedImage;
     }
     @PostMapping("/register/restaurant")
-    public void registerRestaurant(@RequestParam("sessionId") String sessionId, @org.springframework.web.bind.annotation.RequestBody RestaurantDto restaurantDto) {
+    @Transactional
+    public ResponseEntity<String> registerRestaurant(@RequestParam("sessionId") String sessionId, @org.springframework.web.bind.annotation.RequestBody RestaurantDto restaurantDto) {
         // uploaded restaurant picture
         //TODO if user cancelled register restaurant, we should mark or delete an image.
         var id = sessionIdToRestaurantIdMap.get(sessionId);
@@ -121,13 +126,40 @@ public class SellerController {
                 .openTime(restaurantDto.getOpenTime())
                 .closeTime(restaurantDto.getCloseTime())
                 .build();
-        restaurantRepository.save(restaurantEntity);
+
+        var res = restaurantRepository.save(restaurantEntity);
+        sessionIdToRestaurantIdMap.remove(sessionId);
+        return ResponseEntity.ok(res.getId());
     }
 
     @PostMapping("/register/{restaurantId}/menu")
     public void registerMenu(@PathVariable("restaurantId") String restaurantId) {
+        // 1. validate user authority for this restaurant. admin can also change this.
 
     }
+
+    @GetMapping("/registered-restaurant")
+    public ResponseEntity<List<RestaurantDto>> getRegisteredRestaurants() {
+//        User user = getUser();
+//        user.getAll
+        var restaurants = restaurantRepository.findAll();
+        var ret = restaurants.stream().map(restaurant -> RestaurantDto.builder()
+                .type(restaurant.getType())
+                .userId(restaurant.getUserId())
+                .name(restaurant.getName())
+
+                .build()).toList();
+
+        return ResponseEntity.ok(ret);
+    }
+
+    @GetMapping("/restaurant/{restaurantId}")
+    public ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurantId") String restaurantId) {
+
+        return ResponseEntity.ok();
+    }
+
+
 
 
 }

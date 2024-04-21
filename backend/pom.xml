@@ -25,6 +25,7 @@
         <module>call-service/call-config-data</module>
         <module>call-service/call-application</module>
         <module>payment-service</module>
+        <module>restaurant</module>
     </modules>
 
     <parent>

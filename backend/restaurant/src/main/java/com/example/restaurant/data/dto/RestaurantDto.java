@@ -1,4 +1,4 @@
-package com.example.user.data.dto;
+package com.example.restaurant.data.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
