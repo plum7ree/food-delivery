@@ -29,7 +29,8 @@ public class ProfileController {
 
     //TODO put your bucket name here.
     // @Value("${aws.s3.bucketName}")
-    String bucketName = "";
+//    String bucketName = "";
+    private String bucketName = "b-ubermsa-ap-northeast-2-1";
     String keyName = "k-userprofile/userid1.png";
 
     private final S3Client s3Client;

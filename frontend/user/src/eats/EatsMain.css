@@ -22,7 +22,12 @@
 .user-info {
   font-size: 24px;
   color: #333;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #ccc;
 }
+
 
 .search-bar {
   display: flex;

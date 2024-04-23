@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, {useState, useEffect, useRef, useContext} from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import "./UberLikeApp.css";
+import {useSelector} from "react-redux";
 
 const axiosInstance = axios.create({
   baseURL: 'http://localhost:8072'
@@ -16,13 +17,13 @@ const UberLikeApp = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [currentPosition, setCurrentPosition] = useState(null);
   const [routeData, setRouteData] = useState(null);
-  const [profilePictureUrl, setProfilePictureUrl] = useState(null); // 프로필 사진 상태 추가
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const currentPositionMarkerRef = useRef(null);
   const polylineRef = useRef(null);
 
-  // update profile
+  const profilePictureUrl = useSelector((state) => state.profilePicture.url);
+    // update profile
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
