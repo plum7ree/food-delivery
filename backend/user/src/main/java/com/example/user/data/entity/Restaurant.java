@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class Restaurant {
     private String name;
 
     @Enumerated(EnumType.STRING)
-//    @Column(columnDefinition = "user_schema.restaurant_type_enum")
+    @Column(columnDefinition = "user_schema.restaurant_type_enum")
     private RestaurantTypeEnum type;
 
     @Column(columnDefinition = "TIME")
@@ -49,6 +50,10 @@ public class Restaurant {
 
     private String pictureUrl1;
     private String pictureUrl2;
+
+    private BigDecimal price;
+    // 통화 코드는 ISO 4217 표준에 따라 문자열 형태로 저장
+    private String currency;
 
     @Builder.Default
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER)

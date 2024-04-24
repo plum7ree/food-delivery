@@ -12,10 +12,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "option_groups")
 public class OptionGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

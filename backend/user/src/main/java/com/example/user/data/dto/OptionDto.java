@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OptionDto {
     private String name;
-    private Long cost;
+    private String cost;
 
 }

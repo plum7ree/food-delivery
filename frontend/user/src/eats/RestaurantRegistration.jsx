@@ -290,7 +290,7 @@ const RestaurantRegistration = () => {
                            {/* 1. button */}
                            <Button variant="contained" style={{float: "left"}}
                                    onClick={() => addOptionGroup(menuIndex)}>
-                              + Add Option Group
+                              + Add Option
                            </Button>
                            {/* 2. input fields */}
                            <Container style={{float: "left"}}>
@@ -334,7 +334,7 @@ const RestaurantRegistration = () => {
                                        {/* 1.button*/}
                                        <Button variant="contained" style={{float: "left"}}
                                                onClick={() => addOption(menuIndex, optionGroupIndex)}>
-                                          + Add Option
+                                          + Add Select Field
                                        </Button>
                                        {/* 2. input field */}
                                        <Container style={{float:"left"}}>

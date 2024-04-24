@@ -7,15 +7,18 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "menus")
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,6 +28,8 @@ public class Menu {
     private String description;
 
     private String pictureUrl;
+
+    private BigInteger price;
 
     @ManyToOne
     @JoinColumn(name="restaurant_id")

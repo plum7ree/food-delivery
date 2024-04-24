@@ -8,6 +8,7 @@ import com.example.user.data.entity.Option;
 import com.example.user.data.entity.OptionGroup;
 import com.example.user.data.entity.Restaurant;
 import com.example.user.data.repository.RestaurantRepository;
+import com.example.user.data.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.http.MediaType;
@@ -25,6 +26,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -42,10 +45,12 @@ public class SellerController {
 
     private final S3Client s3Client;
 
+    private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
 
-    public SellerController(S3Client s3Client, RestaurantRepository restaurantRepository) {
+    public SellerController(S3Client s3Client, UserRepository userRepository, RestaurantRepository restaurantRepository) {
         this.s3Client = s3Client;
+        this.userRepository = userRepository;
         this.restaurantRepository = restaurantRepository;
     }
 
@@ -135,8 +140,16 @@ public class SellerController {
         var restaurantId = sessionIdToRestaurantIdMap.get(sessionId);
         // enumType validation already done by RestaurantTypeEnum
 
+        var user = userRepository.findById(UUID.fromString("13f0c8f0-eec0-4169-ad9f-e8bb408a5325"));
+        if (user.isEmpty()) {
+            return ResponseEntity.badRequest().body("user not found");
+        }
+
+        var menuDtoList = restaurantDto.getMenuDtoList();
+
         var restaurantEntity = Restaurant.builder()
                 .id(restaurantId)
+                .user(user.get())
                 .name(restaurantDto.getName())
                 .type(RestaurantTypeEnum.valueOf(restaurantDto.getType()))
                 .openTime(restaurantDto.getOpenTime())
@@ -144,6 +157,31 @@ public class SellerController {
                 .pictureUrl1(restaurantDto.getPictureUrl1())
                 .pictureUrl2(restaurantDto.getPictureUrl2())
                 .build();
+
+        // Menu 엔티티 생성 및 Restaurant 엔티티에 추가
+        List<Menu> menuList = menuDtoList.stream()
+                .map(menuDto -> Menu.builder()
+                        .name(menuDto.getName())
+                        .description(menuDto.getDescription())
+                        .pictureUrl(menuDto.getPictureUrl())
+                        .price(BigInteger.valueOf(Long.parseLong(menuDto.getPrice())))
+                        .restaurant(restaurantEntity)
+                        .optionGroupList(menuDto.getOptionGroupDtoList().stream()
+                                .map(optionGroupDto -> OptionGroup.builder()
+                                        .isDuplicatedAllowed(optionGroupDto.isDuplicatedAllowed())
+                                        .isNecessary(optionGroupDto.isNecessary())
+                                        .options(optionGroupDto.getOptionDtoList().stream()
+                                                .map(optionDto -> Option.builder()
+                                                        .name(optionDto.getName())
+                                                        .cost(BigInteger.valueOf(Long.parseLong(optionDto.getCost())))
+                                                        .build())
+                                                .collect(Collectors.toList()))
+                                        .build())
+                                .collect(Collectors.toList()))
+                        .build())
+                .collect(Collectors.toList());
+
+        restaurantEntity.setMenuList(menuList);
 
         var res = restaurantRepository.save(restaurantEntity);
         sessionIdToRestaurantIdMap.remove(sessionId);
@@ -181,7 +219,7 @@ public class SellerController {
     @GetMapping("/restaurant/{restaurantId}")
     @Transactional
     public ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurantId") String restaurantId) {
-        var res = restaurantRepository.findById(restaurantId);
+        var res = restaurantRepository.findById(UUID.fromString(restaurantId));
         if(res.isEmpty()) {
             return ResponseEntity.notFound().build();
         }

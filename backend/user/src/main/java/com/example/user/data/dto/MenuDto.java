@@ -16,6 +16,7 @@ public class MenuDto {
 
     private String name;
     private String description;
+    private String price;
 
     private String pictureUrl;
     List<OptionGroupDto> optionGroupDtoList;

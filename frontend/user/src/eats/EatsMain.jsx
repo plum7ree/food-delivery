@@ -47,10 +47,13 @@ const EatsMain = () => {
               <h2>인기 카테고리</h2>
               <div className="category-list">
                   {categories.map((category, index) => (
-                      <div key={index} className="category-item">
-                          <div className="category-icon">{category.icon}</div>
-                          <span className="category-name">{category.name}</span>
-                      </div>
+                      // key 존재 필수
+                      <Link key={index} to={`/restaurants?type=${category.type}`}>
+                          <div className="category-item">
+                            <div className="category-icon">{category.icon}</div>
+                            <span className="category-name">{category.name}</span>
+                          </div>
+                     </Link>
                   ))}
               </div>
           </div>

@@ -4,6 +4,8 @@ import com.example.user.data.entity.Restaurant;
 import com.example.user.data.entity.Restaurant;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RestaurantRepository extends JpaRepository<Restaurant, String> {
+import java.util.UUID;
+
+public interface RestaurantRepository extends JpaRepository<Restaurant, UUID> {
 
 }

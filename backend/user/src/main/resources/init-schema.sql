@@ -6,25 +6,23 @@ CREATE SCHEMA user_schema;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA user_schema;
 
 -- users
-CREATE TABLE user_schema.users
-(
-    id         uuid                                           NOT NULL,
-    username   character varying COLLATE pg_catalog."default" NOT NULL,
-    first_name character varying COLLATE pg_catalog."default" NOT NULL,
-    last_name  character varying COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT users_pkey PRIMARY KEY (id)
+CREATE TABLE user_schema.users (
+    id UUID PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    role VARCHAR(255) NOT NULL
 );
 
 -- restaurants type enum
 DROP TYPE IF EXISTS user_schema.restaurant_type_enum;
-CREATE TYPE user_schema.restaurant_type_enum AS ENUM ('BURGER', 'PIZZA', 'KOREAN', 'CHINESE', 'JAPANESE', 'MEXICAN', 'ITALIAN', 'AMERICAN', 'FUSION', 'MISC');
 -- restaurants
 CREATE TABLE user_schema.restaurants
 (
     id          uuid                                           NOT NULL,
     user_id     uuid                                           NOT NULL,
     name        character varying COLLATE pg_catalog."default" NOT NULL,
-    type        user_schema.restaurant_type_enum               NOT NULL,
+    type        character varying COLLATE pg_catalog."default" NOT NULL,
     open_time   TIME                                           NOT NULL,
     close_time  TIME                                           NOT NULL,
     picture_url1 character varying COLLATE pg_catalog."default",
@@ -40,6 +38,8 @@ CREATE TABLE user_schema.menus
     name         character varying COLLATE pg_catalog."default" NOT NULL,
     description  character varying COLLATE pg_catalog."default",
     picture_url  character varying COLLATE pg_catalog."default",
+    price         BIGINT                                         NOT NULL,
+    currency      VARCHAR(255),
     restaurant_id uuid                                           NOT NULL,
     created_at   TIMESTAMP                                      NOT NULL,
     updated_at   TIMESTAMP                                      NOT NULL,
@@ -64,6 +64,7 @@ CREATE TABLE user_schema.options
     id              uuid                                           NOT NULL,
     name            character varying COLLATE pg_catalog."default" NOT NULL,
     cost            BIGINT                                         NOT NULL,
+    currency        VARCHAR(3),
     option_group_id uuid                                           NOT NULL,
     CONSTRAINT options_pkey PRIMARY KEY (id),
     CONSTRAINT fk_option_group_id FOREIGN KEY (option_group_id) REFERENCES user_schema.option_groups (id)

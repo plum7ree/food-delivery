@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Embeddable
 public class BaseTimeValue {
     @CreationTimestamp
-    LocalDateTime createAt;
+    LocalDateTime createdAt;
 
     @UpdateTimestamp
     LocalDateTime updatedAt;
