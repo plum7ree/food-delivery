@@ -11,6 +11,9 @@ import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.data.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,7 +70,8 @@ public class SellerController {
     }
     @PostMapping("/restaurant-picture")
     public void uploadRestaurantPicture(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId) {
-        var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
+        // var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
+        var keyName = keyNamePrefix + "/" + "10000000-0000-0000-0001-000000000000";
         if(!UrlUtils.checkBucketExists(bucketName, s3Client)) {
             UrlUtils.createBucket(bucketName, s3Client);
         }
@@ -88,12 +92,58 @@ public class SellerController {
     }
 
     @PostMapping("/restaurant-picture-resized")
-    public ResponseEntity<String> uploadProfilePictureResized(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId) {
-        if(!sessionIdToRestaurantIdMap.containsKey(sessionId)) {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<String> uploadProfilePictureResized(@RequestParam("file") MultipartFile file,
+                                                              @RequestParam("sessionId") String sessionId,
+                                                              @RequestParam(value="idx", required = false, defaultValue = "0") Integer idx) {
+        //if(!sessionIdToRestaurantIdMap.containsKey(sessionId)) {
+        //    return ResponseEntity.notFound().build();
+        //}
+
+        // var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
+        var keyName = keyNamePrefix + "/" + "10000000-0000-0000-0001-000000000000/restaurant-profile/" + idx;
+
+        // Check if the bucket exists, create it if not
+        if (!UrlUtils.checkBucketExists(bucketName, s3Client)) {
+            UrlUtils.createBucket(bucketName, s3Client);
         }
 
-        var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
+        //TODO please recycle this.
+        try (InputStream inputStream = file.getInputStream()) {
+            //TODO move this resize part into serverless application (aws lambda or kubernetes fargate)
+            BufferedImage originalImage = ImageIO.read(inputStream);
+
+            // Resize the image to a small icon
+            BufferedImage resizedImage = resizeImage(originalImage, 200, 200);
+
+            // Convert the resized image to bytes
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(resizedImage, "png", baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            // Upload the resized image to S3
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(keyName)
+                    .build();
+            s3Client.putObject(request, RequestBody.fromBytes(imageBytes));
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Handle exception
+        }
+        return ResponseEntity.ok().build();
+    }
+
+
+    @PostMapping("/menu-picture-resized")
+    public ResponseEntity<String> uploadMenuPictureResized(@RequestParam("file") MultipartFile file,
+                                                              @RequestParam("sessionId") String sessionId,
+                                                              @RequestParam(value="fileIdx") Integer fileIdx) {
+        //if(!sessionIdToRestaurantIdMap.containsKey(sessionId)) {
+        //    return ResponseEntity.notFound().build();
+        //}
+
+        // var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
+        var keyName = keyNamePrefix + "/" + "10000000-0000-0000-0001-000000000000/menu/" + fileIdx;
 
         // Check if the bucket exists, create it if not
         if (!UrlUtils.checkBucketExists(bucketName, s3Client)) {
@@ -158,30 +208,32 @@ public class SellerController {
                 .pictureUrl2(restaurantDto.getPictureUrl2())
                 .build();
 
-        // Menu 엔티티 생성 및 Restaurant 엔티티에 추가
-        List<Menu> menuList = menuDtoList.stream()
-                .map(menuDto -> Menu.builder()
-                        .name(menuDto.getName())
-                        .description(menuDto.getDescription())
-                        .pictureUrl(menuDto.getPictureUrl())
-                        .price(BigInteger.valueOf(Long.parseLong(menuDto.getPrice())))
-                        .restaurant(restaurantEntity)
-                        .optionGroupList(menuDto.getOptionGroupDtoList().stream()
-                                .map(optionGroupDto -> OptionGroup.builder()
-                                        .isDuplicatedAllowed(optionGroupDto.isDuplicatedAllowed())
-                                        .isNecessary(optionGroupDto.isNecessary())
-                                        .options(optionGroupDto.getOptionDtoList().stream()
-                                                .map(optionDto -> Option.builder()
-                                                        .name(optionDto.getName())
-                                                        .cost(BigInteger.valueOf(Long.parseLong(optionDto.getCost())))
-                                                        .build())
-                                                .collect(Collectors.toList()))
-                                        .build())
-                                .collect(Collectors.toList()))
-                        .build())
-                .collect(Collectors.toList());
+        if(menuDtoList != null) {
+            // Menu 엔티티 생성 및 Restaurant 엔티티에 추가
+            List<Menu> menuList = menuDtoList.stream()
+                    .map(menuDto -> Menu.builder()
+                            .name(menuDto.getName())
+                            .description(menuDto.getDescription())
+                            .pictureUrl(menuDto.getPictureUrl())
+                            .price(BigInteger.valueOf(Long.parseLong(menuDto.getPrice())))
+                            .restaurant(restaurantEntity)
+                            .optionGroupList(menuDto.getOptionGroupDtoList().stream()
+                                    .map(optionGroupDto -> OptionGroup.builder()
+                                            .isDuplicatedAllowed(optionGroupDto.isDuplicatedAllowed())
+                                            .isNecessary(optionGroupDto.isNecessary())
+                                            .options(optionGroupDto.getOptionDtoList().stream()
+                                                    .map(optionDto -> Option.builder()
+                                                            .name(optionDto.getName())
+                                                            .cost(BigInteger.valueOf(Long.parseLong(optionDto.getCost())))
+                                                            .build())
+                                                    .collect(Collectors.toList()))
+                                            .build())
+                                    .collect(Collectors.toList()))
+                            .build())
+                    .collect(Collectors.toList());
 
-        restaurantEntity.setMenuList(menuList);
+            restaurantEntity.setMenuList(menuList);
+        }
 
         var res = restaurantRepository.save(restaurantEntity);
         sessionIdToRestaurantIdMap.remove(sessionId);
@@ -196,6 +248,19 @@ public class SellerController {
         // 1. validate user authority for this restaurant. admin can also change this.
         // is restaurant user id is same?
 
+    }
+
+
+
+    @GetMapping("/restaurants")
+    public List<RestaurantDto> getRestaurantsByType(
+            @RequestParam(value = "type") String type,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        var entity =  restaurantRepository.findByType(RestaurantTypeEnum.valueOf(type), pageable);
+        return entity.stream().map(Converter::convertRestaurantEntityToDtoWithoutMenu).collect(Collectors.toList());
     }
 
     @GetMapping("/registered-restaurant")

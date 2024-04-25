@@ -60,8 +60,8 @@ public class SellerControllerTest {
 
         // 첫 번째 메뉴 menu --< optiongroup --< option
         List<OptionDto> optionDtoList1 = Arrays.asList(
-                OptionDto.builder().name("치즈 추가").cost(500L).build(),
-                OptionDto.builder().name("베이컨 추가").cost(1000L).build()
+                OptionDto.builder().name("치즈 추가").cost("500").build(),
+                OptionDto.builder().name("베이컨 추가").cost("1000").build()
         );
         List<OptionGroupDto> optionGroupDtoList1 = Arrays.asList(
                 OptionGroupDto.builder().isDuplicatedAllowed(true).isNecessary(false).optionDtoList(optionDtoList1).build()
@@ -75,8 +75,8 @@ public class SellerControllerTest {
 
         // 두 번째 메뉴
         List<OptionDto> optionDtoList2 = Arrays.asList(
-                OptionDto.builder().name("아메리카노").cost(1500L).build(),
-                OptionDto.builder().name("카페라떼").cost(2000L).build()
+                OptionDto.builder().name("아메리카노").cost("1500").build(),
+                OptionDto.builder().name("카페라떼").cost("2000").build()
         );
         List<OptionGroupDto> optionGroupDtoList2 = Arrays.asList(
                 OptionGroupDto.builder().isDuplicatedAllowed(false).isNecessary(true).optionDtoList(optionDtoList2).build()

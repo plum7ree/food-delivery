@@ -1,16 +1,14 @@
-import React, {useState, useEffect, useRef, useContext} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import "./UberLikeApp.css";
-import {useSelector} from "react-redux";
-
-const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8072'
-});
+import {useDispatch, useSelector} from "react-redux";
+import {fetchProfilePicture} from "./state/fetchProfilePicture";
+import axiosInstance from "./state/axiosInstance";
 
 const UberLikeApp = () => {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState("home");
   const [address, setAddress] = useState("");
   const [serviceType, setServiceType] = useState("regular");
   const [isSearchingDriver, setIsSearchingDriver] = useState(false);
@@ -22,21 +20,16 @@ const UberLikeApp = () => {
   const currentPositionMarkerRef = useRef(null);
   const polylineRef = useRef(null);
 
+  // Redux store에서 프로필 사진 URL을 가져옵니다.
   const profilePictureUrl = useSelector((state) => state.profilePicture.url);
-    // update profile
+
+  // Redux의 dispatch 함수를 가져옵니다.
+  const dispatch = useDispatch();
+
   useEffect(() => {
-    const fetchProfilePicture = async () => {
-      try {
-        const response = await axiosInstance.get("/user/api/profile-picture");
-        console.log("profile picture : ", response.data);
-        // 프로필 사진을 받아와서 상태에 설정
-        setProfilePictureUrl(response.data);
-      } catch (error) {
-        console.error("Error fetching profile picture:", error);
-      }
-    };
-    fetchProfilePicture(); // 프로필 사진 가져오기 함수 호출
-  }, []);
+    // Redux store에서 프로필 사진을 가져오는 액션을 디스패치합니다.
+    dispatch(fetchProfilePicture());
+  }, [dispatch]);
 
   useEffect(() => {
     if (mapRef.isInitialized) return;

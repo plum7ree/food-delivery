@@ -51,9 +51,7 @@ public class Restaurant {
     private String pictureUrl1;
     private String pictureUrl2;
 
-    private BigDecimal price;
-    // 통화 코드는 ISO 4217 표준에 따라 문자열 형태로 저장
-    private String currency;
+
 
     @Builder.Default
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER)

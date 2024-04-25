@@ -22,6 +22,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {Container, styled} from '@mui/system';
 
 import {useSelector} from 'react-redux';
+import axiosInstance from "../state/axiosInstance";
 
 const StyledButton = styled(Button)(({theme}) => ({
    backgroundColor: 'white',
@@ -54,8 +55,6 @@ const RestaurantRegistration = () => {
          optionGroups: null
       },
    ]);
-   const axiosInstance = useSelector((state) => state.axiosInstance.instance);
-
    useEffect(() => {
       fetchRegisteredRestaurants();
    }, []);
@@ -70,7 +69,7 @@ const RestaurantRegistration = () => {
       }
    };
 
-   const uploadPicture = async () => {
+   const uploadRestaurantPicture = async () => {
       try {
          const formData = new FormData();
          formData.append('file', pictureFile);
@@ -79,6 +78,43 @@ const RestaurantRegistration = () => {
       } catch (error) {
          console.error('Error uploading picture:', error);
       }
+   };
+
+
+   const [menuPictureFiles, setMenuPictureFiles] = useState({});
+   const [updatedMenuIndex, setUpdateMenuIndex] = useState(0);
+
+   useEffect(() => {
+     console.log('menuPictureFiles updated:', menuPictureFiles);
+     uploadMenuPicture(menuPictureFiles['updatedMenuIdx']);
+   }, [menuPictureFiles]);
+
+   const uploadMenuPicture = async (menuIndex) => {
+     try {
+        const lastIdx = menuPictureFiles[menuIndex].length-1;
+       const formData = new FormData();
+       formData.append('file', menuPictureFiles[menuIndex][lastIdx]);
+       formData.append('sessionId', sessionId);
+       formData.append('fileIdx', lastIdx);
+       await axiosInstance.post('/user/api/seller/menu-picture-resized', formData);
+     } catch (error) {
+       console.error('Error uploading menu picture:', error);
+     }
+   };
+
+   const addMenuPictureFiles = async (menuIndex, file) => {
+     setMenuPictureFiles((prevFiles) => {
+       const updatedFiles = { ...prevFiles };
+       // if not exists, add new file list.
+       if (!updatedFiles[menuIndex]) {
+         updatedFiles[menuIndex] = [];
+       }
+       updatedFiles[menuIndex].push(file);
+       updatedFiles['updatedMenuIdx'] = menuIndex;
+       console.log(updatedFiles);
+       return updatedFiles;
+     });
+
    };
 
    const registerRestaurant = async () => {
@@ -190,7 +226,7 @@ const RestaurantRegistration = () => {
                      Select Picture
                   </Button>
                </label>
-               <Button variant="contained" style={{float: 'left'}} onClick={uploadPicture} disabled={!pictureFile}>
+               <Button variant="contained" style={{float: 'left'}} onClick={uploadRestaurantPicture} disabled={!pictureFile}>
                   Upload Picture
                </Button>
             </Grid>
@@ -252,10 +288,11 @@ const RestaurantRegistration = () => {
                   }}
                />
             </Grid>
-            <Grid item xs={12} mt={2} ml={4}>
+            <Grid item xs={12} mt={3} ml={3}>
                <Typography align="left">Menus</Typography>
                {menus.map((menu, menuIndex) => (
-                  <Box key={menuIndex}>
+                  <Box key={menuIndex} mb={3}>
+
                      <StyledButton
                         variant="contained"
                         onClick={() => toggleMenuExpansion(menuIndex)}
@@ -266,7 +303,22 @@ const RestaurantRegistration = () => {
                      </StyledButton>
                      <Collapse in={expandedMenus.includes(menuIndex)} timeout="auto" unmountOnExit>
                         <ExpandedContent>
-
+                           <Box display="flex" flexDirection="column" alignItems="flex-start" >
+                              <input
+                                 type="file"
+                                 onChange={(e) => addMenuPictureFiles(menuIndex, e.target.files[0])}
+                                 style={{display: 'none'}}
+                                 id={`menu-picture-upload-${menuIndex}`}
+                              />
+                              <label htmlFor={`menu-picture-upload-${menuIndex}`}>
+                                 <Button variant="contained" xs={2} sm={2} style={{float: 'left'}} component="span">
+                                    Select Menu Picture
+                                 </Button>
+                              </label>
+                              {menuPictureFiles[menuIndex] && menuPictureFiles[menuIndex].map((file, fileIndex) => (
+                                 <Typography key={`menu-${menuIndex}-picture-uploaded-file-${fileIndex}`} xs={2}>{file.name}</Typography>
+                              ))}
+                           </Box>
                            <TextField
                               label="Menu Name"
                               fullWidth
@@ -288,47 +340,48 @@ const RestaurantRegistration = () => {
 
                            {/* Option Group 생성. */}
                            {/* 1. button */}
-                           <Button variant="contained" style={{float: "left"}}
-                                   onClick={() => addOptionGroup(menuIndex)}>
-                              + Add Option
-                           </Button>
-                           {/* 2. input fields */}
-                           <Container style={{float: "left"}}>
-                              {menu.optionGroups && menu.optionGroups.map((optionGroup, optionGroupIndex) => (
-                                 <Box key={optionGroupIndex} ml={4}>
-                                    <Typography variant="subtitle2" align="left" mt={2}>Option</Typography>
-                                    <TextField
-                                       label="name"
-                                       fullWidth
-                                       value={optionGroup.name}
-                                       onChange={(e) =>
-                                          handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)
-                                       }
-                                    />
-                                    <TextField
-                                       label="Is Duplicated Allowed"
-                                       fullWidth
-                                       select
-                                       value={optionGroup.isDuplicatedAllowed}
-                                       onChange={(e) =>
-                                          handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)
-                                       }
-                                    >
-                                       <MenuItem value="true">True</MenuItem>
-                                       <MenuItem value="false">False</MenuItem>
-                                    </TextField>
-                                    <TextField
-                                       label="Is Necessary"
-                                       fullWidth
-                                       select
-                                       value={optionGroup.isNecessary}
-                                       onChange={(e) =>
-                                          handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)
-                                       }
-                                    >
-                                       <MenuItem value="true">True</MenuItem>
-                                       <MenuItem value="false">False</MenuItem>
-                                    </TextField>
+                           <Box mb={3}>
+                              <Button variant="contained" style={{float: "left"}}
+                                      onClick={() => addOptionGroup(menuIndex)}>
+                                 + Add Option
+                              </Button>
+                              {/* 2. input fields */}
+                              <Container style={{float: "left"}}>
+                                 {menu.optionGroups && menu.optionGroups.map((optionGroup, optionGroupIndex) => (
+                                    <Box key={optionGroupIndex} ml={4}>
+                                       <Typography variant="subtitle2" align="left" mt={2}>Option</Typography>
+                                       <TextField
+                                          label="name"
+                                          fullWidth
+                                          value={optionGroup.name}
+                                          onChange={(e) =>
+                                             handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)
+                                          }
+                                       />
+                                       <TextField
+                                          label="Is Duplicated Allowed"
+                                          fullWidth
+                                          select
+                                          value={optionGroup.isDuplicatedAllowed}
+                                          onChange={(e) =>
+                                             handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)
+                                          }
+                                       >
+                                          <MenuItem value="true">True</MenuItem>
+                                          <MenuItem value="false">False</MenuItem>
+                                       </TextField>
+                                       <TextField
+                                          label="Is Necessary"
+                                          fullWidth
+                                          select
+                                          value={optionGroup.isNecessary}
+                                          onChange={(e) =>
+                                             handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)
+                                          }
+                                       >
+                                          <MenuItem value="true">True</MenuItem>
+                                          <MenuItem value="false">False</MenuItem>
+                                       </TextField>
 
                                        {/*Option  생성 */}
                                        {/* 1.button*/}
@@ -337,32 +390,35 @@ const RestaurantRegistration = () => {
                                           + Add Select Field
                                        </Button>
                                        {/* 2. input field */}
-                                       <Container style={{float:"left"}}>
-                                       {optionGroup.options && optionGroup.options.map((option, optionIndex) => (
-                                          <Box key={optionIndex} ml={4}>
-                                             <Typography variant="subtitle2" align="left" mt={2}>Select Field</Typography>
-                                             <TextField
-                                                label="Option Name"
-                                                fullWidth
-                                                value={option.name}
-                                                onChange={(e) =>
-                                                   handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'name', e.target.value)
-                                                }
-                                             />
-                                             <TextField
-                                                label="Option Cost"
-                                                fullWidth
-                                                value={option.cost}
-                                                onChange={(e) =>
-                                                   handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'cost', e.target.value)
-                                                }
-                                             />
-                                          </Box>
-                                       ))}
+                                       <Container style={{float: "left"}}>
+                                          {optionGroup.options && optionGroup.options.map((option, optionIndex) => (
+                                             <Box key={optionIndex} ml={4}>
+                                                <Typography variant="subtitle2" align="left" mt={2}>Select
+                                                   Field</Typography>
+                                                <TextField
+                                                   label="Option Name"
+                                                   fullWidth
+                                                   value={option.name}
+                                                   onChange={(e) =>
+                                                      handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'name', e.target.value)
+                                                   }
+                                                />
+                                                <TextField
+                                                   label="Option Cost"
+                                                   fullWidth
+                                                   value={option.cost}
+                                                   onChange={(e) =>
+                                                      handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'cost', e.target.value)
+                                                   }
+                                                />
+                                             </Box>
+                                          ))}
                                        </Container>
-                                 </Box>
-                              ))}
-                           </Container>
+                                    </Box>
+                                 ))}
+                              </Container>
+
+                           </Box>
 
                         </ExpandedContent>
                      </Collapse>
@@ -379,26 +435,26 @@ const RestaurantRegistration = () => {
             </Grid>
          </Grid>
          <Box mt={4}>
-            <Typography >
+            <Typography>
                Registered Restaurants
             </Typography>
             <TableContainer component={Paper}>
                <Table>
                   <TableHead>
-                     <TableRow>
+                     <TableRow key='tableheadkey'>
                         <TableCell>Name</TableCell>
                         <TableCell>Type</TableCell>
                         <TableCell>Open Time</TableCell>
                         <TableCell>Close Time</TableCell>
                      </TableRow>
                   </TableHead>
-                  <TableBody>
-                     {registeredRestaurants.map((restaurant) => (
-                        <TableRow key={restaurant.id}>
-                           <TableCell>{restaurant.name}</TableCell>
-                           <TableCell>{restaurant.type}</TableCell>
-                           <TableCell>{restaurant.openTime}</TableCell>
-                           <TableCell>{restaurant.closeTime}</TableCell>
+                  <TableBody key='tabkebodykey'>
+                     {registeredRestaurants.map((restaurant, index) => (
+                        <TableRow key={`restaurant-${index}`}>
+                           <TableCell key={`restaurant-name-${index}`}>{restaurant.name}</TableCell>
+                           <TableCell key={`restaurant-type-${index}`}>{restaurant.type}</TableCell>
+                           <TableCell key={`restaurant-opentime-${index}`}>{restaurant.openTime}</TableCell>
+                           <TableCell key={`restaurant-closetime-${index}`}>{restaurant.closeTime}</TableCell>
                         </TableRow>
                      ))}
                   </TableBody>

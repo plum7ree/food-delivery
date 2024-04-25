@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,8 @@ public class Menu {
     private String pictureUrl;
 
     private BigInteger price;
+    // 통화 코드는 ISO 4217 표준에 따라 문자열 형태로 저장
+    private String currency;
 
     @ManyToOne
     @JoinColumn(name="restaurant_id")

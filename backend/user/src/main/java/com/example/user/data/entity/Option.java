@@ -20,7 +20,7 @@ public class Option {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "optiongroup_id")
+    @JoinColumn(name = "option_group_id")
     private OptionGroup optionGroup;
 
     private String name;

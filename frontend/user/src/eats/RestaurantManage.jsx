@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { Fab, Box, List, ListItem, ListItemText } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import {useSelector} from "react-redux";
+import axiosInstance from "../state/axiosInstance";
 
 const RestaurantManage = () => {
   const [restaurants, setRestaurants] = useState([]);
-  const axiosInstance = useSelector((state) => state.axiosInstance.instance);
 
   useEffect(() => {
     fetchRegisteredRestaurants();
@@ -41,9 +41,9 @@ const RestaurantManage = () => {
       </Box>
       <h2>등록된 레스토랑 목록</h2>
       <List>
-        {restaurants.map((restaurant) => (
+        {restaurants.map((restaurant, index) => (
           <ListItem
-            key={restaurant.id}
+            key={index}
             button
             component={Link}
             to={`/restaurant/${restaurant.id}`}
