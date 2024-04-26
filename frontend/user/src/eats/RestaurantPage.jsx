@@ -1,35 +1,67 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import axios from 'axios';
+import {Box} from "@mui/material";
+
+const RestaurantPicture = () => {
+  return (
+     <Box>
+
+
+     </Box>
+  )
+}
+
+const RestaurantMenuLabel = (props) => {
+  const {menu} = props;
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        {/*{menu.name}*/}
+        menu name
+      </Grid>
+      <Grid item xs={12} sm={6} rowSpan={2}>
+        picture
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        {/*{menu.price}*/}
+        menu price
+      </Grid>
+    </Grid>
+  )
+}
 
 const RestaurantPage = () => {
-  const { id } = useParams(); // URL에서 레스토랑 ID를 가져옵니다.
-  const [restaurant, setRestaurant] = useState(null); // 레스토랑 상세 정보를 담을 상태
+  const location = useLocation(); // useLocation 훅을 사용하여 URL 정보를 가져옵니다.
+  const navigate = useNavigate();
+  const [restaurant, setRestaurant] = useState(null); // type 상태를 선언합니다.
 
   useEffect(() => {
-    const fetchRestaurant = async () => {
-      try {
-        const response = await axios.get(`/api/restaurants/${id}`); // API 경로에 레스토랑 ID를 전달하여 해당 레스토랑 정보를 가져옵니다.
-        setRestaurant(response.data); // 가져온 정보를 상태에 저장합니다.
-      } catch (error) {
-        console.error('Error fetching restaurant:', error);
-      }
-    };
+    // URL에서 type 파라미터를 가져옵니다.
+    var restaurant = location.state['restaurant']
+     console.log(location)
+     setRestaurant(restaurant)
+  }, [location]); // location.search가 변경될 때마다 useEffect가 실행됩니다.
 
-    fetchRestaurant(); // 함수를 호출하여 레스토랑 정보를 가져옵니다.
-  }, [id]);
+   // menu 만 별도로 관리하고 싶으면 이렇게.
+   // const [menus, setMenus] = useState([]);
+   // useEffect(() => {
+   //   var restaurant = location.state['restaurant']
+   //   setRestaurant(restaurant)
+   //   setMenus(restaurant.menus)
+   // }, [location]);
 
-  if (!restaurant) {
-    return <div>Loading...</div>; // 데이터를 가져오는 동안 로딩 상태를 표시합니다.
-  }
 
+   console.log(restaurant)
   return (
-    <div>
-      <h2>{restaurant.name}</h2>
-      <p>Address: {restaurant.address}</p>
-      <p>Phone: {restaurant.phone}</p>
-      {/* 기타 레스토랑 정보를 표시합니다. */}
-    </div>
+     <Box>
+       <RestaurantPicture />
+        // restaurant 이 아니라 restaurant.menus 에 걸어도 감지 가능한가?
+       {restaurant.menus.map((menu, index) => (
+          <RestaurantMenuLabel />
+       ))}
+
+     </Box>
   );
 };
 

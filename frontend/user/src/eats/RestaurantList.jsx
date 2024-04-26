@@ -35,11 +35,11 @@ const RestaurantList = () => {
   }, [type]); // type이 변경될 때마다 useEffect가 실행됩니다.
 
 
-  const handleCategoryClick = (restaurantId) => {
+  const handleCategoryClick = (restaurant) => {
     // 해당 카테고리의 타입을 URL에 포함하여 페이지를 이동합니다.
-    navigate(`/eats/restaurants/${restaurantId}`, {
+    navigate(`/eats/restaurant/${restaurant.id}`, {
        state: {
-          id: `${restaurantId}`
+          restaurant: `${restaurant}`
        }
      });
   };
@@ -50,7 +50,7 @@ const RestaurantList = () => {
       <h2>{type ? `${type} 레스토랑 목록` : '레스토랑 목록'}</h2>
       <div className="restaurant-list">
         {restaurants.map((restaurant) => (
-          <div key={restaurant.id} onClick={() => handleCategoryClick(restaurant.id)}>
+          <div key={restaurant.id} onClick={() => handleCategoryClick(restaurant)}>
             <div className="restaurant-item">
               <img src={restaurant.imageUrl} alt={restaurant.name} />
               <p>{restaurant.name}</p>

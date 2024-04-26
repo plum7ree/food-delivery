@@ -39,7 +39,7 @@ export default function App() {
           <Route path="/eats/restaurant-registration" element={<RestaurantRegistration />} />
           <Route path="/eats/restaurant-manage" element={<RestaurantManage />} />
           <Route path="/eats/restaurants/:type" element={<RestaurantList />} />
-            <Route path="/restaurant/:id" element={RestaurantPage} /> {/* 레스토랑 페이지를 라우터에 등록합니다. */}
+          <Route path="/eats/restaurant/:id" element={<RestaurantPage />} /> {/* 레스토랑 페이지를 라우터에 등록합니다. */}
 
         </Routes>
       </Router>

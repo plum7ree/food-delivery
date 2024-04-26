@@ -41,6 +41,86 @@ const ExpandedContent = styled(Box)({
 });
 
 
+const OptionGroupInputField = (props) => {
+   var optionGroup= props.optionGroup;
+   var menuIndex = props.menuIndex;
+   var optionGroupIndex = props.optionGroupIndex;
+   var handleOptionGroupChange = props.handleOptionGroupChange;
+   return (
+      <Box>
+         <Typography variant="subtitle2" align="left" mt={2}>Option</Typography>
+         <TextField
+         label="name"
+         fullWidth
+         value={optionGroup.name}
+         onChange={(e) =>
+         handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)
+         }
+         />
+         <TextField
+         label="Is Duplicated Allowed"
+         fullWidth
+         select
+         value={optionGroup.isDuplicatedAllowed}
+         onChange={(e) =>
+         handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)
+         }
+         >
+         <MenuItem value="true">True</MenuItem>
+         <MenuItem value="false">False</MenuItem>
+         </TextField>
+         <TextField
+         label="Is Necessary"
+         fullWidth
+         select
+         value={optionGroup.isNecessary}
+         onChange={(e) =>
+         handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)
+         }
+         >
+         <MenuItem value="true">True</MenuItem>
+         <MenuItem value="false">False</MenuItem>
+         </TextField>
+      </Box>
+
+
+   )
+
+}
+
+
+const OptionInputField = (props) => {
+   var option = props.option;
+   var optionIndex = props.optionIndex;
+   var menuIndex = props.menuIndex;
+   var optionGroupIndex = props.optionGroupIndex;
+   var handleOptionChange = props.handleOptionChange;
+
+   return (
+      <Box key={optionIndex} ml={4}>
+         <Typography variant="subtitle2" align="left" mt={2}>Select
+            Field</Typography>
+         <TextField
+            label="Option Name"
+            fullWidth
+            value={option.name}
+            onChange={(e) =>
+               handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'name', e.target.value)
+            }
+         />
+         <TextField
+            label="Option Cost"
+            fullWidth
+            value={option.cost}
+            onChange={(e) =>
+               handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'cost', e.target.value)
+            }
+         />
+         </Box>
+   )
+
+}
+
 const RestaurantRegistration = () => {
    const [sessionId, setSessionId] = useState('');
    const [restaurantName, setRestaurantName] = useState('');
@@ -349,39 +429,40 @@ const RestaurantRegistration = () => {
                               <Container style={{float: "left"}}>
                                  {menu.optionGroups && menu.optionGroups.map((optionGroup, optionGroupIndex) => (
                                     <Box key={optionGroupIndex} ml={4}>
-                                       <Typography variant="subtitle2" align="left" mt={2}>Option</Typography>
-                                       <TextField
-                                          label="name"
-                                          fullWidth
-                                          value={optionGroup.name}
-                                          onChange={(e) =>
-                                             handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)
-                                          }
-                                       />
-                                       <TextField
-                                          label="Is Duplicated Allowed"
-                                          fullWidth
-                                          select
-                                          value={optionGroup.isDuplicatedAllowed}
-                                          onChange={(e) =>
-                                             handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)
-                                          }
-                                       >
-                                          <MenuItem value="true">True</MenuItem>
-                                          <MenuItem value="false">False</MenuItem>
-                                       </TextField>
-                                       <TextField
-                                          label="Is Necessary"
-                                          fullWidth
-                                          select
-                                          value={optionGroup.isNecessary}
-                                          onChange={(e) =>
-                                             handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)
-                                          }
-                                       >
-                                          <MenuItem value="true">True</MenuItem>
-                                          <MenuItem value="false">False</MenuItem>
-                                       </TextField>
+                                       <OptionGroupInputField optionGroup={optionGroup} menuIndex={menuIndex} optionGroupIndex={optionGroupIndex} handleOptionGroupChange={handleOptionGroupChange} />
+                                       {/*<Typography variant="subtitle2" align="left" mt={2}>Option</Typography>*/}
+                                       {/*<TextField*/}
+                                       {/*   label="name"*/}
+                                       {/*   fullWidth*/}
+                                       {/*   value={optionGroup.name}*/}
+                                       {/*   onChange={(e) =>*/}
+                                       {/*      handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)*/}
+                                       {/*   }*/}
+                                       {/*/>*/}
+                                       {/*<TextField*/}
+                                       {/*   label="Is Duplicated Allowed"*/}
+                                       {/*   fullWidth*/}
+                                       {/*   select*/}
+                                       {/*   value={optionGroup.isDuplicatedAllowed}*/}
+                                       {/*   onChange={(e) =>*/}
+                                       {/*      handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)*/}
+                                       {/*   }*/}
+                                       {/*>*/}
+                                       {/*   <MenuItem value="true">True</MenuItem>*/}
+                                       {/*   <MenuItem value="false">False</MenuItem>*/}
+                                       {/*</TextField>*/}
+                                       {/*<TextField*/}
+                                       {/*   label="Is Necessary"*/}
+                                       {/*   fullWidth*/}
+                                       {/*   select*/}
+                                       {/*   value={optionGroup.isNecessary}*/}
+                                       {/*   onChange={(e) =>*/}
+                                       {/*      handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)*/}
+                                       {/*   }*/}
+                                       {/*>*/}
+                                       {/*   <MenuItem value="true">True</MenuItem>*/}
+                                       {/*   <MenuItem value="false">False</MenuItem>*/}
+                                       {/*</TextField>*/}
 
                                        {/*Option  생성 */}
                                        {/* 1.button*/}
@@ -392,26 +473,7 @@ const RestaurantRegistration = () => {
                                        {/* 2. input field */}
                                        <Container style={{float: "left"}}>
                                           {optionGroup.options && optionGroup.options.map((option, optionIndex) => (
-                                             <Box key={optionIndex} ml={4}>
-                                                <Typography variant="subtitle2" align="left" mt={2}>Select
-                                                   Field</Typography>
-                                                <TextField
-                                                   label="Option Name"
-                                                   fullWidth
-                                                   value={option.name}
-                                                   onChange={(e) =>
-                                                      handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'name', e.target.value)
-                                                   }
-                                                />
-                                                <TextField
-                                                   label="Option Cost"
-                                                   fullWidth
-                                                   value={option.cost}
-                                                   onChange={(e) =>
-                                                      handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'cost', e.target.value)
-                                                   }
-                                                />
-                                             </Box>
+                                             <OptionInputField key={optionIndex} option={option} optionIndex={optionIndex} menuIndex={menuIndex} optionGroupIndex={optionGroupIndex} handleOptionChange={handleOptionChange} />
                                           ))}
                                        </Container>
                                     </Box>
