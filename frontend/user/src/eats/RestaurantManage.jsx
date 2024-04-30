@@ -14,7 +14,7 @@ const RestaurantManage = () => {
 
   const fetchRegisteredRestaurants = async () => {
     try {
-      const response = await axiosInstance.get('/user/api/seller/registered-restaurant');
+      const response = await axiosInstance.get('/user/api/seller/user-registered-restaurant');
       if (Array.isArray(response.data)) {
         setRestaurants(response.data);
       } else {

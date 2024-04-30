@@ -17,7 +17,7 @@ import {
    Collapse,
 } from '@mui/material';
 import {ExpandMore, ExpandLess} from '@mui/icons-material';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import {Container, styled} from '@mui/system';
 
@@ -26,12 +26,15 @@ import axiosInstance from "../state/axiosInstance";
 
 const StyledButton = styled(Button)(({theme}) => ({
    backgroundColor: 'white',
-     color: 'black', // textColor 수정
+   color: 'black',
    width: '100%',
    borderRadius: '0',
    justifyContent: 'space-between',
    '&:hover': {
       backgroundColor: 'white',
+   },
+   '& .MuiSvgIcon-root': {
+      fontSize: '1.5rem', // 아이콘 크기 조절
    },
 }));
 const ExpandedContent = styled(Box)({
@@ -42,46 +45,56 @@ const ExpandedContent = styled(Box)({
 
 
 const OptionGroupInputField = (props) => {
-   var optionGroup= props.optionGroup;
+   var optionGroup = props.optionGroup;
    var menuIndex = props.menuIndex;
    var optionGroupIndex = props.optionGroupIndex;
    var handleOptionGroupChange = props.handleOptionGroupChange;
+   var removeOptionGroup = props.removeOptionGroup;
    return (
-      <Box>
-         <Typography variant="subtitle2" align="left" mt={2}>Option</Typography>
+      <Grid container mt={3}>
+         <Grid container>
+            <Grid item xs={6} align="left">
+               <Typography variant="subtitle1">Option</Typography>
+
+            </Grid>
+            <Grid item align="right" xs={6}>
+               <DeleteIcon onClick={() => removeOptionGroup(menuIndex, optionGroupIndex)}/>
+
+            </Grid>
+         </Grid>
          <TextField
-         label="name"
-         fullWidth
-         value={optionGroup.name}
-         onChange={(e) =>
-         handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)
-         }
+            label="name"
+            fullWidth
+            value={optionGroup.name}
+            onChange={(e) =>
+               handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)
+            }
          />
          <TextField
-         label="Is Duplicated Allowed"
-         fullWidth
-         select
-         value={optionGroup.isDuplicatedAllowed}
-         onChange={(e) =>
-         handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)
-         }
+            label="Is Duplicated Allowed"
+            fullWidth
+            select
+            value={optionGroup.isDuplicatedAllowed}
+            onChange={(e) =>
+               handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)
+            }
          >
-         <MenuItem value="true">True</MenuItem>
-         <MenuItem value="false">False</MenuItem>
+            <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
          </TextField>
          <TextField
-         label="Is Necessary"
-         fullWidth
-         select
-         value={optionGroup.isNecessary}
-         onChange={(e) =>
-         handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)
-         }
+            label="Is Necessary"
+            fullWidth
+            select
+            value={optionGroup.isNecessary}
+            onChange={(e) =>
+               handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)
+            }
          >
-         <MenuItem value="true">True</MenuItem>
-         <MenuItem value="false">False</MenuItem>
+            <MenuItem value="true">True</MenuItem>
+            <MenuItem value="false">False</MenuItem>
          </TextField>
-      </Box>
+      </Grid>
 
 
    )
@@ -95,11 +108,20 @@ const OptionInputField = (props) => {
    var menuIndex = props.menuIndex;
    var optionGroupIndex = props.optionGroupIndex;
    var handleOptionChange = props.handleOptionChange;
+   var removeOption = props.removeOption;
 
    return (
-      <Box key={optionIndex} ml={4}>
-         <Typography variant="subtitle2" align="left" mt={2}>Select
-            Field</Typography>
+      <Grid container key={optionIndex} ml={4}>
+         <Grid container>
+            <Grid item xs={6} align="left">
+               <Typography variant="subtitle2" align="left" mt={2}>Select Field</Typography>
+
+            </Grid>
+            <Grid item align="right" xs={6}>
+               <DeleteIcon onClick={() => removeOption(menuIndex, optionGroupIndex, optionIndex)}/>
+
+            </Grid>
+         </Grid>
          <TextField
             label="Option Name"
             fullWidth
@@ -116,23 +138,25 @@ const OptionInputField = (props) => {
                handleOptionChange(menuIndex, optionGroupIndex, optionIndex, 'cost', e.target.value)
             }
          />
-         </Box>
+
+      </Grid>
    )
 
 }
 
 const RestaurantRegistration = () => {
-   const [sessionId, setSessionId] = useState('');
    const [restaurantName, setRestaurantName] = useState('');
    const [restaurantType, setRestaurantType] = useState('');
    const [openTime, setOpenTime] = useState('');
    const [closeTime, setCloseTime] = useState('');
    const [pictureFile, setPictureFile] = useState(null);
+   const [menuPictureFiles, setMenuPictureFiles] = useState([]);
+
    const [registeredRestaurants, setRegisteredRestaurants] = useState([]);
    const [menus, setMenus] = useState([
       {
          name: '', description: '', price: '',
-         optionGroups: null
+         optionGroups: null,
       },
    ]);
    useEffect(() => {
@@ -142,63 +166,54 @@ const RestaurantRegistration = () => {
 
    const createSession = async () => {
       try {
-         const response = await axiosInstance.post('/user/api/seller/create-session');
-         setSessionId(response.data);
+         return axiosInstance.post('/user/api/seller/create-session').then(response => response.data);
+
       } catch (error) {
          console.error('Error creating session:', error);
       }
    };
 
-   const uploadRestaurantPicture = async () => {
+   const uploadRestaurantPicture = async (sessionId) => {
       try {
-         const formData = new FormData();
-         formData.append('file', pictureFile);
-         formData.append('sessionId', sessionId);
-         await axiosInstance.post('/user/api/seller/restaurant-picture-resized', formData);
+         if (pictureFile) {
+            console.log('trying to upload restaurant picture resized. sessionId: {}', sessionId)
+            const formData = new FormData();
+            formData.append('file', pictureFile);
+            formData.append('sessionId', sessionId);
+            formData.append('type', 'restaurant');
+            axiosInstance.post('/user/api/seller/register/picture', formData);
+
+         } else {
+            console.error("no restaurant picture pictureFile: ", pictureFile)
+         }
+      } catch (error) {
+         console.error('Error uploading picture:', error);
+      }
+   };
+
+   const uploadMenuPicture = async (sessionId) => {
+      try {
+         if (menuPictureFiles) {
+            menuPictureFiles.map((file) => {
+               const formData = new FormData();
+               formData.append('file', pictureFile);
+               formData.append('sessionId', sessionId);
+               formData.append('type', 'menu');
+               axiosInstance.post('/user/api/seller/register/picture', formData);
+            })
+         } else {
+            console.error("no restaurant picture pictureFile: ", pictureFile)
+         }
       } catch (error) {
          console.error('Error uploading picture:', error);
       }
    };
 
 
-   const [menuPictureFiles, setMenuPictureFiles] = useState({});
-   const [updatedMenuIndex, setUpdateMenuIndex] = useState(0);
-
-   useEffect(() => {
-     console.log('menuPictureFiles updated:', menuPictureFiles);
-     uploadMenuPicture(menuPictureFiles['updatedMenuIdx']);
-   }, [menuPictureFiles]);
-
-   const uploadMenuPicture = async (menuIndex) => {
-     try {
-        const lastIdx = menuPictureFiles[menuIndex].length-1;
-       const formData = new FormData();
-       formData.append('file', menuPictureFiles[menuIndex][lastIdx]);
-       formData.append('sessionId', sessionId);
-       formData.append('fileIdx', lastIdx);
-       await axiosInstance.post('/user/api/seller/menu-picture-resized', formData);
-     } catch (error) {
-       console.error('Error uploading menu picture:', error);
-     }
-   };
-
-   const addMenuPictureFiles = async (menuIndex, file) => {
-     setMenuPictureFiles((prevFiles) => {
-       const updatedFiles = { ...prevFiles };
-       // if not exists, add new file list.
-       if (!updatedFiles[menuIndex]) {
-         updatedFiles[menuIndex] = [];
-       }
-       updatedFiles[menuIndex].push(file);
-       updatedFiles['updatedMenuIdx'] = menuIndex;
-       console.log(updatedFiles);
-       return updatedFiles;
-     });
-
-   };
-
    const registerRestaurant = async () => {
       try {
+         const sessionId = await createSession()
+         console.log("sessionId created : " + sessionId)
          const restaurantData = {
             name: restaurantName,
             sessionId: sessionId,
@@ -207,8 +222,10 @@ const RestaurantRegistration = () => {
             closeTime: closeTime,
             menuDtoList: menus,
          };
+         await uploadRestaurantPicture(sessionId);
+         await uploadMenuPicture(sessionId);
          await axiosInstance.post(`/user/api/seller/register/restaurant`, restaurantData);
-         fetchRegisteredRestaurants();
+         await fetchRegisteredRestaurants();
       } catch (error) {
          console.error('Error registering restaurant:', error);
       }
@@ -216,7 +233,7 @@ const RestaurantRegistration = () => {
 
    const fetchRegisteredRestaurants = async () => {
       try {
-         const response = await axiosInstance.get('/user/api/seller/registered-restaurant');
+         const response = await axiosInstance.get('/user/api/seller/user-registered-restaurant');
          setRegisteredRestaurants(response.data);
       } catch (error) {
          console.error('Error fetching registered restaurants:', error);
@@ -226,6 +243,11 @@ const RestaurantRegistration = () => {
    const addMenu = () => {
       setMenus([...menus, {name: '', description: '', price: '', optionGroups: null}]);
    };
+   const deleteMenu = (index) => {
+      const updatedMenus = [...menus];
+      updatedMenus.splice(index, 1);
+      setMenus(updatedMenus);
+   };
 
    const handleMenuChange = (index, field, value) => {
       const updatedMenus = [...menus];
@@ -234,21 +256,34 @@ const RestaurantRegistration = () => {
    };
    const addOptionGroup = (menuIndex) => {
       const updatedMenus = [...menus];
-      if(!updatedMenus[menuIndex].optionGroups) {
+      if (!updatedMenus[menuIndex].optionGroups) {
          updatedMenus[menuIndex].optionGroups = []
       }
       updatedMenus[menuIndex].optionGroups.push({
-         name : '',
+         name: '',
          isNecessary: false,
          isDuplicatedAllowed: true,
          options: null
       });
       setMenus(updatedMenus);
    };
+   const removeOptionGroup = (menuIndex, optionGroupIndex) => {
+      const updatedMenus = [...menus];
+      console.log(updatedMenus);
+      updatedMenus[menuIndex].optionGroups.splice(optionGroupIndex, 1);
+      setMenus(updatedMenus);
+   }
+
+   const removeOption = (menuIndex, optionGroupIndex, optionIndex) => {
+      const updatedMenus = [...menus];
+      console.log(updatedMenus);
+      updatedMenus[menuIndex].optionGroups[optionGroupIndex].options.splice(optionIndex, 1);
+      setMenus(updatedMenus);
+   }
 
    const addOption = (menuIndex, optionGroupIndex) => {
       const updatedMenus = [...menus];
-      if(!updatedMenus[menuIndex].optionGroups[optionGroupIndex].options) {
+      if (!updatedMenus[menuIndex].optionGroups[optionGroupIndex].options) {
          updatedMenus[menuIndex].optionGroups[optionGroupIndex].options = []
       }
       updatedMenus[menuIndex].optionGroups[optionGroupIndex].options.push({name: '', cost: ''});
@@ -284,31 +319,30 @@ const RestaurantRegistration = () => {
    };
 
    return (
-      <Box p={4}>
-         <Typography variant="h4" align="left" gutterBottom>
-            Restaurant Registration
-         </Typography>
-         <Grid container spacing={2} alignItems="flex-start">
-            <Grid item xs={12}>
-               <Button variant="contained" style={{float: 'left'}} onClick={createSession}>
-                  Create Session
-               </Button>
-            </Grid>
-            <Grid item xs={12}>
-               <input
-                  type="file"
-                  onChange={(e) => setPictureFile(e.target.files[0])}
-                  style={{display: 'none'}}
-                  id="picture-upload"
-               />
-               <label htmlFor="picture-upload">
-                  <Button variant="contained" style={{float: 'left'}} component="span">
-                     Select Picture
-                  </Button>
-               </label>
-               <Button variant="contained" style={{float: 'left'}} onClick={uploadRestaurantPicture} disabled={!pictureFile}>
-                  Upload Picture
-               </Button>
+      <Grid container item lg={6}>
+         <Grid item>
+            <Typography variant="h4" align="left" gutterBottom>
+               Restaurant Registration
+            </Typography>
+         </Grid>
+         <Grid container alignItems="flex-start">
+            <Grid container columnSpacing={2}>
+               <Grid item>
+                  <input
+                     type="file"
+                     onChange={(e) => setPictureFile(e.target.files[0])}
+                     style={{display: 'none'}}
+                     id="picture-upload"
+                  />
+                  <label htmlFor="picture-upload">
+                     <Button variant="outlined" style={{float: 'left'}} component="span">
+                        Select Picture
+                     </Button>
+                  </label>
+               </Grid>
+               <Grid item>
+                  <Typography>{pictureFile && pictureFile.name}</Typography>
+               </Grid>
             </Grid>
             <Grid item xs={12}>
                <TextField
@@ -376,29 +410,49 @@ const RestaurantRegistration = () => {
                      <StyledButton
                         variant="contained"
                         onClick={() => toggleMenuExpansion(menuIndex)}
-                        endIcon={expandedMenus.includes(menuIndex) ? <ExpandLess/> : <ExpandMore/>}
+                        endIcon={expandedMenus.includes(menuIndex) ? (
+                           <Box display="flex" alignItems="right">
+                              <ExpandLess/>
+                              <DeleteIcon onClick={() => deleteMenu(menuIndex)}/>
+                           </Box>
+                        ) : (
+                           <Box display="flex" alignItems="right">
+                              <ExpandMore/>
+                              <DeleteIcon onClick={() => deleteMenu(menuIndex)}/>
+                           </Box>
+                        )}
 
                      >
                         {menu.name}
                      </StyledButton>
                      <Collapse in={expandedMenus.includes(menuIndex)} timeout="auto" unmountOnExit>
-                        <ExpandedContent>
-                           <Box display="flex" flexDirection="column" alignItems="flex-start" >
-                              <input
-                                 type="file"
-                                 onChange={(e) => addMenuPictureFiles(menuIndex, e.target.files[0])}
-                                 style={{display: 'none'}}
-                                 id={`menu-picture-upload-${menuIndex}`}
-                              />
-                              <label htmlFor={`menu-picture-upload-${menuIndex}`}>
-                                 <Button variant="contained" xs={2} sm={2} style={{float: 'left'}} component="span">
-                                    Select Menu Picture
-                                 </Button>
-                              </label>
-                              {menuPictureFiles[menuIndex] && menuPictureFiles[menuIndex].map((file, fileIndex) => (
-                                 <Typography key={`menu-${menuIndex}-picture-uploaded-file-${fileIndex}`} xs={2}>{file.name}</Typography>
-                              ))}
-                           </Box>
+                        <ExpandedContent ml={3}>
+                           <Grid container alignItems="flex-start">
+                              <Grid container columnSpacing={2}>
+                                 <Grid item>
+                                    <input
+                                       type="file"
+                                       onChange={(e) => {
+                                          const updated = [...menuPictureFiles]
+                                          updated[menuIndex] = e.target.files[0];
+                                          setMenuPictureFiles(updated)
+                                       }
+                                       }
+                                       style={{display: 'none'}}
+                                       id={`menu-picture-upload-${menuIndex}`}
+                                    />
+                                    <label htmlFor={`menu-picture-upload-${menuIndex}`}>
+                                       <Button variant="outlined" style={{float: 'left'}}
+                                               component="span">
+                                          Select Menu Picture
+                                       </Button>
+                                    </label>
+                                 </Grid>
+                                 <Grid item>
+                                    <Typography>{menuPictureFiles && menuPictureFiles[menuIndex] && menuPictureFiles[menuIndex].name}</Typography>
+                                 </Grid>
+                              </Grid>
+                           </Grid>
                            <TextField
                               label="Menu Name"
                               fullWidth
@@ -425,44 +479,16 @@ const RestaurantRegistration = () => {
                                       onClick={() => addOptionGroup(menuIndex)}>
                                  + Add Option
                               </Button>
+
                               {/* 2. input fields */}
                               <Container style={{float: "left"}}>
                                  {menu.optionGroups && menu.optionGroups.map((optionGroup, optionGroupIndex) => (
                                     <Box key={optionGroupIndex} ml={4}>
-                                       <OptionGroupInputField optionGroup={optionGroup} menuIndex={menuIndex} optionGroupIndex={optionGroupIndex} handleOptionGroupChange={handleOptionGroupChange} />
-                                       {/*<Typography variant="subtitle2" align="left" mt={2}>Option</Typography>*/}
-                                       {/*<TextField*/}
-                                       {/*   label="name"*/}
-                                       {/*   fullWidth*/}
-                                       {/*   value={optionGroup.name}*/}
-                                       {/*   onChange={(e) =>*/}
-                                       {/*      handleOptionGroupChange(menuIndex, optionGroupIndex, 'name', e.target.value)*/}
-                                       {/*   }*/}
-                                       {/*/>*/}
-                                       {/*<TextField*/}
-                                       {/*   label="Is Duplicated Allowed"*/}
-                                       {/*   fullWidth*/}
-                                       {/*   select*/}
-                                       {/*   value={optionGroup.isDuplicatedAllowed}*/}
-                                       {/*   onChange={(e) =>*/}
-                                       {/*      handleOptionGroupChange(menuIndex, optionGroupIndex, 'isDuplicatedAllowed', e.target.value)*/}
-                                       {/*   }*/}
-                                       {/*>*/}
-                                       {/*   <MenuItem value="true">True</MenuItem>*/}
-                                       {/*   <MenuItem value="false">False</MenuItem>*/}
-                                       {/*</TextField>*/}
-                                       {/*<TextField*/}
-                                       {/*   label="Is Necessary"*/}
-                                       {/*   fullWidth*/}
-                                       {/*   select*/}
-                                       {/*   value={optionGroup.isNecessary}*/}
-                                       {/*   onChange={(e) =>*/}
-                                       {/*      handleOptionGroupChange(menuIndex, optionGroupIndex, 'isNecessary', e.target.value)*/}
-                                       {/*   }*/}
-                                       {/*>*/}
-                                       {/*   <MenuItem value="true">True</MenuItem>*/}
-                                       {/*   <MenuItem value="false">False</MenuItem>*/}
-                                       {/*</TextField>*/}
+                                       <OptionGroupInputField optionGroup={optionGroup} menuIndex={menuIndex}
+                                                              optionGroupIndex={optionGroupIndex}
+                                                              handleOptionGroupChange={handleOptionGroupChange}
+                                                              removeOptionGroup={removeOptionGroup}
+                                       />
 
                                        {/*Option  생성 */}
                                        {/* 1.button*/}
@@ -470,10 +496,18 @@ const RestaurantRegistration = () => {
                                                onClick={() => addOption(menuIndex, optionGroupIndex)}>
                                           + Add Select Field
                                        </Button>
+
                                        {/* 2. input field */}
                                        <Container style={{float: "left"}}>
                                           {optionGroup.options && optionGroup.options.map((option, optionIndex) => (
-                                             <OptionInputField key={optionIndex} option={option} optionIndex={optionIndex} menuIndex={menuIndex} optionGroupIndex={optionGroupIndex} handleOptionChange={handleOptionChange} />
+                                             (
+                                                <OptionInputField key={optionIndex} option={option}
+                                                                  optionIndex={optionIndex} menuIndex={menuIndex}
+                                                                  optionGroupIndex={optionGroupIndex}
+                                                                  handleOptionChange={handleOptionChange}
+                                                                  removeOption={removeOption}/>
+
+                                             )
                                           ))}
                                        </Container>
                                     </Box>
@@ -490,13 +524,13 @@ const RestaurantRegistration = () => {
                   + Add Menu
                </Button>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item>
                <Button variant="contained" onClick={registerRestaurant}>
                   Register Restaurant
                </Button>
             </Grid>
          </Grid>
-         <Box mt={4}>
+         <Grid item xs={12} mt={10}>
             <Typography>
                Registered Restaurants
             </Typography>
@@ -522,8 +556,8 @@ const RestaurantRegistration = () => {
                   </TableBody>
                </Table>
             </TableContainer>
-         </Box>
-      </Box>
+         </Grid>
+      </Grid>
    )
       ;
 };

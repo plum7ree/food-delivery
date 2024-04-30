@@ -36,10 +36,11 @@ const RestaurantList = () => {
 
 
   const handleCategoryClick = (restaurant) => {
+    console.log(restaurant)
     // 해당 카테고리의 타입을 URL에 포함하여 페이지를 이동합니다.
-    navigate(`/eats/restaurant/${restaurant.id}`, {
+    navigate(`/eats/restaurant/restaurant-page`, {
        state: {
-          restaurant: `${restaurant}`
+          restaurantId: restaurant.id
        }
      });
   };
