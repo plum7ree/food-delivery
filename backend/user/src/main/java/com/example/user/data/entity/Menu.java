@@ -19,7 +19,6 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "menus")
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -39,9 +38,10 @@ public class Menu {
     private Restaurant restaurant;
 
 
-    @OneToMany(mappedBy = "menu", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "menu", fetch = FetchType.EAGER, orphanRemoval=true)
     @BatchSize(size=20)
     @Size(max=20)
+                @Builder.Default
     List<OptionGroup> optionGroupList = new ArrayList<>();
 
 

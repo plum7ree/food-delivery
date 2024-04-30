@@ -6,12 +6,13 @@ CREATE SCHEMA user_schema;
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA user_schema;
 
 -- users
-CREATE TABLE user_schema.users (
-    id UUID PRIMARY KEY,
+CREATE TABLE user_schema.users
+(
+    id       UUID PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    role VARCHAR(255) NOT NULL
+    email    VARCHAR(255) NOT NULL UNIQUE,
+    role     VARCHAR(255) NOT NULL
 );
 
 -- restaurants type enum
@@ -19,12 +20,12 @@ DROP TYPE IF EXISTS user_schema.restaurant_type_enum;
 -- restaurants
 CREATE TABLE user_schema.restaurants
 (
-    id          uuid                                           NOT NULL,
-    user_id     uuid                                           NOT NULL,
-    name        character varying COLLATE pg_catalog."default" NOT NULL,
-    type        character varying COLLATE pg_catalog."default" NOT NULL,
-    open_time   TIME                                           NOT NULL,
-    close_time  TIME                                           NOT NULL,
+    id           uuid                                           NOT NULL,
+    user_id      uuid                                           NOT NULL,
+    name         character varying COLLATE pg_catalog."default" NOT NULL,
+    type         character varying COLLATE pg_catalog."default" NOT NULL,
+    open_time    TIME                                           NOT NULL,
+    close_time   TIME                                           NOT NULL,
     picture_url1 character varying COLLATE pg_catalog."default",
     picture_url2 character varying COLLATE pg_catalog."default",
     CONSTRAINT restaurants_pkey PRIMARY KEY (id),
@@ -34,15 +35,15 @@ CREATE TABLE user_schema.restaurants
 -- menus
 CREATE TABLE user_schema.menus
 (
-    id           uuid                                           NOT NULL,
-    name         character varying COLLATE pg_catalog."default" NOT NULL,
-    description  character varying COLLATE pg_catalog."default",
-    picture_url  character varying COLLATE pg_catalog."default",
+    id            uuid                                           NOT NULL,
+    name          character varying COLLATE pg_catalog."default" NOT NULL,
+    description   character varying COLLATE pg_catalog."default",
+    picture_url   character varying COLLATE pg_catalog."default",
     price         BIGINT                                         NOT NULL,
     currency      VARCHAR(255),
     restaurant_id uuid                                           NOT NULL,
-    created_at   TIMESTAMP                                      NOT NULL,
-    updated_at   TIMESTAMP                                      NOT NULL,
+    created_at    TIMESTAMP                                      NOT NULL,
+    updated_at    TIMESTAMP                                      NOT NULL,
     CONSTRAINT menus_pkey PRIMARY KEY (id),
     CONSTRAINT fk_restaurant_id FOREIGN KEY (restaurant_id) REFERENCES user_schema.restaurants (id)
 );
@@ -50,13 +51,15 @@ CREATE TABLE user_schema.menus
 -- option_groups
 CREATE TABLE user_schema.option_groups
 (
-    id                   uuid                                           NOT NULL,
-    is_duplicated_allowed BOOLEAN                                       NOT NULL,
-    is_necessary         BOOLEAN                                       NOT NULL,
-    menu_id              uuid                                           NOT NULL,
+    id                uuid         NOT NULL,
+    description       varchar(500) NOT NULL,
+    max_select_number int          NOT NULL,
+    is_necessary      BOOLEAN      NOT NULL,
+    menu_id           uuid         NOT NULL,
     CONSTRAINT option_groups_pkey PRIMARY KEY (id),
     CONSTRAINT fk_menu_id FOREIGN KEY (menu_id) REFERENCES user_schema.menus (id)
 );
+
 
 -- options
 CREATE TABLE user_schema.options

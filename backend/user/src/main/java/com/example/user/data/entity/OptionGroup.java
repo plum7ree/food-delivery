@@ -17,17 +17,19 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "option_groups")
 public class OptionGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-
-    boolean isDuplicatedAllowed = true;
+    String description;
+        @Builder.Default
+    Integer maxSelectNumber = 1;
+            @Builder.Default
     boolean isNecessary = false;
 
-    @OneToMany(mappedBy = "optionGroup", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "optionGroup", fetch = FetchType.EAGER, orphanRemoval=true)
     @Size(max=20)
+                @Builder.Default
     List<Option> options = new ArrayList<>();
 
     @ManyToOne

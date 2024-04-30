@@ -15,12 +15,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OptionGroupDto {
+    String description;
     @Builder.Default
-    boolean isDuplicatedAllowed = true;
+    Integer maxSelectNumber = 1;
     @Builder.Default
     boolean isNecessary = false;
     @Builder.Default
     List<OptionDto> selectedIndicesList = new ArrayList<>();
-
-    List<OptionDto> optionDtoList;
+    @Builder.Default
+    List<OptionDto> optionDtoList = new ArrayList<>();
 }

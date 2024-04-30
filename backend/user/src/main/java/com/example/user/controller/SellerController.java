@@ -1,16 +1,16 @@
 package com.example.user.controller;
 
 
-import com.example.commonawsutil.s3.UrlUtils;
+import com.example.commonawsutil.s3.GeneratePresignedGetUrlAndRetrieve;
 import com.example.user.data.dto.*;
 import com.example.user.data.entity.Menu;
 import com.example.user.data.entity.Option;
 import com.example.user.data.entity.OptionGroup;
-import com.example.user.data.entity.Restaurant;
 import com.example.user.data.repository.RestaurantRepository;
-import com.example.user.data.repository.UserRepository;
+import com.example.user.data.repository.AccountRepository;
+import com.example.user.service.ImageService;
+import com.example.user.service.RestaurantService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,21 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.Response;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,199 +36,72 @@ public class SellerController {
 
     private final S3Client s3Client;
 
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final RestaurantRepository restaurantRepository;
+    private final RestaurantService restaurantService;
+    private final ImageService imageService;
 
-    public SellerController(S3Client s3Client, UserRepository userRepository, RestaurantRepository restaurantRepository) {
+    public SellerController(S3Client s3Client, AccountRepository accountRepository, RestaurantRepository restaurantRepository, RestaurantService restaurantService, ImageService imageService) {
         this.s3Client = s3Client;
-        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
         this.restaurantRepository = restaurantRepository;
+        this.restaurantService = restaurantService;
+        this.imageService = imageService;
     }
 
     //TODO what if load balancer brings a user into wrong instance?
     // -> store this into redis master, and only read from master for this task.
-    private final Map<UUID, UUID> sessionIdToRestaurantIdMap = new HashMap<>(); // 세션 ID와 레스토랑 ID를 매핑하기 위한 맵
+    private final Map<String, RestaurantDto> sessionIdToRestaurantDtoMap = new HashMap<>(); // 세션 ID와 레스토랑 ID를 매핑하기 위한 맵
 
     @PostMapping("/create-session")
     public ResponseEntity<String> createSession() {
-        UUID sessionId = UUID.randomUUID(); // 세션 ID 생성
-        UUID restaurantId = UUID.randomUUID();
-        sessionIdToRestaurantIdMap.put(sessionId, restaurantId); // 세션 ID와 레스토랑 ID를 매핑하는 맵에 추가
-        return ResponseEntity.ok(sessionId.toString());
-    }
-    @PostMapping("/restaurant-picture")
-    public void uploadRestaurantPicture(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId) {
-        // var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
-        var keyName = keyNamePrefix + "/" + "10000000-0000-0000-0001-000000000000";
-        if(!UrlUtils.checkBucketExists(bucketName, s3Client)) {
-            UrlUtils.createBucket(bucketName, s3Client);
-        }
-        try (InputStream inputStream = file.getInputStream()) {
-            if (!file.getContentType().equals("image/png")) {
-                // Handle the case where the file is not a PNG image
-                throw new IllegalArgumentException("Profile picture must be a PNG image.");
-            }
-            PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(keyName)
-                    .build();
-            s3Client.putObject(request, RequestBody.fromInputStream(inputStream, file.getSize()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            // 예외 처리 로직 추가
-        }
+        log.info("create session");
+        String sessionId = UUID.randomUUID().toString(); // 세션 ID 생성
+        RestaurantDto restaurantDto = new RestaurantDto();
+        restaurantDto.setId( UUID.randomUUID().toString());
+        sessionIdToRestaurantDtoMap.put(sessionId, restaurantDto); // 세션 ID와 레스토랑 ID를 매핑하는 맵에 추가
+        return ResponseEntity.ok(sessionId);
     }
 
-    @PostMapping("/restaurant-picture-resized")
-    public ResponseEntity<String> uploadProfilePictureResized(@RequestParam("file") MultipartFile file,
-                                                              @RequestParam("sessionId") String sessionId,
-                                                              @RequestParam(value="idx", required = false, defaultValue = "0") Integer idx) {
-        //if(!sessionIdToRestaurantIdMap.containsKey(sessionId)) {
-        //    return ResponseEntity.notFound().build();
-        //}
-
-        // var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
-        var keyName = keyNamePrefix + "/" + "10000000-0000-0000-0001-000000000000/restaurant-profile/" + idx;
-
-        // Check if the bucket exists, create it if not
-        if (!UrlUtils.checkBucketExists(bucketName, s3Client)) {
-            UrlUtils.createBucket(bucketName, s3Client);
+    @PostMapping("/register/picture")
+    @Transactional
+    public ResponseEntity<String> uploadRestaurantPicture(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId, @RequestParam("type") String type) {
+        try {
+            var _restaurantDto = sessionIdToRestaurantDtoMap.get(sessionId);
+            imageService.uploadPictureResized(_restaurantDto.getId(), type, file, 0);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
-
-        //TODO please recycle this.
-        try (InputStream inputStream = file.getInputStream()) {
-            //TODO move this resize part into serverless application (aws lambda or kubernetes fargate)
-            BufferedImage originalImage = ImageIO.read(inputStream);
-
-            // Resize the image to a small icon
-            BufferedImage resizedImage = resizeImage(originalImage, 200, 200);
-
-            // Convert the resized image to bytes
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(resizedImage, "png", baos);
-            byte[] imageBytes = baos.toByteArray();
-
-            // Upload the resized image to S3
-            PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(keyName)
-                    .build();
-            s3Client.putObject(request, RequestBody.fromBytes(imageBytes));
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Handle exception
-        }
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("");
     }
 
 
-    @PostMapping("/menu-picture-resized")
-    public ResponseEntity<String> uploadMenuPictureResized(@RequestParam("file") MultipartFile file,
-                                                              @RequestParam("sessionId") String sessionId,
-                                                              @RequestParam(value="fileIdx") Integer fileIdx) {
-        //if(!sessionIdToRestaurantIdMap.containsKey(sessionId)) {
-        //    return ResponseEntity.notFound().build();
-        //}
-
-        // var keyName = keyNamePrefix + "/" + sessionIdToRestaurantIdMap.get(sessionId);
-        var keyName = keyNamePrefix + "/" + "10000000-0000-0000-0001-000000000000/menu/" + fileIdx;
-
-        // Check if the bucket exists, create it if not
-        if (!UrlUtils.checkBucketExists(bucketName, s3Client)) {
-            UrlUtils.createBucket(bucketName, s3Client);
-        }
-        try (InputStream inputStream = file.getInputStream()) {
-            //TODO move this resize part into serverless application (aws lambda or kubernetes fargate)
-            BufferedImage originalImage = ImageIO.read(inputStream);
-
-            // Resize the image to a small icon
-            BufferedImage resizedImage = resizeImage(originalImage, 200, 200);
-
-            // Convert the resized image to bytes
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(resizedImage, "png", baos);
-            byte[] imageBytes = baos.toByteArray();
-
-            // Upload the resized image to S3
-            PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(keyName)
-                    .build();
-            s3Client.putObject(request, RequestBody.fromBytes(imageBytes));
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Handle exception
-        }
-        return ResponseEntity.ok().build();
-    }
-
-    private BufferedImage resizeImage(BufferedImage originalImage, int width, int height) {
-        BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = resizedImage.createGraphics();
-        g.drawImage(originalImage, 0, 0, width, height, null);
-        g.dispose();
-        return resizedImage;
-    }
     @PostMapping("/register/restaurant")
     @Transactional
     public ResponseEntity<String> registerRestaurant(@org.springframework.web.bind.annotation.RequestBody RestaurantDto restaurantDto) {
         // uploaded restaurant picture
         //TODO if user cancelled register restaurant, we should mark or delete an image.
         var sessionId = restaurantDto.getSessionId();
-        var restaurantId = sessionIdToRestaurantIdMap.get(sessionId);
+        var _restaurantDto = sessionIdToRestaurantDtoMap.get(sessionId);
         // enumType validation already done by RestaurantTypeEnum
 
-        var user = userRepository.findById(UUID.fromString("13f0c8f0-eec0-4169-ad9f-e8bb408a5325"));
-        if (user.isEmpty()) {
-            return ResponseEntity.badRequest().body("user not found");
-        }
+//        var user = accountRepository.findById(UUID.fromString("13f0c8f0-eec0-4169-ad9f-e8bb408a5325"));
+//        if (user.isEmpty()) {
+//            return ResponseEntity.badRequest().body("user not found");
+//        }
 
         var menuDtoList = restaurantDto.getMenuDtoList();
-
-        var restaurantEntity = Restaurant.builder()
-                .id(restaurantId)
-                .user(user.get())
-                .name(restaurantDto.getName())
-                .type(RestaurantTypeEnum.valueOf(restaurantDto.getType()))
-                .openTime(restaurantDto.getOpenTime())
-                .closeTime(restaurantDto.getCloseTime())
-                .pictureUrl1(restaurantDto.getPictureUrl1())
-                .pictureUrl2(restaurantDto.getPictureUrl2())
-                .build();
-
-        if(menuDtoList != null) {
-            // Menu 엔티티 생성 및 Restaurant 엔티티에 추가
-            List<Menu> menuList = menuDtoList.stream()
-                    .map(menuDto -> Menu.builder()
-                            .name(menuDto.getName())
-                            .description(menuDto.getDescription())
-                            .pictureUrl(menuDto.getPictureUrl())
-                            .price(BigInteger.valueOf(Long.parseLong(menuDto.getPrice())))
-                            .restaurant(restaurantEntity)
-                            .optionGroupList(menuDto.getOptionGroupDtoList().stream()
-                                    .map(optionGroupDto -> OptionGroup.builder()
-                                            .isDuplicatedAllowed(optionGroupDto.isDuplicatedAllowed())
-                                            .isNecessary(optionGroupDto.isNecessary())
-                                            .options(optionGroupDto.getOptionDtoList().stream()
-                                                    .map(optionDto -> Option.builder()
-                                                            .name(optionDto.getName())
-                                                            .cost(BigInteger.valueOf(Long.parseLong(optionDto.getCost())))
-                                                            .build())
-                                                    .collect(Collectors.toList()))
-                                            .build())
-                                    .collect(Collectors.toList()))
-                            .build())
-                    .collect(Collectors.toList());
-
-            restaurantEntity.setMenuList(menuList);
+        if(menuDtoList.isEmpty()) {
+            return ResponseEntity.badRequest().body("no menu exists!");
         }
 
-        var res = restaurantRepository.save(restaurantEntity);
-        sessionIdToRestaurantIdMap.remove(sessionId);
+        var restaurantId = restaurantService.save(restaurantDto);
+
+        sessionIdToRestaurantDtoMap.remove(sessionId);
 
 
 
-        return ResponseEntity.ok(res.getId().toString());
+        return ResponseEntity.ok(restaurantId);
     }
 
     @PostMapping("/register/{restaurantId}/menu")
@@ -252,31 +113,86 @@ public class SellerController {
 
 
 
+//    {
+//      "content": [
+//        {
+//          "name": "Restaurant 1",
+//          "type": "BURGER",
+//          "openTime": "10:00:00",
+//          "closeTime": "22:00:00",
+//          "pictureUrl1": "https://presigned-url-for-restaurant-1-picture.example.com"
+//        },
+//        {
+//          "name": "Restaurant 2",
+//          "type": "PIZZA",
+//          "openTime": "11:00:00",
+//          "closeTime": "23:00:00",
+//          "pictureUrl1": "https://presigned-url-for-restaurant-2-picture.example.com"
+//        },
+//        // 더 많은 Restaurant 정보
+//      ],
+//      "pageable": {
+//        "sort": {
+//          "sorted": false,
+//          "unsorted": true,
+//          "empty": true
+//        },
+//        "offset": 0,
+//        "pageNumber": 0,
+//        "pageSize": 10,
+//        "paged": true,
+//        "unpaged": false
+//      },
+//      "last": true,
+//      "totalPages": 1,
+//      "totalElements": 10,
+//      "size": 10,
+//      "number": 0,
+//      "sort": {
+//        "sorted": false,
+//        "unsorted": true,
+//        "empty": true
+//      },
+//      "first": true,
+//      "numberOfElements": 10,
+//      "empty": false
+//    }
     @GetMapping("/restaurants")
-    public List<RestaurantDto> getRestaurantsByType(
+    public Page<RestaurantDto> getRestaurantsByType(
             @RequestParam(value = "type") String type,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        var entity =  restaurantRepository.findByType(RestaurantTypeEnum.valueOf(type), pageable);
-        return entity.stream().map(Converter::convertRestaurantEntityToDtoWithoutMenu).collect(Collectors.toList());
+        var restaurantDtos =  restaurantRepository.findByType(RestaurantTypeEnum.valueOf(type), pageable);
+
+        // picture 에 대해 presigned URl 생성
+        restaurantDtos.stream().forEach(restaurant -> {
+            var keyName = restaurant.getPictureUrl1();
+            GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
+            String presignedUrlString = "";
+            try {
+                presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
+                presign.useHttpUrlConnectionToGet(presignedUrlString);
+            } catch (Exception e) {
+
+            }
+            restaurant.setPictureUrl1(presignedUrlString);
+        });
+
+        return restaurantDtos;
     }
 
-    @GetMapping("/registered-restaurant")
-    public ResponseEntity<List<RestaurantDto>> getRegisteredRestaurants() {
+    @GetMapping("/user-registered-restaurant")
+    public ResponseEntity<List<RestaurantDto>> getUserRegisteredRestaurantsBty() {
 //        User user = getUser();
 //        user.getAll
         var restaurants = restaurantRepository.findAll();
-
 //        restaurants.stream().forEach(res -> res.findAllMenu);
-
         var ret = restaurants.stream().map(restaurant -> RestaurantDto.builder()
                 .type(String.valueOf(restaurant.getType()))
                 .name(restaurant.getName())
                 .build()).toList();
-
-
 
         return ResponseEntity.ok(ret);
     }
@@ -288,7 +204,9 @@ public class SellerController {
         if(res.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        log.info("getRestaurant restairamtEntity: {} " ,res.toString());
         List<Menu> menuList = res.get().getMenuList();
+        log.info("getRestaurant: menuList : {}" , menuList.toString());
         //        menuList.get(0)
         menuList.stream().forEach(menu -> menu.getOptionGroupList().stream().forEach(optionGroup -> optionGroup.getOptions()));
 
@@ -301,14 +219,23 @@ public class SellerController {
                             List<OptionDto> optionDtoList = options.stream()
                                     .map(option -> OptionDto.builder()
                                             .name(option.getName())
+                                            .cost(option.getCost().toString())
                                             .build())
                                     .collect(Collectors.toList());
                             return OptionGroupDto.builder()
+                                    .description(optionGroup.getDescription())
+                                    .optionDtoList(optionDtoList)
+                                    .maxSelectNumber(optionGroup.getMaxSelectNumber())
+                                    .isNecessary(optionGroup.isNecessary())
                                     .build();
                         })
                         .collect(Collectors.toList());
                 return MenuDto.builder()
                         .name(menu.getName())
+                        .price(menu.getPrice().toString())
+                        .description(menu.getDescription())
+                        .pictureUrl(menu.getPictureUrl())
+                        .optionGroupDtoList(optionGroupDtoList)
                         .build();
             })
             .collect(Collectors.toList());
@@ -321,77 +248,3 @@ public class SellerController {
 
 
 }
-
-
-//
-//@RestController("/api/seller")
-//public class SellerController {
-//
-//    @PersistenceContext
-//    private EntityManager entityManager;
-//
-//    private final JPAQueryFactory queryFactory;
-//
-//    SellerController(S3Client s3Client, RestaurantRepository restaurantRepository, EntityManager entityManager) {
-//        this.s3Client = s3Client;
-//        this.restaurantRepository = restaurantRepository;
-//        this.entityManager = entityManager;
-//        this.queryFactory = new JPAQueryFactory(entityManager);
-//    }
-//
-//
-//    @GetMapping("/registered-restaurant")
-//    public ResponseEntity<List<RestaurantDto>> getRegisteredRestaurants() {
-//        TypedQuery<Restaurant> query = entityManager.createQuery("SELECT r FROM Restaurant r", Restaurant.class);
-//        List<Restaurant> restaurants = query.getResultList();
-//
-//        List<RestaurantDto> ret = restaurants.stream()
-//                .map(restaurant -> RestaurantDto.builder()
-//                        .type(restaurant.getType())
-//                        .userId(restaurant.getUserId())
-//                        .name(restaurant.getName())
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        return ResponseEntity.ok(ret);
-//    }
-//
-//    @GetMapping("/restaurant/{restaurantId}")
-//    @Transactional
-//    public ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurantId") String restaurantId) {
-//        Restaurant restaurant = queryFactory.selectFrom(QRestaurant.restaurant)
-//                .leftJoin(QRestaurant.restaurant.menuList, menu).fetchJoin()
-//                .leftJoin(menu.optionGroupList, optionGroup).fetchJoin()
-//                .leftJoin(optionGroup.options, option).fetchJoin()
-//                .where(QRestaurant.restaurant.id.eq(restaurantId))
-//                .fetchOne();
-//
-//        if (restaurant == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        List<MenuDto> menuDtoList = restaurant.getMenuList().stream()
-//                .map(menu -> {
-//                    List<OptionGroupDto> optionGroupDtoList = menu.getOptionGroupList().stream()
-//                            .map(optionGroup -> {
-//                                List<OptionDto> optionDtoList = optionGroup.getOptions().stream()
-//                                        .map(option -> OptionDto.builder()
-//                                                .name(option.getName())
-//                                                .build())
-//                                        .collect(Collectors.toList());
-//                                return OptionGroupDto.builder()
-//                                        .optionDtoList(optionDtoList)
-//                                        .build();
-//                            })
-//                            .collect(Collectors.toList());
-//                    return MenuDto.builder()
-//                            .name(menu.getName())
-//                            .optionGroupDtoList(optionGroupDtoList)
-//                            .build();
-//                })
-//                .collect(Collectors.toList());
-//
-//        return ResponseEntity.ok(RestaurantDto.builder()
-//                .menuDtoList(menuDtoList)
-//                .build());
-//    }

@@ -64,7 +64,7 @@ public class SellerControllerTest {
                 OptionDto.builder().name("베이컨 추가").cost("1000").build()
         );
         List<OptionGroupDto> optionGroupDtoList1 = Arrays.asList(
-                OptionGroupDto.builder().isDuplicatedAllowed(true).isNecessary(false).optionDtoList(optionDtoList1).build()
+                OptionGroupDto.builder().maxSelectNumber(10).isNecessary(false).optionDtoList(optionDtoList1).build()
         );
         MenuDto menuDto1 = MenuDto.builder()
                 .name("햄버거 세트")
@@ -79,7 +79,7 @@ public class SellerControllerTest {
                 OptionDto.builder().name("카페라떼").cost("2000").build()
         );
         List<OptionGroupDto> optionGroupDtoList2 = Arrays.asList(
-                OptionGroupDto.builder().isDuplicatedAllowed(false).isNecessary(true).optionDtoList(optionDtoList2).build()
+                OptionGroupDto.builder().maxSelectNumber(10).isNecessary(true).optionDtoList(optionDtoList2).build()
         );
         MenuDto menuDto2 = MenuDto.builder()
                 .name("음료 선택")
@@ -122,10 +122,10 @@ public class SellerControllerTest {
 
         // Then
         // Verify that the restaurant is saved in the repository
-        List<Restaurant> restaurants = restaurantRepository.findAll();
+        List<RestaurantDto> restaurants = restaurantRepository.findAll();
         assertThat(restaurants).hasSize(1);
 
-        Restaurant savedRestaurant = restaurants.get(0);
+        var savedRestaurant = restaurants.get(0);
         assertThat(savedRestaurant.getName()).isEqualTo("Test Restaurant");
         assertThat(savedRestaurant.getType()).isEqualTo(RestaurantTypeEnum.KOREAN);
         assertThat(savedRestaurant.getOpenTime()).isEqualTo(LocalTime.of(10, 0));

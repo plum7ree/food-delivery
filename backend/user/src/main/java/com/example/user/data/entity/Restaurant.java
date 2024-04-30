@@ -4,9 +4,7 @@ import com.example.user.data.dto.RestaurantTypeEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 
-import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,6 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "restaurants")
 public class Restaurant {
 
     @Id
@@ -27,13 +24,12 @@ public class Restaurant {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id")
+    private Account account;
 
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "user_schema.restaurant_type_enum")
     private RestaurantTypeEnum type;
 
     @Column(columnDefinition = "TIME")
@@ -54,7 +50,7 @@ public class Restaurant {
 
 
     @Builder.Default
-    @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER, orphanRemoval=true)
     @Size(max = 100) // set max menu register size
 //    @BatchSize(size = 100)
     private List<Menu> menuList = new ArrayList<>();

@@ -2,6 +2,7 @@ package com.example.user.data.dto;
 
 import com.example.user.data.entity.Menu;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 import java.util.List;

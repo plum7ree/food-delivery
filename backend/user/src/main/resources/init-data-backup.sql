@@ -1,23 +1,22 @@
-
 -- Insert example data for users
-INSERT INTO account(id, username, password, email, role)
+INSERT INTO user_schema.users(id, username, password, email, role)
 VALUES ('13f0c8f0-eec0-4169-ad9f-e8bb408a5325', 'username1', 'password1', 'user1@example.com', 'ROLE_USER');
 
-INSERT INTO account(id, username, password, email, role)
+INSERT INTO user_schema.users(id, username, password, email, role)
 VALUES ('dafd9593-0027-42f6-981a-629216784217', 'username2', 'password2', 'user2@example.com', 'ROLE_ADMIN');
 
-INSERT INTO account(id, username, password, email, role)
+INSERT INTO user_schema.users(id, username, password, email, role)
 VALUES ('10000000-0000-0000-0000-000000000000', 'username3', 'password2', 'user3@example.com', 'ROLE_ADMIN');
 
 
 -- Insert example data for BURGER restaurants
 -- restaurants
-INSERT INTO restaurant (id, account_id, name, type, open_time, close_time, picture_url1, picture_url2)
+INSERT INTO user_schema.restaurants (id, user_id, name, type, open_time, close_time, picture_url1, picture_url2)
 VALUES ('db38a0d6-af39-487f-80e0-e88995c8b5bd', '13f0c8f0-eec0-4169-ad9f-e8bb408a5325', 'Burger Place 1', 'BURGER',
         '10:00:00', '22:00:00', 'url1', 'url2');
 
 -- menus
-INSERT INTO menu (id, name, description, picture_url, price, currency, restaurant_id, created_at,
+INSERT INTO user_schema.menus (id, name, description, picture_url, price, currency, restaurant_id, created_at,
                                updated_at)
 VALUES ('a59ce8e1-9969-4625-a15c-53d5cf671017', 'Classic Burger', 'Delicious classic burger', 'burger_url1', 10000,
         'KRW', 'db38a0d6-af39-487f-80e0-e88995c8b5bd', now(), now()),
@@ -26,14 +25,14 @@ VALUES ('a59ce8e1-9969-4625-a15c-53d5cf671017', 'Classic Burger', 'Delicious cla
 
 -- option_groups
 -- Insert example data for BURGER restaurants
-INSERT INTO option_group (id, description, max_select_number, is_necessary, menu_id)
+INSERT INTO user_schema.option_groups (id, description, max_select_number, is_necessary, menu_id)
 VALUES ('6dbe903a-ae92-4877-b3c5-48f796ee7acb', 'Select options', 1, true, 'a59ce8e1-9969-4625-a15c-53d5cf671017'),
        ('6dbe903a-ae92-4877-b3c5-48f796ee7acc', 'Select options', 1, false, 'a59ce8e1-9969-4625-a15c-53d5cf671017'),
        ('6dbe903a-ae92-4877-b3c5-48f796ee7acd', 'Select options', 1, true, '5d45696d-232f-40eb-a14f-0c16cff1511a'),
        ('6dbe903a-ae92-4877-b3c5-48f796ee7ace', 'Select options', 1, false, '5d45696d-232f-40eb-a14f-0c16cff1511a');
 
 -- options
-INSERT INTO option (id, name, cost, currency, option_group_id)
+INSERT INTO user_schema.options (id, name, cost, currency, option_group_id)
 VALUES ('12345678-1234-1234-1234-123456789012', 'Lettuce', 500, 'KRW', '6dbe903a-ae92-4877-b3c5-48f796ee7acb'),
        ('12345678-1234-1234-1234-123456789013', 'Tomato', 500, 'KRW', '6dbe903a-ae92-4877-b3c5-48f796ee7acb'),
        ('12345678-1234-1234-1234-123456789014', 'Onion', 500, 'KRW', '6dbe903a-ae92-4877-b3c5-48f796ee7acb'),
@@ -50,12 +49,12 @@ VALUES ('12345678-1234-1234-1234-123456789012', 'Lettuce', 500, 'KRW', '6dbe903a
 
 -- Insert example data for PIZZA restaurants
 -- restaurants
-INSERT INTO restaurant (id, account_id, name, type, open_time, close_time, picture_url1, picture_url2)
+INSERT INTO user_schema.restaurants (id, user_id, name, type, open_time, close_time, picture_url1, picture_url2)
 VALUES ('13f0c8f0-eec0-4169-ad9f-e8bb408a5325', '10000000-0000-0000-0000-000000000000', 'Pizza Place 1', 'PIZZA',
         '11:00:00', '23:00:00', 'pizza_url1', 'pizza_url2');
 
 -- menus
-INSERT INTO menu (id, name, description, picture_url, price, currency, restaurant_id, created_at,
+INSERT INTO user_schema.menus (id, name, description, picture_url, price, currency, restaurant_id, created_at,
                                updated_at)
 VALUES ('d1a99a90-fd1d-4c9c-94a5-75d8a6f95fa5', 'Margherita Pizza',
         'Traditional pizza with tomato, mozzarella, and basil', 'pizza1_url1', 15000, 'KRW',
@@ -65,14 +64,14 @@ VALUES ('d1a99a90-fd1d-4c9c-94a5-75d8a6f95fa5', 'Margherita Pizza',
 
 -- option_groups
 -- Insert example data for PIZZA restaurants
-INSERT INTO option_group (id, description, max_select_number, is_necessary, menu_id)
+INSERT INTO user_schema.option_groups (id, description, max_select_number, is_necessary, menu_id)
 VALUES ('e4db2ad7-0e6f-419d-80de-47e0b89056f3', 'Select options', 1, true, 'd1a99a90-fd1d-4c9c-94a5-75d8a6f95fa5'),
        ('f049a923-6767-469a-9e77-9f15b7884c32', 'Select options', 1, false, 'd1a99a90-fd1d-4c9c-94a5-75d8a6f95fa5'),
        ('cc94d70a-31d1-4b33-9d3d-04de92680144', 'Select options', 1, true, '3cc8bc8f-9a1e-4a49-9e5f-40da2cd2a3a1'),
        ('a0d7e0ed-1684-4a5c-a073-6050a20de8d8', 'Select options', 1, false, '3cc8bc8f-9a1e-4a49-9e5f-40da2cd2a3a1');
 
 -- options
-INSERT INTO option (id, name, cost, currency, option_group_id)
+INSERT INTO user_schema.options (id, name, cost, currency, option_group_id)
 VALUES ('63f2852a-55c3-4a77-a8e2-eb039b6c84d1', 'Extra Cheese', 1000, 'KRW', 'e4db2ad7-0e6f-419d-80de-47e0b89056f3'),
        ('cb0de529-4a09-4e56-8b69-8f4e42611ef1', 'Mushroom', 1000, 'KRW', 'e4db2ad7-0e6f-419d-80de-47e0b89056f3'),
        ('67469a69-5d6b-44d8-8503-5dd698e7a4f3', 'Olives', 1000, 'KRW', 'e4db2ad7-0e6f-419d-80de-47e0b89056f3'),
