@@ -1,8 +1,3 @@
-
-
-
-
-
          /**
           * Object {id: null, sessionId: null, userId: null, name: null, type: null, ...}
           * id = null

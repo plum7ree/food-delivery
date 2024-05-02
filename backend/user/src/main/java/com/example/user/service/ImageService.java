@@ -1,8 +1,8 @@
 package com.example.user.service;
 
 import com.example.commonawsutil.s3.UrlUtils;
-import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.data.repository.AccountRepository;
+import com.example.user.data.repository.RestaurantRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,11 @@ import java.io.InputStream;
 @Service
 @Slf4j
 public class ImageService {
+    private final S3Client s3Client;
+    private final AccountRepository accountRepository;
+    private final RestaurantRepository restaurantRepository;
     private String bucketName = "b-ubermsa-ap-northeast-2-1";
     private String keyNamePrefix = "k-restaurant-picture";
-        private final S3Client s3Client;
-
-            private final AccountRepository accountRepository;
-    private final RestaurantRepository restaurantRepository;
 
     public ImageService(S3Client s3Client, AccountRepository accountRepository, RestaurantRepository restaurantRepository) {
         this.s3Client = s3Client;
@@ -35,7 +34,7 @@ public class ImageService {
 
 
     public void uploadPictureResized(String restaurantId, String folder, MultipartFile file, Integer fileIdx) {
-                log.info("uploadPictureResized");
+        log.info("uploadPictureResized");
 
 
         var keyName = keyNamePrefix + "/" + restaurantId + "/" + folder + "/" + file.getName();
@@ -69,6 +68,7 @@ public class ImageService {
             // Handle exception
         }
     }
+
     private BufferedImage resizeImage(BufferedImage originalImage, int width, int height) {
         BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = resizedImage.createGraphics();

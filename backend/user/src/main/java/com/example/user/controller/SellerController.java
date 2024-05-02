@@ -2,12 +2,10 @@ package com.example.user.controller;
 
 
 import com.example.commonawsutil.s3.GeneratePresignedGetUrlAndRetrieve;
-import com.example.user.data.dto.*;
-import com.example.user.data.entity.Menu;
-import com.example.user.data.entity.Option;
-import com.example.user.data.entity.OptionGroup;
-import com.example.user.data.repository.RestaurantRepository;
+import com.example.user.data.dto.RestaurantDto;
+import com.example.user.data.dto.RestaurantTypeEnum;
 import com.example.user.data.repository.AccountRepository;
+import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.service.ImageService;
 import com.example.user.service.RestaurantService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,25 +19,27 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api/seller", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Slf4j
 public class SellerController {
-//    private String bucketName = "b-";
-//    private String keyNamePrefix = "k-";
-    private String bucketName = "b-ubermsa-ap-northeast-2-1";
-    private String keyNamePrefix = "k-restaurant-picture";
-
     private final S3Client s3Client;
-
     private final AccountRepository accountRepository;
     private final RestaurantRepository restaurantRepository;
     private final RestaurantService restaurantService;
     private final ImageService imageService;
+    //TODO what if load balancer brings a user into wrong instance?
+    // -> store this into redis master, and only read from master for this task.
+    private final Map<String, RestaurantDto> sessionIdToRestaurantDtoMap = new HashMap<>(); // 세션 ID와 레스토랑 ID를 매핑하기 위한 맵
+    //    private String bucketName = "b-";
+//    private String keyNamePrefix = "k-";
+    private String bucketName = "b-ubermsa-ap-northeast-2-1";
+    private String keyNamePrefix = "k-restaurant-picture";
 
     public SellerController(S3Client s3Client, AccountRepository accountRepository, RestaurantRepository restaurantRepository, RestaurantService restaurantService, ImageService imageService) {
         this.s3Client = s3Client;
@@ -49,16 +49,12 @@ public class SellerController {
         this.imageService = imageService;
     }
 
-    //TODO what if load balancer brings a user into wrong instance?
-    // -> store this into redis master, and only read from master for this task.
-    private final Map<String, RestaurantDto> sessionIdToRestaurantDtoMap = new HashMap<>(); // 세션 ID와 레스토랑 ID를 매핑하기 위한 맵
-
     @PostMapping("/create-session")
     public ResponseEntity<String> createSession() {
         log.info("create session");
         String sessionId = UUID.randomUUID().toString(); // 세션 ID 생성
         RestaurantDto restaurantDto = new RestaurantDto();
-        restaurantDto.setId( UUID.randomUUID().toString());
+        restaurantDto.setId(UUID.randomUUID());
         sessionIdToRestaurantDtoMap.put(sessionId, restaurantDto); // 세션 ID와 레스토랑 ID를 매핑하는 맵에 추가
         return ResponseEntity.ok(sessionId);
     }
@@ -68,7 +64,7 @@ public class SellerController {
     public ResponseEntity<String> uploadRestaurantPicture(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId, @RequestParam("type") String type) {
         try {
             var _restaurantDto = sessionIdToRestaurantDtoMap.get(sessionId);
-            imageService.uploadPictureResized(_restaurantDto.getId(), type, file, 0);
+            imageService.uploadPictureResized(_restaurantDto.getId().toString(), type, file, 0);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -91,14 +87,13 @@ public class SellerController {
 //        }
 
         var menuDtoList = restaurantDto.getMenuDtoList();
-        if(menuDtoList.isEmpty()) {
+        if (menuDtoList.isEmpty()) {
             return ResponseEntity.badRequest().body("no menu exists!");
         }
 
-        var restaurantId = restaurantService.save(restaurantDto);
+        var restaurantId = restaurantService.saveRestaurantAndAllChildren(restaurantDto);
 
         sessionIdToRestaurantDtoMap.remove(sessionId);
-
 
 
         return ResponseEntity.ok(restaurantId);
@@ -112,8 +107,7 @@ public class SellerController {
     }
 
 
-
-//    {
+    //    {
 //      "content": [
 //        {
 //          "name": "Restaurant 1",
@@ -164,7 +158,7 @@ public class SellerController {
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        var restaurantDtos =  restaurantRepository.findByType(RestaurantTypeEnum.valueOf(type), pageable);
+        var restaurantDtos = restaurantRepository.findByType(RestaurantTypeEnum.valueOf(type), pageable);
 
         // picture 에 대해 presigned URl 생성
         restaurantDtos.stream().forEach(restaurant -> {
@@ -190,7 +184,7 @@ public class SellerController {
         var restaurants = restaurantRepository.findAll();
 //        restaurants.stream().forEach(res -> res.findAllMenu);
         var ret = restaurants.stream().map(restaurant -> RestaurantDto.builder()
-                .type(String.valueOf(restaurant.getType()))
+                .type(restaurant.getType())
                 .name(restaurant.getName())
                 .build()).toList();
 
@@ -199,52 +193,23 @@ public class SellerController {
 
     @GetMapping("/restaurant/{restaurantId}")
     @Transactional
-    public ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurantId") String restaurantId) {
-        var res = restaurantRepository.findById(UUID.fromString(restaurantId));
-        if(res.isEmpty()) {
+    public ResponseEntity<RestaurantDto> getRestaurantAndAllChildren(@PathVariable("restaurantId") String restaurantId) {
+        RestaurantDto restaurantDto = null;
+        try {
+            restaurantDto = restaurantService.findRestaurantById(restaurantId);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-        log.info("getRestaurant restairamtEntity: {} " ,res.toString());
-        List<Menu> menuList = res.get().getMenuList();
-        log.info("getRestaurant: menuList : {}" , menuList.toString());
-        //        menuList.get(0)
-        menuList.stream().forEach(menu -> menu.getOptionGroupList().stream().forEach(optionGroup -> optionGroup.getOptions()));
+        log.info("getRestaurant restairamtEntity: {} ", restaurantDto.toString());
 
-        List<MenuDto> menuDtoList = menuList.stream()
-            .map(menu -> {
-                List<OptionGroup> optionGroupList = menu.getOptionGroupList();
-                List<OptionGroupDto> optionGroupDtoList = optionGroupList.stream()
-                        .map(optionGroup -> {
-                            List<Option> options = optionGroup.getOptions(); // LazyInitializationException 발생
-                            List<OptionDto> optionDtoList = options.stream()
-                                    .map(option -> OptionDto.builder()
-                                            .name(option.getName())
-                                            .cost(option.getCost().toString())
-                                            .build())
-                                    .collect(Collectors.toList());
-                            return OptionGroupDto.builder()
-                                    .description(optionGroup.getDescription())
-                                    .optionDtoList(optionDtoList)
-                                    .maxSelectNumber(optionGroup.getMaxSelectNumber())
-                                    .isNecessary(optionGroup.isNecessary())
-                                    .build();
-                        })
-                        .collect(Collectors.toList());
-                return MenuDto.builder()
-                        .name(menu.getName())
-                        .price(menu.getPrice().toString())
-                        .description(menu.getDescription())
-                        .pictureUrl(menu.getPictureUrl())
-                        .optionGroupDtoList(optionGroupDtoList)
-                        .build();
-            })
-            .collect(Collectors.toList());
+        var menuDtoList = restaurantService.findMenuAndAllChildrenByRestaurantId(restaurantId).orElse(null);
+        restaurantDto.setMenuDtoList(menuDtoList);
+
+        log.info("getRestaurant: menuList : {}", menuDtoList.toString());
 
 
-        return ResponseEntity.ok(RestaurantDto.builder().menuDtoList(menuDtoList).build());
+        return ResponseEntity.ok(restaurantDto);
     }
-
-
 
 
 }

@@ -2,12 +2,9 @@ package com.example.user.data.entity;
 
 import com.example.user.data.dto.RestaurantTypeEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -48,13 +45,11 @@ public class Restaurant {
     private String pictureUrl2;
 
 
-
-    @Builder.Default
-    @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER, orphanRemoval=true)
-    @Size(max = 100) // set max menu register size
-//    @BatchSize(size = 100)
-    private List<Menu> menuList = new ArrayList<>();
-
+//    @Builder.Default
+//    @OneToMany(mappedBy = "restaurant", fetch = FetchType.EAGER, orphanRemoval=true)
+//    @Size(max = 100) // set max menu register size
+////    @BatchSize(size = 100)
+//    private List<Menu> menuList = new ArrayList<>();
 
 
 }

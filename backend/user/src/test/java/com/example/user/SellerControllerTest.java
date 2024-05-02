@@ -1,36 +1,28 @@
 package com.example.user;
 
 
-import com.example.user.controller.SellerController;
 import com.example.user.data.dto.*;
-import com.example.user.data.entity.Restaurant;
 import com.example.user.data.repository.RestaurantRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import software.amazon.awssdk.services.s3.S3Client;
 
-import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(properties = {"eureka.client.enabled=false"})
@@ -60,8 +52,8 @@ public class SellerControllerTest {
 
         // 첫 번째 메뉴 menu --< optiongroup --< option
         List<OptionDto> optionDtoList1 = Arrays.asList(
-                OptionDto.builder().name("치즈 추가").cost("500").build(),
-                OptionDto.builder().name("베이컨 추가").cost("1000").build()
+                OptionDto.builder().name("치즈 추가").cost(BigInteger.valueOf(500)).build(),
+                OptionDto.builder().name("베이컨 추가").cost(BigInteger.valueOf(1000)).build()
         );
         List<OptionGroupDto> optionGroupDtoList1 = Arrays.asList(
                 OptionGroupDto.builder().maxSelectNumber(10).isNecessary(false).optionDtoList(optionDtoList1).build()
@@ -75,8 +67,8 @@ public class SellerControllerTest {
 
         // 두 번째 메뉴
         List<OptionDto> optionDtoList2 = Arrays.asList(
-                OptionDto.builder().name("아메리카노").cost("1500").build(),
-                OptionDto.builder().name("카페라떼").cost("2000").build()
+                OptionDto.builder().name("아메리카노").cost(BigInteger.valueOf(1500)).build(),
+                OptionDto.builder().name("카페라떼").cost(BigInteger.valueOf(2000)).build()
         );
         List<OptionGroupDto> optionGroupDtoList2 = Arrays.asList(
                 OptionGroupDto.builder().maxSelectNumber(10).isNecessary(true).optionDtoList(optionDtoList2).build()
@@ -105,7 +97,7 @@ public class SellerControllerTest {
         RestaurantDto restaurantDto = RestaurantDto.builder()
                 .sessionId(sessionId)
                 .name("Test Restaurant")
-                .type("KOREAN")
+                .type(RestaurantTypeEnum.KOREAN)
                 .openTime(LocalTime.of(10, 0))
                 .closeTime(LocalTime.of(22, 0))
                 .pictureUrl1("http://example.com/picture1.jpg")
@@ -116,8 +108,8 @@ public class SellerControllerTest {
         // When
         // Register the restaurant
         mockMvc.perform(post("/api/seller/register/restaurant")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(restaurantDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(restaurantDto)))
                 .andExpect(status().isOk());
 
         // Then

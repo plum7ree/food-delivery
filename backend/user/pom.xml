@@ -15,7 +15,7 @@
             <artifactId>common-aws-util</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -103,7 +103,7 @@
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
             <version>5.0.0</version>
-             <classifier>jakarta</classifier>
+            <classifier>jakarta</classifier>
         </dependency>
 
     </dependencies>

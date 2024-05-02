@@ -1,8 +1,6 @@
 package com.example.user.data.dto;
 
-import com.example.user.data.entity.Option;
-import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,4 +24,6 @@ public class OptionGroupDto {
     List<OptionDto> selectedIndicesList = new ArrayList<>();
     @Builder.Default
     List<OptionDto> optionDtoList = new ArrayList<>();
+    @JsonIgnore
+    private UUID id;
 }

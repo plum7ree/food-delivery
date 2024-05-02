@@ -4,7 +4,6 @@ import com.example.user.data.dto.RestaurantDto;
 import com.example.user.data.dto.RestaurantTypeEnum;
 import com.example.user.data.entity.QRestaurant;
 import com.example.user.data.entity.Restaurant;
-
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -31,69 +30,78 @@ import java.util.UUID;
 @Slf4j
 public class RestaurantRepository {
     @Autowired
+    private final JPAQueryFactory jpaQueryFactory;
+    @Autowired
     EntityManager em;
 
-	@Autowired
-	private final JPAQueryFactory jpaQueryFactory;
+    public RestaurantRepository(JPAQueryFactory jpaQueryFactory) {
+        this.jpaQueryFactory = jpaQueryFactory;
+    }
 
-	public RestaurantRepository(JPAQueryFactory jpaQueryFactory) {
-		this.jpaQueryFactory = jpaQueryFactory;
-	}
+    public Optional<RestaurantDto> findById(UUID id) {
+        QRestaurant restaurant = QRestaurant.restaurant;
+        return Optional.ofNullable(jpaQueryFactory.select(Projections.fields(
+                        RestaurantDto.class,
+                        restaurant.id,
+                        restaurant.name,
+                        restaurant.type,
+                        restaurant.openTime,
+                        restaurant.closeTime
+                ))
+                .from(restaurant)
+                .where(restaurant.id.eq(id))
+                .fetchOne());
+    }
 
-	public Optional<Restaurant> findById(UUID id) {
-		Restaurant restaurant = em.find(Restaurant.class, id);
-		log.info("restaurant -> {}", restaurant);
-		return Optional.of(restaurant);
-	}
+    public Restaurant save(Restaurant restaurant) {
+        if (restaurant.getId() == null) {
+            em.persist(restaurant);
+        } else {
+            em.merge(restaurant);
+        }
+        return restaurant;
+    }
 
-	public Restaurant save(Restaurant restaurant) {
-		if (restaurant.getId() == null) {
-			em.persist(restaurant);
-		} else {
-			em.merge(restaurant);
-		}
-		return restaurant;
-	}
+    public Page<RestaurantDto> findByType(RestaurantTypeEnum type, Pageable pageable) {
+        QRestaurant restaurant = QRestaurant.restaurant;
 
-public Page<RestaurantDto> findByType(RestaurantTypeEnum type, Pageable pageable) {
-    QRestaurant restaurant = QRestaurant.restaurant;
+        //TODO instead of count entire db, how about make a recomendation system (memory or disk)?
+        long total = jpaQueryFactory.select(restaurant)
+                .from(restaurant)
+                .where(restaurant.type.eq(type))
+                .fetchCount();
 
-	//TODO instead of count entire db, how about make a recomendation system (memory or disk)?
-    long total = jpaQueryFactory.select(restaurant)
-        .from(restaurant)
-        .where(restaurant.type.eq(type))
-        .fetchCount();
+        List<RestaurantDto> restaurantDtos = jpaQueryFactory.select(Projections.fields(
+                        RestaurantDto.class,
+                        restaurant.id,
+                        restaurant.name,
+                        restaurant.type,
+                        restaurant.openTime,
+                        restaurant.closeTime
+                ))
+                .from(restaurant)
+                .where(restaurant.type.eq(type))
+                .offset((int) pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
-    List<RestaurantDto> restaurantDtos = jpaQueryFactory.select(Projections.fields(
-            RestaurantDto.class,
-            restaurant.name,
-            restaurant.type,
-            restaurant.openTime,
-            restaurant.closeTime
-        ))
-        .from(restaurant)
-        .where(restaurant.type.eq(type))
-        .offset((int) pageable.getOffset())
-        .limit(pageable.getPageSize())
-        .fetch();
+        return new PageImpl<>(restaurantDtos, pageable, total);
+    }
 
-    return new PageImpl<>(restaurantDtos, pageable, total);
-}
+    public List<RestaurantDto> findAll() {
+        QRestaurant restaurant = QRestaurant.restaurant;
 
-public List<RestaurantDto> findAll() {
-    QRestaurant restaurant = QRestaurant.restaurant;
+        List<RestaurantDto> restaurantDtos = jpaQueryFactory.select(Projections.fields(
+                        RestaurantDto.class,
+                        restaurant.name,
+                        restaurant.type,
+                        restaurant.openTime,
+                        restaurant.closeTime
+                ))
+                .from(restaurant)
+                .fetch();
 
-    List<RestaurantDto> restaurantDtos = jpaQueryFactory.select(Projections.fields(
-            RestaurantDto.class,
-            restaurant.name,
-            restaurant.type,
-            restaurant.openTime,
-            restaurant.closeTime
-        ))
-        .from(restaurant)
-        .fetch();
-
-    return restaurantDtos;
-}
+        return restaurantDtos;
+    }
 
 }

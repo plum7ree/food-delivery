@@ -1,6 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
-import axios from 'axios';
+import React, {useEffect, useState} from 'react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {Box, Grid} from "@mui/material";
 import axiosInstance from "../state/axiosInstance";
 import {v4 as uuidv4} from 'uuid';

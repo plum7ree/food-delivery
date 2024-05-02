@@ -1,11 +1,10 @@
 package com.example.user.data.dto;
 
-import com.example.user.data.entity.Menu;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -14,11 +13,11 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RestaurantDto {
-    String id;
+    UUID id;
     String sessionId;
     String userId;
     String name;
-    String type;
+    RestaurantTypeEnum type;
 
     LocalTime openTime;
     LocalTime closeTime;

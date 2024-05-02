@@ -1,4 +1,3 @@
-
 -- Insert example data for users
 INSERT INTO account(id, username, password, email, role)
 VALUES ('13f0c8f0-eec0-4169-ad9f-e8bb408a5325', 'username1', 'password1', 'user1@example.com', 'ROLE_USER');
@@ -18,7 +17,7 @@ VALUES ('db38a0d6-af39-487f-80e0-e88995c8b5bd', '13f0c8f0-eec0-4169-ad9f-e8bb408
 
 -- menus
 INSERT INTO menu (id, name, description, picture_url, price, currency, restaurant_id, created_at,
-                               updated_at)
+                  updated_at)
 VALUES ('a59ce8e1-9969-4625-a15c-53d5cf671017', 'Classic Burger', 'Delicious classic burger', 'burger_url1', 10000,
         'KRW', 'db38a0d6-af39-487f-80e0-e88995c8b5bd', now(), now()),
        ('5d45696d-232f-40eb-a14f-0c16cff1511a', 'Cheeseburger', 'Tasty cheeseburger with melted cheese', 'burger_url2',
@@ -56,7 +55,7 @@ VALUES ('13f0c8f0-eec0-4169-ad9f-e8bb408a5325', '10000000-0000-0000-0000-0000000
 
 -- menus
 INSERT INTO menu (id, name, description, picture_url, price, currency, restaurant_id, created_at,
-                               updated_at)
+                  updated_at)
 VALUES ('d1a99a90-fd1d-4c9c-94a5-75d8a6f95fa5', 'Margherita Pizza',
         'Traditional pizza with tomato, mozzarella, and basil', 'pizza1_url1', 15000, 'KRW',
         '13f0c8f0-eec0-4169-ad9f-e8bb408a5325', now(), now()),

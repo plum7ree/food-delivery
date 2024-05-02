@@ -3,7 +3,6 @@ package com.example.user.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.UUID;
 

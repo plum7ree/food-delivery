@@ -3,14 +3,9 @@ package com.example.user.data.entity;
 
 import com.example.commondata.entity.BaseTimeValue;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,15 +29,15 @@ public class Menu {
     private String currency;
 
     @ManyToOne
-    @JoinColumn(name="restaurant_id")
+    @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;
 
 
-    @OneToMany(mappedBy = "menu", fetch = FetchType.EAGER, orphanRemoval=true)
-    @BatchSize(size=20)
-    @Size(max=20)
-                @Builder.Default
-    List<OptionGroup> optionGroupList = new ArrayList<>();
+//    @OneToMany(mappedBy = "menu", fetch = FetchType.EAGER, orphanRemoval=true)
+//    @BatchSize(size=20)
+//    @Size(max=20)
+//                @Builder.Default
+//    List<OptionGroup> optionGroupList = new ArrayList<>();
 
 
     @Embedded

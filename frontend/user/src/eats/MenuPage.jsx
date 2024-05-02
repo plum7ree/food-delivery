@@ -1,17 +1,6 @@
-import React, {useState, useEffect} from 'react';
-import {useLocation, useParams} from 'react-router-dom';
-import axios from 'axios';
-import {
-   Box, Checkbox,
-   FormControl,
-   FormControlLabel,
-   FormGroup,
-   FormLabel,
-   Grid,
-   Radio,
-   RadioGroup,
-   Typography
-} from "@mui/material";
+import React, {useState} from 'react';
+import {useLocation} from 'react-router-dom';
+import {Box, Checkbox, FormControl, FormGroup, Grid, Typography} from "@mui/material";
 import {v4 as uuidv4} from 'uuid';
 
 const MenuPicture = (props) => {
@@ -55,29 +44,29 @@ const OptionLabel = (props) => {
    );
 };
 const CustomFormControlLabel = (props) => {
-  const { option, optionGroupIndex, optionIndex, isChecked, onOptionChange } = props;
+   const {option, optionGroupIndex, optionIndex, isChecked, onOptionChange} = props;
 
-  return (
-    <Box
-      display="flex"
-      alignItems="center"
-      justifyContent="space-between"
-      width="100%"
-      sx={{
-        border: '1px solid #ddd',
-        borderRadius: '4px',
-        padding: '8px 12px',
-      }}
-    >
-      <Box display="flex" alignItems="center">
-        <Checkbox checked={isChecked} onChange={() => onOptionChange(optionGroupIndex, optionIndex)} />
-        <Typography variant="body2" ml={2}>
-          {option.name}
-        </Typography>
+   return (
+      <Box
+         display="flex"
+         alignItems="center"
+         justifyContent="space-between"
+         width="100%"
+         sx={{
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            padding: '8px 12px',
+         }}
+      >
+         <Box display="flex" alignItems="center">
+            <Checkbox checked={isChecked} onChange={() => onOptionChange(optionGroupIndex, optionIndex)}/>
+            <Typography variant="body2" ml={2}>
+               {option.name}
+            </Typography>
+         </Box>
+         <Typography variant="body2">{option.cost}</Typography>
       </Box>
-      <Typography variant="body2">{option.cost}</Typography>
-    </Box>
-  );
+   );
 };
 
 
@@ -101,50 +90,50 @@ const MenuPage = (props) => {
     */
    const [selectedOptions, setSelectedOptions] = useState({});
 
-  const handleOptionChange = (optionGroupIndex, optionIndex) => {
-    setSelectedOptions((prevSelectedOptions) => {
-      const updatedOptions = { ...prevSelectedOptions };
+   const handleOptionChange = (optionGroupIndex, optionIndex) => {
+      setSelectedOptions((prevSelectedOptions) => {
+         const updatedOptions = {...prevSelectedOptions};
 
-      const currentOptionGroup = updatedOptions[optionGroupIndex] || {};
+         const currentOptionGroup = updatedOptions[optionGroupIndex] || {};
 
-      if (currentOptionGroup[optionIndex]) {
-         /**
-          * Instead of False, delete Key.
-          * CheckBox's onChange callback can only know that it is changed.
-          * It doesn't know it is checked or not.
-          */
-         delete currentOptionGroup[optionIndex];
-      } else {
-        currentOptionGroup[optionIndex] = true;
-      }
+         if (currentOptionGroup[optionIndex]) {
+            /**
+             * Instead of False, delete Key.
+             * CheckBox's onChange callback can only know that it is changed.
+             * It doesn't know it is checked or not.
+             */
+            delete currentOptionGroup[optionIndex];
+         } else {
+            currentOptionGroup[optionIndex] = true;
+         }
 
-      updatedOptions[optionGroupIndex] = currentOptionGroup;
-      return updatedOptions;
-    });
-  };
+         updatedOptions[optionGroupIndex] = currentOptionGroup;
+         return updatedOptions;
+      });
+   };
    return (
       <Box display="flex" flexDirection="column" alignItems="center">
          <MenuPicture/>
          {optionGroups && optionGroups.map((optionGroup, optionGroupIndex) => (
-            <Grid key={uuidv4()} container alignItems="center" >
-                <FormControl key={uuidv4()} fullWidth={true} >
+            <Grid key={uuidv4()} container alignItems="center">
+               <FormControl key={uuidv4()} fullWidth={true}>
                   <OptionLabel key={uuidv4()} optionGroup={optionGroup}/>
                   <FormGroup>
                      {optionGroup.optionDtoList.map((option, optionIndex) => {
                         return (
                            <CustomFormControlLabel
-                               key={uuidv4()}
-                               option={option}
-                               isChecked={selectedOptions && selectedOptions[optionGroupIndex] && selectedOptions[optionGroupIndex][optionIndex] === true}
-                               optionGroupIndex={optionGroupIndex}
-                               optionIndex={optionIndex}
-                               onOptionChange={handleOptionChange}
-                             />
+                              key={uuidv4()}
+                              option={option}
+                              isChecked={selectedOptions && selectedOptions[optionGroupIndex] && selectedOptions[optionGroupIndex][optionIndex] === true}
+                              optionGroupIndex={optionGroupIndex}
+                              optionIndex={optionIndex}
+                              onOptionChange={handleOptionChange}
+                           />
 
                         )
                      })}
                   </FormGroup>
-                </FormControl>
+               </FormControl>
 
             </Grid>
          ))}

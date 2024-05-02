@@ -1,11 +1,10 @@
-import React, {useState, useEffect} from 'react';
-import axios from 'axios';
+import React, {useEffect, useState} from 'react';
 import {
    Box,
-   Typography,
    Button,
-   TextField,
+   Collapse,
    Grid,
+   MenuItem,
    Paper,
    Table,
    TableBody,
@@ -13,15 +12,13 @@ import {
    TableContainer,
    TableHead,
    TableRow,
-   MenuItem,
-   Collapse,
+   TextField,
+   Typography,
 } from '@mui/material';
-import {ExpandMore, ExpandLess} from '@mui/icons-material';
+import {ExpandLess, ExpandMore} from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import {Container, styled} from '@mui/system';
-
-import {useSelector} from 'react-redux';
 import axiosInstance from "../state/axiosInstance";
 
 const StyledButton = styled(Button)(({theme}) => ({

@@ -2,10 +2,8 @@ package com.example.user.controller;
 
 import com.example.commonawsutil.s3.GeneratePresignedGetUrlAndRetrieve;
 import com.example.commonawsutil.s3.UrlUtils;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,21 +17,18 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(path = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
 @Slf4j
 public class ProfileController {
 
+    private final S3Client s3Client;
+    String keyName = "k-userprofile/userid1.png";
     //TODO put your bucket name here.
     // @Value("${aws.s3.bucketName}")
 //    String bucketName = "";
     private String bucketName = "b-ubermsa-ap-northeast-2-1";
-    String keyName = "k-userprofile/userid1.png";
-
-    private final S3Client s3Client;
 
     ProfileController(S3Client s3Client) {
         this.s3Client = s3Client;
@@ -42,7 +37,7 @@ public class ProfileController {
     @PostMapping("/profile-picture")
     public void uploadProfilePicture(@RequestParam("file") MultipartFile file) {
         //TODO check png or jpeg
-        if(!UrlUtils.checkBucketExists(bucketName, s3Client)) {
+        if (!UrlUtils.checkBucketExists(bucketName, s3Client)) {
             UrlUtils.createBucket(bucketName, s3Client);
         }
         try (InputStream inputStream = file.getInputStream()) {
