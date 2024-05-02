@@ -8,9 +8,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>driver</artifactId>
-<properties>
-    <maven.test.skip>true</maven.test.skip>
-</properties>
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
 
     <dependencies>
         <!-- my modules-->

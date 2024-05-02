@@ -1,20 +1,13 @@
 package com.example.calldataaccess.repository;
 
 import com.example.calldataaccess.entity.CallEntity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -36,7 +29,6 @@ public interface CallRepository extends JpaRepository<CallEntity, UUID>, QueryDS
 //    // offset calls setFirstResult(offset)
 //    @Query("SELECT c FROM CallEntity c WHERE c.userId = :userID ORDER BY c.createdAt DESC")
 //    List<CallEntity> findCallEntitiesByUserId(@Param("userID") UUID userID, int limit);
-
 
 
 }

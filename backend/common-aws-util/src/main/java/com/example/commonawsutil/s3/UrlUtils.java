@@ -39,7 +39,7 @@ public class UrlUtils {
 
     public static void uploadFile(S3Client s3Client, String bucketName, String key, File file) {
         s3Client.putObject(b -> b.bucket(bucketName).key(key), file.toPath());
-        try (S3Waiter waiter = S3Waiter.builder().client(s3Client).build() ){
+        try (S3Waiter waiter = S3Waiter.builder().client(s3Client).build()) {
             waiter.waitUntilObjectExists(w -> w.bucket(bucketName).key(key));
         }
         logger.info("File uploaded successfully");

@@ -1,7 +1,6 @@
 package com.example.calldataaccess.entity;
 
 import com.example.commondata.domain.aggregate.valueobject.CallStatus;
-import com.querydsl.core.annotations.QueryEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

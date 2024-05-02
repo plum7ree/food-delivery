@@ -7,7 +7,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,8 +30,8 @@ public class TossPaymentTest {
 
         // 결제 확인 요청 보내기
         mockMvc.perform(MockMvcRequestBuilders.post("/confirm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.paymentKey").value(paymentKey))
@@ -41,9 +40,9 @@ public class TossPaymentTest {
 
         // 결제 성공 페이지 요청 보내기
         mockMvc.perform(MockMvcRequestBuilders.get("/success")
-                .param("paymentKey", paymentKey)
-                .param("orderId", orderId)
-                .param("amount", String.valueOf(amount)))
+                        .param("paymentKey", paymentKey)
+                        .param("orderId", orderId)
+                        .param("amount", String.valueOf(amount)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("결제 성공")))

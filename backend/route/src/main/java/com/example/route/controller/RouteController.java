@@ -1,28 +1,28 @@
 package com.example.route.controller;
-import brave.Response;
+
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.query_dsl.MultiMatchQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.core.search.TotalHits;
 import co.elastic.clients.elasticsearch.core.search.TotalHitsRelation;
-import com.example.route.data.dto.*;
+import com.example.route.data.dto.InstructionDto;
+import com.example.route.data.dto.OsmDto;
+import com.example.route.data.dto.PointDto;
+import com.example.route.data.dto.RouteResponseDto;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.util.shapes.GHPoint;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
@@ -38,13 +38,11 @@ import java.util.stream.StreamSupport;
 @Slf4j
 public class RouteController {
 
+    private static final String INDEX_NAME = "osm";
     @Autowired
     private GraphHopper graphHopper;
-
     @Autowired
     private ElasticsearchClient esClient;
-    private static final String INDEX_NAME = "osm";
-
 
     @Operation(
             summary = "routing request"
@@ -98,14 +96,14 @@ public class RouteController {
     public ResponseEntity<OsmDto> searchAddress(@RequestParam String text) throws IOException {
 
         SearchResponse<OsmDto> response = esClient.search(s -> s
-            .index(INDEX_NAME)
-            .query(q -> q
-                .multiMatch(t -> t
-                    .fields("name", "street", "city")
-                    .query(text)
-                )
-            ),
-            OsmDto.class
+                        .index(INDEX_NAME)
+                        .query(q -> q
+                                .multiMatch(t -> t
+                                        .fields("name", "street", "city")
+                                        .query(text)
+                                )
+                        ),
+                OsmDto.class
         );
 
 
@@ -119,7 +117,7 @@ public class RouteController {
         }
 
         List<Hit<OsmDto>> hits = response.hits().hits();
-        for (Hit<OsmDto> hit: hits) {
+        for (Hit<OsmDto> hit : hits) {
             OsmDto osmDto = hit.source();
             log.info("Found product " + osmDto.toString() + ", score " + hit.score());
         }

@@ -8,14 +8,10 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 import software.amazon.awssdk.utils.IoUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.nio.file.Paths;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Duration;
 
 /**

@@ -1,8 +1,8 @@
 apiVersion: aws.crossplane.io/v1beta1
 kind: DBSubnetGroup
 metadata:
-  name: {{ .Release.Name }}-rds-subnet-group
+  name: { { .Release.Name } }-rds-subnet-group
 spec:
   forProvider:
     description: Subnet group for RDS instance
-    subnetIDs: {{ .Values.rds.subnetIds }}
+    subnetIDs: { { .Values.rds.subnetIds } }

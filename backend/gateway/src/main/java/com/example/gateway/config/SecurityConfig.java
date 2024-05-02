@@ -20,28 +20,28 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http
-            .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
+                .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
 //                .cors(cors->cors.disable())
-            .csrf(ServerHttpSecurity.CsrfSpec::disable)
-            .authorizeExchange(exchanges -> exchanges
-                    .pathMatchers("/my-account"
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers("/my-account"
 //                            "/driver/**",
 //                            "/route/**",
 //                            "/websocket/**",
 //                            "/sockjs/**"
-                    ).authenticated()
-                    .pathMatchers(
-                            "/contact",
-                            "/register",
-                            "/driver/**",
-                            "/route/**",
-                            "/user/**",
-                            "/websocket/**",
-                            "/sockjs/**"
-                    ).permitAll()
-                    .anyExchange().authenticated())
-            .httpBasic(Customizer.withDefaults())
-            .formLogin(Customizer.withDefaults());
+                        ).authenticated()
+                        .pathMatchers(
+                                "/contact",
+                                "/register",
+                                "/driver/**",
+                                "/route/**",
+                                "/user/**",
+                                "/websocket/**",
+                                "/sockjs/**"
+                        ).permitAll()
+                        .anyExchange().authenticated())
+                .httpBasic(Customizer.withDefaults())
+                .formLogin(Customizer.withDefaults());
 //            .formLogin(formLogin -> formLogin
 //                    .loginPage("/login")
 //                    .usernameParameter("email")
