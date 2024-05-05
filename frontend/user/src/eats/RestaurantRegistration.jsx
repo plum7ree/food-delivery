@@ -219,6 +219,8 @@ const RestaurantRegistration = () => {
             closeTime: closeTime,
             menuDtoList: menus,
          };
+
+         console.log(restaurantData)
          await uploadRestaurantPicture(sessionId);
          await uploadMenuPicture(sessionId);
          await axiosInstance.post(`/user/api/seller/register/restaurant`, restaurantData);

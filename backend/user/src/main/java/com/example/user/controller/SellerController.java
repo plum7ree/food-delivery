@@ -7,6 +7,7 @@ import com.example.user.data.dto.RestaurantTypeEnum;
 import com.example.user.data.repository.AccountRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.service.ImageService;
+import com.example.user.service.ImageType;
 import com.example.user.service.RestaurantService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/api/seller", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -61,10 +63,10 @@ public class SellerController {
 
     @PostMapping("/register/picture")
     @Transactional
-    public ResponseEntity<String> uploadRestaurantPicture(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId, @RequestParam("type") String type) {
+    public ResponseEntity<String> uploadRestaurantPicture(@RequestParam("file") MultipartFile file, @RequestParam("sessionId") String sessionId, @RequestParam("type") ImageType type) {
         try {
             var _restaurantDto = sessionIdToRestaurantDtoMap.get(sessionId);
-            imageService.uploadPictureResized(_restaurantDto.getId().toString(), type, file, 0);
+            imageService.uploadPictureResized(_restaurantDto.getId().toString(), type.name(), file, 0);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
@@ -75,16 +77,11 @@ public class SellerController {
     @PostMapping("/register/restaurant")
     @Transactional
     public ResponseEntity<String> registerRestaurant(@org.springframework.web.bind.annotation.RequestBody RestaurantDto restaurantDto) {
-        // uploaded restaurant picture
+
         //TODO if user cancelled register restaurant, we should mark or delete an image.
         var sessionId = restaurantDto.getSessionId();
-        var _restaurantDto = sessionIdToRestaurantDtoMap.get(sessionId);
-        // enumType validation already done by RestaurantTypeEnum
+        restaurantDto.setUserId("13f0c8f0-eec0-4169-ad9f-e8bb408a5325");
 
-//        var user = accountRepository.findById(UUID.fromString("13f0c8f0-eec0-4169-ad9f-e8bb408a5325"));
-//        if (user.isEmpty()) {
-//            return ResponseEntity.badRequest().body("user not found");
-//        }
 
         var menuDtoList = restaurantDto.getMenuDtoList();
         if (menuDtoList.isEmpty()) {
@@ -161,28 +158,14 @@ public class SellerController {
         var restaurantDtos = restaurantRepository.findByType(RestaurantTypeEnum.valueOf(type), pageable);
 
         // picture 에 대해 presigned URl 생성
-        restaurantDtos.stream().forEach(restaurant -> {
-            var keyName = restaurant.getPictureUrl1();
-            GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
-            String presignedUrlString = "";
-            try {
-                presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
-                presign.useHttpUrlConnectionToGet(presignedUrlString);
-            } catch (Exception e) {
-
-            }
-            restaurant.setPictureUrl1(presignedUrlString);
-        });
+        restaurantDtos.stream().map(restaurant -> imageService.createPresignedUrlForRestaurant(restaurant)).collect(Collectors.toList());
 
         return restaurantDtos;
     }
 
     @GetMapping("/user-registered-restaurant")
     public ResponseEntity<List<RestaurantDto>> getUserRegisteredRestaurantsBty() {
-//        User user = getUser();
-//        user.getAll
         var restaurants = restaurantRepository.findAll();
-//        restaurants.stream().forEach(res -> res.findAllMenu);
         var ret = restaurants.stream().map(restaurant -> RestaurantDto.builder()
                 .type(restaurant.getType())
                 .name(restaurant.getName())
@@ -201,11 +184,14 @@ public class SellerController {
             return ResponseEntity.notFound().build();
         }
         log.info("getRestaurant restairamtEntity: {} ", restaurantDto.toString());
+        restaurantDto = imageService.createPresignedUrlForRestaurant(restaurantDto);
 
         var menuDtoList = restaurantService.findMenuAndAllChildrenByRestaurantId(restaurantId).orElse(null);
+        menuDtoList = menuDtoList.stream().map(imageService::createPresignedUrlForMenuAndAllChildren).collect(Collectors.toList());
         restaurantDto.setMenuDtoList(menuDtoList);
 
         log.info("getRestaurant: menuList : {}", menuDtoList.toString());
+
 
 
         return ResponseEntity.ok(restaurantDto);

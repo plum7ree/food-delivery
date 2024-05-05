@@ -5,10 +5,7 @@ import com.example.user.data.dto.MenuDto;
 import com.example.user.data.dto.OptionDto;
 import com.example.user.data.dto.OptionGroupDto;
 import com.example.user.data.dto.RestaurantDto;
-import com.example.user.data.entity.Menu;
-import com.example.user.data.entity.Option;
-import com.example.user.data.entity.OptionGroup;
-import com.example.user.data.entity.Restaurant;
+import com.example.user.data.entity.*;
 import com.example.user.data.repository.MenuRepository;
 import com.example.user.data.repository.OptionGroupRepository;
 import com.example.user.data.repository.OptionRepository;
@@ -55,6 +52,7 @@ public class RestaurantService {
         var menuDtoList = restaurantDto.getMenuDtoList();
 
         var restaurantEntity = Restaurant.builder()
+                .account(Account.builder().id(UUID.fromString(restaurantDto.getUserId())).build())
                 .name(restaurantDto.getName())
                 .type(restaurantDto.getType())
                 .openTime(restaurantDto.getOpenTime())
@@ -149,4 +147,5 @@ public class RestaurantService {
     public MenuDto saveMenu(MenuDto menu) {
         return menu;
     }
+
 }

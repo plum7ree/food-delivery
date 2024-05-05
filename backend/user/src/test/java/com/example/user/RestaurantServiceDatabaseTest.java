@@ -1,6 +1,7 @@
 package com.example.user;
 
 import com.example.user.data.dto.*;
+import com.example.user.data.repository.MenuRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.service.RestaurantService;
 import lombok.extern.slf4j.Slf4j;
@@ -26,18 +27,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 )
 @DirtiesContext
 @Slf4j
-class RestaurantServiceIntegrationTest {
+class RestaurantServiceDatabaseTest {
 
     @Autowired
     private RestaurantRepository restaurantRepository;
 
     @Autowired
     private RestaurantService restaurantService;
+    
+    @Autowired
+    private MenuRepository menuRepository;
 
     @Test
     void saveRestaurantTest() {
         // 테스트용 데이터베이스에 저장할 데이터 생성
+
         RestaurantDto restaurantDto = new RestaurantDto();
+        restaurantDto.setUserId("13f0c8f0-eec0-4169-ad9f-e8bb408a5325");
         restaurantDto.setName("Burger King");
         restaurantDto.setType(RestaurantTypeEnum.BURGER);
         restaurantDto.setOpenTime(LocalTime.of(10, 0));
@@ -99,6 +105,7 @@ class RestaurantServiceIntegrationTest {
                 .orElse(null);
         var savedMenuDtoList = restaurantService.findMenuAndAllChildrenByRestaurantId(savedRestaurant.getId().toString())
                 .orElse(null);
+
         // 저장된 레스토랑이 null이 아닌지 확인
         assert savedRestaurant != null;
         assert savedMenuDtoList != null;
@@ -107,6 +114,15 @@ class RestaurantServiceIntegrationTest {
         assertEquals(savedRestaurant.getOpenTime(), LocalTime.of(10, 0));
         assertEquals(savedRestaurant.getCloseTime(), LocalTime.of(22, 0));
         assertEquals(savedMenuDtoList.size(), 2);
+        savedMenuDtoList.stream().forEach(savedMenuDto-> {
+            assert savedMenuDto.getRestaurantId() != null;
+        });
 
+        savedMenuDtoList = menuRepository.findByRestaurantIdNoDtoProjection(savedRestaurantId).orElse(null);
+        assert savedMenuDtoList != null;
+        savedMenuDtoList.stream().forEach(savedMenu -> {
+        log.info("restaurant Id {}", savedMenu.getRestaurantId());
+
+        });
     }
 }

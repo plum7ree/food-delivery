@@ -1,6 +1,9 @@
 package com.example.user.service;
 
+import com.example.commonawsutil.s3.GeneratePresignedGetUrlAndRetrieve;
 import com.example.commonawsutil.s3.UrlUtils;
+import com.example.user.data.dto.MenuDto;
+import com.example.user.data.dto.RestaurantDto;
 import com.example.user.data.repository.AccountRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +27,15 @@ public class ImageService {
     private final AccountRepository accountRepository;
     private final RestaurantRepository restaurantRepository;
     private String bucketName = "b-ubermsa-ap-northeast-2-1";
-    private String keyNamePrefix = "k-restaurant-picture";
+    private static String keyNamePrefix = "k-restaurant-picture";
 
+    @FunctionalInterface
+    public interface KeyNameGenerator {
+        String apply(String restaurantId, String folder, String fileName, Integer fileIdx);
+    }
+    KeyNameGenerator KeyNameGen = (restaurantId, folder, fileName, fileIdx) -> {
+        return keyNamePrefix + "/" + restaurantId + "/" + folder + "/" + fileName;
+    };
     public ImageService(S3Client s3Client, AccountRepository accountRepository, RestaurantRepository restaurantRepository) {
         this.s3Client = s3Client;
         this.accountRepository = accountRepository;
@@ -36,8 +46,7 @@ public class ImageService {
     public void uploadPictureResized(String restaurantId, String folder, MultipartFile file, Integer fileIdx) {
         log.info("uploadPictureResized");
 
-
-        var keyName = keyNamePrefix + "/" + restaurantId + "/" + folder + "/" + file.getName();
+        var keyName = KeyNameGen.apply(restaurantId, folder, file.getName(), fileIdx);
 
         // Check if the bucket exists, create it if not
         if (!UrlUtils.checkBucketExists(bucketName, s3Client)) {
@@ -75,5 +84,35 @@ public class ImageService {
         g.drawImage(originalImage, 0, 0, width, height, null);
         g.dispose();
         return resizedImage;
+    }
+
+
+    public RestaurantDto createPresignedUrlForRestaurant(RestaurantDto restaurantDto) {
+
+        var keyName = KeyNameGen.apply(restaurantDto.getId().toString(), ImageType.RESTAURANT.name(), restaurantDto.getPictureUrl1(), 0);
+            GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
+            String presignedUrlString = "";
+            try {
+                presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
+                presign.useHttpUrlConnectionToGet(presignedUrlString);
+            } catch (Exception e) {
+
+            }
+            restaurantDto.setPictureUrl1(presignedUrlString);
+            return restaurantDto;
+    }
+
+    public MenuDto createPresignedUrlForMenuAndAllChildren(MenuDto menuDto) {
+        var keyName = KeyNameGen.apply(menuDto.getRestaurantId().toString(), ImageType.MENU.name(), menuDto.getPictureUrl(), 0);
+            GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
+            String presignedUrlString = "";
+            try {
+                presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
+                presign.useHttpUrlConnectionToGet(presignedUrlString);
+            } catch (Exception e) {
+
+            }
+            menuDto.setPictureUrl(presignedUrlString);
+            return menuDto;
     }
 }

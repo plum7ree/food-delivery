@@ -20,6 +20,7 @@ public class MenuDto {
     List<OptionGroupDto> optionGroupDtoList = new ArrayList<>();
     @JsonIgnore
     private UUID id;
+    private UUID restaurantId;
     private String name;
     private String description;
     private BigInteger price;
