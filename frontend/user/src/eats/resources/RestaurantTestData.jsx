@@ -1,0 +1,58 @@
+// restaurants.js
+export const RestaurantTestData = [
+  {
+    id: 1,
+    name: "맥도날드",
+    rating: 4.3,
+    distance: 1.5,
+    deliveryTime: 30,
+    deliveryFee: 3000,
+    imageUrl: "https://www.mcdonalds.co.kr/upload/product/pcList/1714445968716.png",
+  },
+  {
+    id: 2,
+    name: "버거킹",
+    rating: 4.1,
+    distance: 2.2,
+    deliveryTime: 35,
+    deliveryFee: 2500,
+    imageUrl: "https://www.mcdonalds.co.kr/upload/product/pcList/1583727841393.png",
+  },
+  {
+    id: 3,
+    name: "KFC",
+    rating: 3.9,
+    distance: 3.1,
+    deliveryTime: 40,
+    deliveryFee: 3500,
+    imageUrl: "https://kfcapi.inicis.com/kfcs_api_img/KFCS/goods/DL_2277617_20240326172444991.png",
+  },
+     {
+    id: 4,
+    name: "KFC",
+    rating: 3.9,
+    distance: 3.1,
+    deliveryTime: 40,
+    deliveryFee: 3500,
+    imageUrl: "https://kfcapi.inicis.com/kfcs_api_img/KFCS/goods/DL_2277617_20240326172444991.png",
+  },
+     {
+    id: 5,
+    name: "KFC",
+    rating: 3.9,
+    distance: 3.1,
+    deliveryTime: 40,
+    deliveryFee: 3500,
+    imageUrl: "https://kfcapi.inicis.com/kfcs_api_img/KFCS/goods/DL_2277617_20240326172444991.png",
+  },
+     {
+    id: 6,
+    name: "KFC",
+    rating: 3.9,
+    distance: 3.1,
+    deliveryTime: 40,
+    deliveryFee: 3500,
+    imageUrl: "https://kfcapi.inicis.com/kfcs_api_img/KFCS/goods/DL_2277617_20240326172444991.png",
+  },
+  // 더 많은 음식점 데이터를 추가할 수 있습니다.
+];

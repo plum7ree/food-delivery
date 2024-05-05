@@ -1,39 +1,80 @@
-import React, {useState} from "react";
+import React from "react";
 import {BrowserRouter as Router, Link, Route, Routes} from "react-router-dom";
 import "./styles.css";
 import UberLikeApp from "./UberLikeApp";
 import EatsMain from "./eats/EatsMain";
+import {Box, Grid, Typography} from "@mui/material";
+import {styled} from "@mui/material/styles";
+import {FaCar, FaUtensils} from "react-icons/fa";
 import MyPage from "./eats/MyPage";
 import RestaurantRegistration from "./eats/RestaurantRegistration";
 import RestaurantManage from "./eats/RestaurantManage";
-import {AppBar, Tab, Tabs} from "@mui/material";
-import {styled} from "@mui/material/styles";
-import RestaurantPage from "./eats/RestaurantPage";
 import RestaurantList from "./eats/RestaurantList";
+import RestaurantPage from "./eats/RestaurantPage";
 import MenuPage from "./eats/MenuPage";
 
-const StyledTab = styled(Tab)({
-   color: "#fff",
+const IconContainer = styled(Box)({
+   display: "flex",
+   justifyContent: "center",
+   alignItems: "center",
+   // height: "100vh",
+});
+
+const IconLink = styled(Link)({
+   display: "flex",
+   flexDirection: "column",
+   alignItems: "center",
+   textDecoration: "none",
+   color: "#000",
+   margin: "0 20px",
+   padding: "20px",
+   borderRadius: "25px",
+   border: "2px solid #fff",
+   transition: "background-color 0.3s ease",
+   "&:hover": {
+      backgroundColor: "rgba(0, 0, 0, 0.1)",
+   },
+});
+
+const IconWrapper = styled(Box)({
+   fontSize: "7rem",
+   marginBottom: "10px",
 });
 
 export default function App() {
-   const [selectedTab, setSelectedTab] = useState(0);
-
-   const handleTabChange = (event, newValue) => {
-      setSelectedTab(newValue);
-   };
-
    return (
       <div className="App">
          <Router>
-            <AppBar position="static">
-               <Tabs value={selectedTab} onChange={handleTabChange}>
-                  <StyledTab label="홈" component={Link} to="/"/>
-                  <StyledTab label="Uber" component={Link} to="/uber"/>
-                  <StyledTab label="Uber Eats" component={Link} to="/eats"/>
-               </Tabs>
-            </AppBar>
             <Routes>
+               <Route
+                  path="/"
+                  element={
+                     <Grid container display="flex" justifyContent="center" alignItems="center">
+                        <Grid container style={{justifyContent: "flex-center", flexDirection: "column"}}>
+                           <Typography style={{fontSize: "2.5rem", fontWeight: "bold", marginBottom: "2rem"}}>
+                              Choose a Service
+                           </Typography> </Grid>
+                        <Grid container style={{justifyContent: "flex-end", flexDirection: "column"}}>
+                           <IconContainer>
+
+                              <IconLink to="/uber">
+                                 <IconWrapper>
+                                    <FaCar/>
+                                 </IconWrapper>
+                                 <Typography variant="h5">Taxi</Typography>
+                              </IconLink>
+                              <IconLink to="/eats">
+                                 <IconWrapper>
+                                    <FaUtensils/>
+                                 </IconWrapper>
+                                 <Typography variant="h5">Delivery</Typography>
+                              </IconLink>
+                           </IconContainer>
+
+                        </Grid>
+                     </Grid>
+                  }
+               />
                <Route path="/uber" element={<UberLikeApp/>}/>
                <Route path="/eats" element={<EatsMain/>}/>
                <Route path="/eats/mypage" element={<MyPage/>}/>

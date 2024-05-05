@@ -106,51 +106,6 @@ public class SellerController {
 
     }
 
-
-    //    {
-//      "content": [
-//        {
-//          "name": "Restaurant 1",
-//          "type": "BURGER",
-//          "openTime": "10:00:00",
-//          "closeTime": "22:00:00",
-//          "pictureUrl1": "https://presigned-url-for-restaurant-1-picture.example.com"
-//        },
-//        {
-//          "name": "Restaurant 2",
-//          "type": "PIZZA",
-//          "openTime": "11:00:00",
-//          "closeTime": "23:00:00",
-//          "pictureUrl1": "https://presigned-url-for-restaurant-2-picture.example.com"
-//        },
-//        // 더 많은 Restaurant 정보
-//      ],
-//      "pageable": {
-//        "sort": {
-//          "sorted": false,
-//          "unsorted": true,
-//          "empty": true
-//        },
-//        "offset": 0,
-//        "pageNumber": 0,
-//        "pageSize": 10,
-//        "paged": true,
-//        "unpaged": false
-//      },
-//      "last": true,
-//      "totalPages": 1,
-//      "totalElements": 10,
-//      "size": 10,
-//      "number": 0,
-//      "sort": {
-//        "sorted": false,
-//        "unsorted": true,
-//        "empty": true
-//      },
-//      "first": true,
-//      "numberOfElements": 10,
-//      "empty": false
-//    }
     @GetMapping("/restaurants")
     public Page<RestaurantDto> getRestaurantsByType(
             @RequestParam(value = "type") String type,
