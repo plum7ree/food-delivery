@@ -6,11 +6,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
 import { Tabs, Tab } from "@mui/material";
 import { Container } from "@mui/system";
-import { RestaurantTestData as mockRestaurants } from './resources/RestaurantTestData'; // restaurants 데이터 가져오기
+import { RestaurantListTestData as mockRestaurants } from './resources/RestaurantListTestData'; // restaurants 데이터 가져오기
 
 const StyledTab = styled(Tab)(({ theme }) => ({
   '&.Mui-selected .MuiAvatar-root': {
-    border: `2px solid ${theme.palette.primary.main}`, // 선택 됬을때 avatar menu logo 테두리 primary 색갈로 바꿈.
+    border: `2px solid ${theme.palette.primary.main}`, // 선택 됬을때 avatar checkout logo 테두리 primary 색갈로 바꿈.
   },
   '&.Mui-selected .MuiTypography-root': {
     color: theme.palette.primary.main,

@@ -1,7 +1,10 @@
 import React, {useState} from 'react';
-import {useLocation} from 'react-router-dom';
-import {Box, Checkbox, FormControl, FormGroup, Grid, Typography} from "@mui/material";
+import {useLocation, useNavigate} from 'react-router-dom';
+import {Box, Button, Checkbox, FormControl, FormGroup, Grid, Typography} from "@mui/material";
 import {v4 as uuidv4} from 'uuid';
+import {Container} from "@mui/system";
+import {useDispatch} from "react-redux";
+import {addMenu} from "../state/checkout/selectedMenuSlice";
 
 const MenuPicture = (props) => {
    const {url1} = props;
@@ -16,8 +19,8 @@ const OptionLabel = (props) => {
    const {optionGroup} = props;
 
    return (
-      <Box mt={3}>
-         <Grid container alignItems="center" justifyContent="space-between">
+      <Grid container>
+         <Grid container  justifyContent="space-between">
             <Grid item>
                <Typography variant="h6">{optionGroup.description}</Typography>
             </Grid>
@@ -25,13 +28,13 @@ const OptionLabel = (props) => {
                {optionGroup.necessary && (
                   // Grid container 내부에 Grid 는 모두 한 행의 각 열로 순서대로 배치된다.
                   // Grid container 가 없으면 각 열로 배치됨.
-                  <Grid container alignItems="center">
-                     <Grid>
+                  <Grid container item alignItems="center">
+                     <Grid item>
                         <Typography variant="body1" ml={2}>
                            Must Select
                         </Typography>
                      </Grid>
-                     <Grid>
+                     <Grid item>
                         <Typography variant="body1" ml={2}>
                            {optionGroup.maxSelectNumber}
                         </Typography>
@@ -40,7 +43,7 @@ const OptionLabel = (props) => {
                )}
             </Grid>
          </Grid>
-      </Box>
+      </Grid>
    );
 };
 const CustomFormControlLabel = (props) => {
@@ -69,11 +72,12 @@ const CustomFormControlLabel = (props) => {
    );
 };
 
-
-const MenuPage = (props) => {
-   const location = useLocation()
-   const {optionGroups} = location.state
-
+const MenuPage = () => {
+   const location = useLocation();
+   const navigate = useNavigate();
+   const {menu, onOptionSelect} = location.state;
+   console.log(location.state)
+   const optionGroups = menu.optionGroupDtoList;
    /**
     *
     * selectedOptions = {
@@ -88,10 +92,11 @@ const MenuPage = (props) => {
     * example) { 0: { 0 : true }, 1: { 0 : true, 1: true}}
     *
     */
-   const [selectedOptions, setSelectedOptions] = useState({});
+   const [selectedOptionsState, setSelectedOptionsState] = useState({});
+   const [totalState, setTotalState] = useState(0);
 
    const handleOptionChange = (optionGroupIndex, optionIndex) => {
-      setSelectedOptions((prevSelectedOptions) => {
+      setSelectedOptionsState((prevSelectedOptions) => {
          const updatedOptions = {...prevSelectedOptions};
 
          const currentOptionGroup = updatedOptions[optionGroupIndex] || {};
@@ -110,36 +115,67 @@ const MenuPage = (props) => {
          updatedOptions[optionGroupIndex] = currentOptionGroup;
          return updatedOptions;
       });
+
+      // 옵션 선택에 따른 총 금액 업데이트
+      updateTotal(optionGroups, selectedOptionsState);
    };
+
+   const updateTotal = (optionGroups, selectedOptions) => {
+      let newTotal = 0;
+      optionGroups.forEach((optionGroup, optionGroupIndex) => {
+         optionGroup.optionDtoList.forEach((option, optionIndex) => {
+            if (selectedOptions[optionGroupIndex] && selectedOptions[optionGroupIndex][optionIndex]) {
+               newTotal += parseInt(option.cost);
+            }
+         });
+      });
+      setTotalState(newTotal);
+   };
+
+  const dispatch = useDispatch();
+  const handleAddToCart = () => {
+    dispatch(addMenu({ menuItem: menu, selectedOptions: selectedOptionsState }));
+    navigate(-1);
+  };
    return (
-      <Box display="flex" flexDirection="column" alignItems="center">
-         <MenuPicture/>
-         {optionGroups && optionGroups.map((optionGroup, optionGroupIndex) => (
-            <Grid key={uuidv4()} container alignItems="center">
-               <FormControl key={uuidv4()} fullWidth={true}>
-                  <OptionLabel key={uuidv4()} optionGroup={optionGroup}/>
-                  <FormGroup>
-                     {optionGroup.optionDtoList.map((option, optionIndex) => {
-                        return (
+      <Container maxWidth="sm">
+         <Grid container direction="column" spacing={4} justifyItems="center">
+            <Grid item>
+               <MenuPicture/>
+
+            </Grid>
+
+            {optionGroups && optionGroups.map((optionGroup, optionGroupIndex) => (
+               <Grid key={uuidv4()} container item >
+                  <FormControl key={uuidv4()} fullWidth={true}>
+                     <OptionLabel key={uuidv4()} optionGroup={optionGroup}/>
+                     <FormGroup>
+                        {optionGroup.optionDtoList.map((option, optionIndex) => (
                            <CustomFormControlLabel
                               key={uuidv4()}
                               option={option}
-                              isChecked={selectedOptions && selectedOptions[optionGroupIndex] && selectedOptions[optionGroupIndex][optionIndex] === true}
+                              isChecked={selectedOptionsState && selectedOptionsState[optionGroupIndex] && selectedOptionsState[optionGroupIndex][optionIndex] === true}
                               optionGroupIndex={optionGroupIndex}
                               optionIndex={optionIndex}
                               onOptionChange={handleOptionChange}
                            />
+                        ))}
+                     </FormGroup>
+                  </FormControl>
+               </Grid>
+            ))}
+         </Grid>
 
-                        )
-                     })}
-                  </FormGroup>
-               </FormControl>
-
-            </Grid>
-         ))}
-      </Box>
-   )
-
+         <Grid container item justify="center">
+            <Button variant="contained"
+                    color="success"
+                    fullWidth
+                    onClick={handleAddToCart}>
+               Add to Cart ({totalState}원)
+            </Button>
+         </Grid>
+      </Container>
+   );
 };
 
 export default MenuPage;
