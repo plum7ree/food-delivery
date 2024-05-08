@@ -1,6 +1,10 @@
 server:
   port: 8077
 
+aws:
+  s3:
+    bucket-name: ""
+
 spring:
   application:
     name: "user"

@@ -22,7 +22,7 @@ public class OptionGroup {
     @JoinColumn(name = "menu_id")
     Menu menu;
 
-//    @OneToMany(mappedBy = "optionGroup", fetch = FetchType.EAGER, orphanRemoval=true)
+    //    @OneToMany(mappedBy = "optionGroup", fetch = FetchType.EAGER, orphanRemoval=true)
 //    @Size(max=20)
 //                @Builder.Default
 //    List<Option> options = new ArrayList<>();

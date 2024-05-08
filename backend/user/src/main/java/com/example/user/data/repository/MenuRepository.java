@@ -17,8 +17,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.hibernate.query.results.Builders.fetch;
-
 
 //public interface MenuRepository extends JpaRepository<Menu, UUID> {
 //}
@@ -58,6 +56,7 @@ public class MenuRepository {
 
         return Optional.of(menuDtos);
     }
+
     public Optional<List<MenuDto>> findByRestaurantIdNoDtoProjection(String restaurantId) {
         QMenu menu = QMenu.menu;
         var entityList = jpaQueryFactory.selectFrom(menu)
@@ -68,10 +67,11 @@ public class MenuRepository {
                 .price(entity.getPrice())
                 .restaurantId(entity.getRestaurant().getId())
                 .build()).collect(Collectors.toList());
-        
-        
+
+
         return Optional.of(dtoList);
     }
+
     public void saveAll(List<Menu> menuList) {
         menuList.forEach(menuEntity -> {
             em.persist(menuEntity);

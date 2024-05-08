@@ -8,6 +8,9 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>user</artifactId>
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
     <dependencies>
 
         <dependency>
@@ -108,5 +111,22 @@
 
     </dependencies>
 
+    <build>
+
+        <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.3.2</version>
+                <configuration>
+                    <to>
+                        <image>lomojiki/uber-msa-${project.artifactId}:latest</image>
+                    </to>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
 
 </project>

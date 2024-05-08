@@ -8,6 +8,7 @@ import com.example.user.data.repository.AccountRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -23,25 +24,21 @@ import java.io.InputStream;
 @Service
 @Slf4j
 public class ImageService {
+    private static String keyNamePrefix = "k-restaurant-picture";
     private final S3Client s3Client;
     private final AccountRepository accountRepository;
     private final RestaurantRepository restaurantRepository;
-    private String bucketName = "b-ubermsa-ap-northeast-2-1";
-    private static String keyNamePrefix = "k-restaurant-picture";
-
-    @FunctionalInterface
-    public interface KeyNameGenerator {
-        String apply(String restaurantId, String folder, String fileName, Integer fileIdx);
-    }
     KeyNameGenerator KeyNameGen = (restaurantId, folder, fileName, fileIdx) -> {
         return keyNamePrefix + "/" + restaurantId + "/" + folder + "/" + fileName;
     };
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
+
     public ImageService(S3Client s3Client, AccountRepository accountRepository, RestaurantRepository restaurantRepository) {
         this.s3Client = s3Client;
         this.accountRepository = accountRepository;
         this.restaurantRepository = restaurantRepository;
     }
-
 
     public void uploadPictureResized(String restaurantId, String folder, MultipartFile file, Integer fileIdx) {
         log.info("uploadPictureResized");
@@ -86,33 +83,37 @@ public class ImageService {
         return resizedImage;
     }
 
-
     public RestaurantDto createPresignedUrlForRestaurant(RestaurantDto restaurantDto) {
 
         var keyName = KeyNameGen.apply(restaurantDto.getId().toString(), ImageType.RESTAURANT.name(), restaurantDto.getPictureUrl1(), 0);
-            GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
-            String presignedUrlString = "";
-            try {
-                presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
-                presign.useHttpUrlConnectionToGet(presignedUrlString);
-            } catch (Exception e) {
+        GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
+        String presignedUrlString = "";
+        try {
+            presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
+            presign.useHttpUrlConnectionToGet(presignedUrlString);
+        } catch (Exception e) {
 
-            }
-            restaurantDto.setPictureUrl1(presignedUrlString);
-            return restaurantDto;
+        }
+        restaurantDto.setPictureUrl1(presignedUrlString);
+        return restaurantDto;
     }
 
     public MenuDto createPresignedUrlForMenuAndAllChildren(MenuDto menuDto) {
         var keyName = KeyNameGen.apply(menuDto.getRestaurantId().toString(), ImageType.MENU.name(), menuDto.getPictureUrl(), 0);
-            GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
-            String presignedUrlString = "";
-            try {
-                presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
-                presign.useHttpUrlConnectionToGet(presignedUrlString);
-            } catch (Exception e) {
+        GeneratePresignedGetUrlAndRetrieve presign = new GeneratePresignedGetUrlAndRetrieve();
+        String presignedUrlString = "";
+        try {
+            presignedUrlString = presign.createPresignedGetUrl(bucketName, keyName);
+            presign.useHttpUrlConnectionToGet(presignedUrlString);
+        } catch (Exception e) {
 
-            }
-            menuDto.setPictureUrl(presignedUrlString);
-            return menuDto;
+        }
+        menuDto.setPictureUrl(presignedUrlString);
+        return menuDto;
+    }
+
+    @FunctionalInterface
+    public interface KeyNameGenerator {
+        String apply(String restaurantId, String folder, String fileName, Integer fileIdx);
     }
 }

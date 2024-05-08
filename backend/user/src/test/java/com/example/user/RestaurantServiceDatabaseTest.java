@@ -34,7 +34,7 @@ class RestaurantServiceDatabaseTest {
 
     @Autowired
     private RestaurantService restaurantService;
-    
+
     @Autowired
     private MenuRepository menuRepository;
 
@@ -114,14 +114,14 @@ class RestaurantServiceDatabaseTest {
         assertEquals(savedRestaurant.getOpenTime(), LocalTime.of(10, 0));
         assertEquals(savedRestaurant.getCloseTime(), LocalTime.of(22, 0));
         assertEquals(savedMenuDtoList.size(), 2);
-        savedMenuDtoList.stream().forEach(savedMenuDto-> {
+        savedMenuDtoList.stream().forEach(savedMenuDto -> {
             assert savedMenuDto.getRestaurantId() != null;
         });
 
         savedMenuDtoList = menuRepository.findByRestaurantIdNoDtoProjection(savedRestaurantId).orElse(null);
         assert savedMenuDtoList != null;
         savedMenuDtoList.stream().forEach(savedMenu -> {
-        log.info("restaurant Id {}", savedMenu.getRestaurantId());
+            log.info("restaurant Id {}", savedMenu.getRestaurantId());
 
         });
     }

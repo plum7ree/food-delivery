@@ -1,7 +1,6 @@
 package com.example.user.controller;
 
 
-import com.example.commonawsutil.s3.GeneratePresignedGetUrlAndRetrieve;
 import com.example.user.data.dto.RestaurantDto;
 import com.example.user.data.dto.RestaurantTypeEnum;
 import com.example.user.data.repository.AccountRepository;
@@ -10,6 +9,7 @@ import com.example.user.service.ImageService;
 import com.example.user.service.ImageType;
 import com.example.user.service.RestaurantService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,9 +38,10 @@ public class SellerController {
     //TODO what if load balancer brings a user into wrong instance?
     // -> store this into redis master, and only read from master for this task.
     private final Map<String, RestaurantDto> sessionIdToRestaurantDtoMap = new HashMap<>(); // 세션 ID와 레스토랑 ID를 매핑하기 위한 맵
-    //    private String bucketName = "b-";
-//    private String keyNamePrefix = "k-";
-    private String bucketName = "b-ubermsa-ap-northeast-2-1";
+
+
+    @Value("${aws.s3.bucket-name}")
+    private String bucketName;
     private String keyNamePrefix = "k-restaurant-picture";
 
     public SellerController(S3Client s3Client, AccountRepository accountRepository, RestaurantRepository restaurantRepository, RestaurantService restaurantService, ImageService imageService) {
@@ -146,7 +147,6 @@ public class SellerController {
         restaurantDto.setMenuDtoList(menuDtoList);
 
         log.info("getRestaurant: menuList : {}", menuDtoList.toString());
-
 
 
         return ResponseEntity.ok(restaurantDto);
