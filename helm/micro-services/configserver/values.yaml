@@ -2,9 +2,7 @@
 # Declare variables to be passed into your templates.
 
 deploymentName: configserver-deployment
-serviceName: configserver
-appLabel: configserver
-appName: configserver
+deploymentLabel: configserver
 
 replicaCount: 1
 

@@ -1,24 +1,24 @@
-# Default values for driver.
+# Default values for user.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-deploymentName: driver-deployment
-deploymentLabel: driver
+deploymentName: user-deployment
+deploymentLabel: user
 
 
 replicaCount: 1
 
 image:
-  repository: lomojiki/uber-msa-driver
+  repository: lomojiki/uber-msa-user
   # Always, IfNotPresent, Never
   imagePullPolicy: Never
   tag: latest
 
-containerPort: 8080
+containerPort: 8077
 
 service:
   type: ClusterIP
-  port: 8080
-  targetPort: 8080
+  port: 8077
+  targetPort: 8077
 
 appname_enabled: true
 profile_enabled: true # get profile from config server

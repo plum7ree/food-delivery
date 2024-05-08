@@ -1,5 +1,5 @@
 apiVersion: v2
-name: prod-env
+name: user
 description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -27,23 +27,3 @@ dependencies:
   - name: common
     version: 0.1.0
     repository: file://../../common
-
-  - name: configserver
-    version: 0.1.0
-    repository: file://../../micro-services/configserver
-
-  - name: eurekaserver
-    version: 0.1.0
-    repository: file://../../micro-services/eurekaserver
-
-#  - name: driver
-#    version: 0.1.0
-#    repository: file://../../micro-services/driver
-
-  - name: user
-    version: 0.1.0
-    repository: file://../../micro-services/user
-
-  - name: gateway
-    version: 0.1.0
-    repository: file://../../micro-services/gateway

@@ -8,7 +8,7 @@ deploymentLabel: driver
 replicaCount: 1
 
 image:
-  repository: lomojiki/uber-msa-driver
+  repository: lomojiki/uber-msa-userdb
   # Always, IfNotPresent, Never
   imagePullPolicy: Never
   tag: latest

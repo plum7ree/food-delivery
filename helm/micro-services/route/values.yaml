@@ -2,9 +2,8 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 deploymentName: route-deployment
-serviceName: route
-appLabel: route
-appName: route
+deploymentLabel: route
+
 
 replicaCount: 1
 

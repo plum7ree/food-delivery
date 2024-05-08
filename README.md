@@ -123,12 +123,24 @@ create new chart
 helm create <chart-name>
 ```
 
+eurekaserver: 8080
 configserver: 8071   
-locationredis: 8072
+gateway: 8072
 driver: 8090
 monitoring: 8091
 route: 8075
+user: 8077
+driver-service: 8078
 
+
+# port must be same.
+# helm/.../user/values.yml
+containerPort: 8077
+
+service:
+  type: ClusterIP
+  port: 8077
+  targetPort: 8077
 ---
 
 ### Kafka Module Architecture
@@ -212,6 +224,5 @@ Domain Driven Design
 2. gateway server
 
 - route rules
-
 
 

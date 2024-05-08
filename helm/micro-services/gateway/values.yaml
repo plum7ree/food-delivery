@@ -2,9 +2,8 @@
 # Declare variables to be passed into your templates.
 
 deploymentName: gateway-deployment
-serviceName: gateway
-appLabel: gateway
-appName: gateway
+deploymentLabel: gateway
+
 
 replicaCount: 1
 
