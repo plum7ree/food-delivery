@@ -1,0 +1,15 @@
+dependencies:
+- name: common
+  repository: file://../../common
+  version: 0.1.0
+- name: terminal
+  repository: file://../../micro-services/terminal
+  version: 0.1.0
+- name: configserver
+  repository: file://../../micro-services/configserver
+  version: 0.1.0
+- name: eurekaserver
+  repository: file://../../micro-services/eurekaserver
+  version: 0.1.0
+digest: sha256:777785da30c0493d7597fd79295d064a1f55d004abfd7a570d571dec6b764794
+generated: "2024-05-09T10:30:22.953249+09:00"
