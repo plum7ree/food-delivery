@@ -4,37 +4,34 @@ kind: Deployment
 metadata:
   name: {{ .Values.deploymentName }}
   labels:
-    app: {{ .Values.deploymentLabel }}
+    app: {{ .Values.appLabel }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.deploymentLabel }}
+      app: {{ .Values.appLabel }}
   template:
     metadata:
       labels:
-        app: {{ .Values.deploymentLabel }}
+        app: {{ .Values.appLabel }}
     spec:
       containers:
-      - name: {{ .Values.deploymentLabel }}
+      - name: {{ .Values.appLabel }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         ports:
         - containerPort: {{ .Values.containerPort }}
           protocol: TCP
         env:
+        {{- if .Values.appname_enabled }}
+        - name: SPRING_APPLICATION_NAME
+          value: {{ .Values.appName }}
+        {{- end }}
         {{- if .Values.profile_enabled }}
         - name: SPRING_PROFILES_ACTIVE
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.global.configMapName }}
               key: SPRING_PROFILES_ACTIVE
-        {{- end }}
-        {{- if .Values.zipkin_enabled }}
-        - name: SPRING_ZIPKIN_BASEURL
-          valueFrom:
-            configMapKeyRef:
-              name: {{ .Values.global.configMapName }}
-              key: SPRING_ZIPKIN_BASEURL
         {{- end }}
         {{- if .Values.config_enabled }}
         - name: SPRING_CONFIG_IMPORT
@@ -57,39 +54,31 @@ spec:
               name: {{ .Values.global.configMapName }}
               key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI
         {{- end }}
-        {{- if .Values.keycloak_enabled }}
-        - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_TOKEN-URI
+        {{- if .Values.otel_enabled }}
+        - name: JAVA_TOOL_OPTIONS
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.global.configMapName }}
-              key: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_TOKEN-URI
-        {{- end }}
-        {{- if .Values.keycloak_enabled }}
-        - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_AUTHORIZATION-URI
+              key: JAVA_TOOL_OPTIONS
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.global.configMapName }}
-              key: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_AUTHORIZATION-URI
-        {{- end }}
-        {{- if .Values.keycloak_enabled }}
-        - name: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_USERINFO-URI
+              key: OTEL_EXPORTER_OTLP_ENDPOINT
+        - name: OTEL_METRICS_EXPORTER
           valueFrom:
             configMapKeyRef:
               name: {{ .Values.global.configMapName }}
-              key: SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_USERINFO-URI
+              key: OTEL_METRICS_EXPORTER
+        - name: OTEL_SERVICE_NAME
+          value: {{ .Values.appName }}
         {{- end }}
-        {{- if .Values.keycloak_enabled }}
-        - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_EAZYBANK-GATEWAY_CLIENT-ID
+        {{- if .Values.kafka_enabled }}
+        - name: SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS
           valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.secretName }}
-              key: keycloakclientid
+            configMapKeyRef:
+              name: {{ .Values.global.configMapName }}
+              key: SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS
         {{- end }}
-        {{- if .Values.keycloak_enabled }}
-        - name: SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_EAZYBANK-GATEWAY_CLIENT-SECRET
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.secretName }}
-              key: keycloakclientsecret
-        {{- end }}
+
 {{- end -}}

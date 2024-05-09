@@ -2,8 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 deploymentName: eurekaserver-deployment
-deploymentLabel: eurekaserver
-
+serviceName: eurekaserver
+appLabel: eurekaserver
+appName: eurekaserver
 
 replicaCount: 1
 
@@ -23,7 +24,7 @@ appname_enabled: true
 profile_enabled: true # get profile from config server
 config_enabled: true # get config server url.
 #server_side_discovery_enabled: false
-eureka_enabled: true # client-side msa.
+eureka_enabled: false # client-side msa.
 resourceserver_enabled: false # gateway server which only needs keycloak url.
 #otel_enabled: true # grafana
 #kafka_enabled: true

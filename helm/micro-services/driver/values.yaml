@@ -2,8 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 deploymentName: driver-deployment
-deploymentLabel: driver
-
+serviceName: driver
+appLabel: driver
+appName: driver
 
 replicaCount: 1
 
