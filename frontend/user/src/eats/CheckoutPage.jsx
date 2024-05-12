@@ -187,25 +187,21 @@ useEffect(() => {
                   </Typography>
                </Grid>
          </Grid>
-         <Grid item>
-            <Typography variant="h6">Select Payment Method</Typography>
-            <RadioGroup value={paymentMethod} onChange={handlePaymentMethodChange}>
-               <FormControlLabel value={PaymentMethod.CREDIT_CARD} control={<Radio/>} label="Credit Card"/>
-               <FormControlLabel value={PaymentMethod.TOSS} control={<Radio/>} label="Toss"/>
-            </RadioGroup>
-         </Grid>
-         <Grid container item mt={2}>
-            <Button variant="contained" color="success" fullWidth onClick={handleCheckout}>
-               Pay
-            </Button>
-         </Grid>
-         {showTossPayment && (
-        <div>
+         {/*<Grid item>*/}
+         {/*   <Typography variant="h6">Select Payment Method</Typography>*/}
+         {/*   <RadioGroup value={paymentMethod} onChange={handlePaymentMethodChange}>*/}
+         {/*      <FormControlLabel value={PaymentMethod.CREDIT_CARD} control={<Radio/>} label="Credit Card"/>*/}
+         {/*      <FormControlLabel value={PaymentMethod.TOSS} control={<Radio/>} label="Toss"/>*/}
+         {/*   </RadioGroup>*/}
+         {/*</Grid>*/}
           <div className="popup-container">
             <TossCheckoutPage />
           </div>
-        </div>
-      )}
+         {/*<Grid container item mt={2}>*/}
+         {/*   <Button variant="contained" color="success" fullWidth onClick={handleCheckout}>*/}
+         {/*      Pay*/}
+         {/*   </Button>*/}
+         {/*</Grid>*/}
       </Container>
    );
 };
