@@ -3,6 +3,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {Box, Grid, Typography, Button, RadioGroup, FormControlLabel, Radio, Divider} from '@mui/material';
 import {Container} from "@mui/system";
 import {useSelector} from "react-redux";
+import {TossCheckoutPage} from "./checkout/TossCheckoutPage";
 
       /**
        * menuItem = {
@@ -106,6 +107,12 @@ const calculateTotalPrice = ({optionGroupDtoList, selectedOptions}) => {
      return total;
    };
 
+
+const PaymentMethod = {
+  CREDIT_CARD: 'credit_card',
+  TOSS: 'toss',
+};
+
 const CheckoutPage = () => {
    const location = useLocation();
    const navigate = useNavigate();
@@ -113,6 +120,7 @@ const CheckoutPage = () => {
    // selectedMenuItems = [{menuItem, selectedOptions}...]
    const selectedMenuItems = useSelector((state) => state.selectedMenu);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [showTossPayment, setShowTossPayment] = useState(false);
 
 
 useEffect(() => {
@@ -130,7 +138,12 @@ useEffect(() => {
    const handleCheckout = () => {
       // 결제 처리 로직 추가
       console.log('Checkout completed', {paymentMethod, totalPrice});
-      navigate('/');
+      if (paymentMethod === PaymentMethod.CREDIT_CARD) {
+
+      } else if (paymentMethod === PaymentMethod.TOSS) {
+      setShowTossPayment(true);
+
+      }
    };
 
 
@@ -174,18 +187,21 @@ useEffect(() => {
                   </Typography>
                </Grid>
          </Grid>
-         <Grid item>
-            <Typography variant="h6">Select Payment Method</Typography>
-            <RadioGroup value={paymentMethod} onChange={handlePaymentMethodChange}>
-               <FormControlLabel value="credit_card" control={<Radio/>} label="Credit Card"/>
-               <FormControlLabel value="toss" control={<Radio/>} label="Toss"/>
-            </RadioGroup>
-         </Grid>
-         <Grid container item mt={2}>
-            <Button variant="contained" color="success" fullWidth onClick={handleCheckout}>
-               Pay
-            </Button>
-         </Grid>
+         {/*<Grid item>*/}
+         {/*   <Typography variant="h6">Select Payment Method</Typography>*/}
+         {/*   <RadioGroup value={paymentMethod} onChange={handlePaymentMethodChange}>*/}
+         {/*      <FormControlLabel value={PaymentMethod.CREDIT_CARD} control={<Radio/>} label="Credit Card"/>*/}
+         {/*      <FormControlLabel value={PaymentMethod.TOSS} control={<Radio/>} label="Toss"/>*/}
+         {/*   </RadioGroup>*/}
+         {/*</Grid>*/}
+          <div className="popup-container">
+            <TossCheckoutPage />
+          </div>
+         {/*<Grid container item mt={2}>*/}
+         {/*   <Button variant="contained" color="success" fullWidth onClick={handleCheckout}>*/}
+         {/*      Pay*/}
+         {/*   </Button>*/}
+         {/*</Grid>*/}
       </Container>
    );
 };

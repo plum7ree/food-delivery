@@ -1,6 +1,5 @@
 import React from "react";
-// HashRouter instead BrowseRouter for s3 hosting.
-import { HashRouter as Router, Link, Route, Routes } from "react-router-dom";
+import {createHashRouter, Link, RouterProvider} from "react-router-dom";
 import "./styles.css";
 import UberLikeApp from "./UberLikeApp";
 import EatsMain from "./eats/EatsMain";
@@ -14,6 +13,7 @@ import RestaurantList from "./eats/RestaurantList";
 import RestaurantPage from "./eats/RestaurantPage";
 import MenuPage from "./eats/MenuPage";
 import CheckoutPage from "./eats/CheckoutPage";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
 const IconContainer = styled(Box)({
   display: "flex",
@@ -42,50 +42,83 @@ const IconWrapper = styled(Box)({
   marginBottom: "10px",
 });
 
+const router = createHashRouter([
+  {
+    path: "/",
+    element: (
+      <Grid container display="flex" justifyContent="center" alignItems="center">
+        <Grid container style={{ justifyContent: "flex-center", flexDirection: "column" }}>
+          <Typography style={{ fontSize: "2.5rem", fontWeight: "bold", marginBottom: "2rem" }}>
+            Choose a Service
+          </Typography>
+        </Grid>
+        <Grid container style={{ justifyContent: "flex-end", flexDirection: "column" }}>
+          <IconContainer>
+            <IconLink to="/uber">
+              <IconWrapper>
+                <FaCar />
+              </IconWrapper>
+              <Typography variant="h5">Taxi</Typography>
+            </IconLink>
+            <IconLink to="/eats">
+              <IconWrapper>
+                <FaUtensils />
+              </IconWrapper>
+              <Typography variant="h5">Delivery</Typography>
+            </IconLink>
+          </IconContainer>
+        </Grid>
+      </Grid>
+    ),
+  },
+  {
+    path: "/uber",
+    element: <UberLikeApp />,
+  },
+  {
+    path: "/eats",
+    element: <EatsMain />,
+  },
+  {
+    path: "/eats/mypage",
+    element: <MyPage />,
+  },
+  {
+    path: "/eats/restaurant-registration",
+    element: <RestaurantRegistration />,
+  },
+  {
+    path: "/eats/restaurant-manage",
+    element: <RestaurantManage />,
+  },
+  {
+    path: "/eats/restaurants/:type",
+    element: <RestaurantList />,
+  },
+  {
+    path: "/eats/restaurant/restaurant-page",
+    element: <RestaurantPage />,
+  },
+  {
+    path: "/eats/restaurant/menu",
+    element: <MenuPage />,
+  },
+  {
+    path: "/eats/checkout",
+    element: <CheckoutPage />,
+  },
+  // {
+  //   path: "/toss-checkout",
+  //   element: <TossCheckoutMain />,
+  // },
+]);
+
+
+const queryClient = new QueryClient();
+
 export default function App() {
   return (
-    <div className="App">
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Grid container display="flex" justifyContent="center" alignItems="center">
-                <Grid container style={{ justifyContent: "flex-center", flexDirection: "column" }}>
-                  <Typography style={{ fontSize: "2.5rem", fontWeight: "bold", marginBottom: "2rem" }}>
-                    Choose a Service
-                  </Typography>
-                </Grid>
-                <Grid container style={{ justifyContent: "flex-end", flexDirection: "column" }}>
-                  <IconContainer>
-                    <IconLink to="/uber">
-                      <IconWrapper>
-                        <FaCar />
-                      </IconWrapper>
-                      <Typography variant="h5">Taxi</Typography>
-                    </IconLink>
-                    <IconLink to="/eats">
-                      <IconWrapper>
-                        <FaUtensils />
-                      </IconWrapper>
-                      <Typography variant="h5">Delivery</Typography>
-                    </IconLink>
-                  </IconContainer>
-                </Grid>
-              </Grid>
-            }
-          />
-          <Route path="/uber" element={<UberLikeApp />} />
-          <Route path="/eats" element={<EatsMain />} />
-          <Route path="/eats/mypage" element={<MyPage />} />
-          <Route path="/eats/restaurant-registration" element={<RestaurantRegistration />} />
-          <Route path="/eats/restaurant-manage" element={<RestaurantManage />} />
-          <Route path="/eats/restaurants/:type" element={<RestaurantList />} />
-          <Route path="/eats/restaurant/restaurant-page" element={<RestaurantPage />} />
-          <Route path="/eats/restaurant/menu" element={<MenuPage />} />
-          <Route path="/eats/checkout" element={<CheckoutPage />} />
-        </Routes>
-      </Router>
-    </div>
-  );
+    <QueryClientProvider client={queryClient}>
+     <RouterProvider router={router} />
+    </QueryClientProvider>);
 }
