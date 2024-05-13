@@ -5,6 +5,7 @@ retry-config:
   maxAttempts: 3
   sleep-time-ms: 2000
 
+
 spring:
   jpa:
     #TODO: none 으로 설정해야 init-x.sql 스크립트로 실행된 테이블이 drop 안된다.

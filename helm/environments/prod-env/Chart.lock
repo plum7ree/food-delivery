@@ -11,5 +11,11 @@ dependencies:
 - name: eurekaserver
   repository: file://../../micro-services/eurekaserver
   version: 0.1.0
-digest: sha256:777785da30c0493d7597fd79295d064a1f55d004abfd7a570d571dec6b764794
-generated: "2024-05-09T10:30:22.953249+09:00"
+- name: user
+  repository: file://../../micro-services/user
+  version: 0.1.0
+- name: gateway
+  repository: file://../../micro-services/gateway
+  version: 0.1.0
+digest: sha256:d6bfa360ea1bb6443d091db8bfc95c8136166f87d94e9f0cc73d09474cec5eeb
+generated: "2024-05-10T13:15:10.538779+09:00"
