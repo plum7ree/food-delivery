@@ -95,7 +95,7 @@ const RestaurantList = () => {
     <Container maxWidth="sm">
       <Grid container direction="column" spacing={2}>
         <Grid item container alignItems="center" justifyContent="space-between">
-          <IconButton>
+          <IconButton onClick={()=>{navigate(-1)}} color="inherit" aria-label="menu">
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h6">{type}</Typography>

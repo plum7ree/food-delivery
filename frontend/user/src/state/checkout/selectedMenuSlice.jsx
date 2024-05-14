@@ -90,12 +90,18 @@ const selectedMenuSlice = createSlice({
         menuItem.quantity = quantity;
       }
     },
+
   },
 });
 
 export const selectTotalPrice = (state) => {
   return state.selectedMenu.reduce((total, item) => total + item.menuItem.price * item.quantity, 0);
 };
+
+export const selectCartItemCount = (state) => {
+  return state.selectedMenu.length;
+};
+
 export const { addMenu,
   removeMenu,
   updateQuantity } = selectedMenuSlice.actions;

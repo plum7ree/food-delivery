@@ -1,5 +1,5 @@
 import React from "react";
-import {createHashRouter, Link, RouterProvider} from "react-router-dom";
+import {createHashRouter, createBrowserRouter, Link, RouterProvider} from "react-router-dom";
 import "./styles.css";
 import UberLikeApp from "./UberLikeApp";
 import EatsMain from "./eats/EatsMain";
@@ -13,7 +13,8 @@ import RestaurantList from "./eats/RestaurantList";
 import RestaurantPage from "./eats/RestaurantPage";
 import MenuPage from "./eats/MenuPage";
 import CheckoutPage from "./eats/CheckoutPage";
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {CheckoutSuccessPage} from "./eats/checkout/CheckoutSuccessPage";
+import {CheckoutFailPage} from "./eats/checkout/CheckoutFailPage";
 
 const IconContainer = styled(Box)({
   display: "flex",
@@ -42,7 +43,7 @@ const IconWrapper = styled(Box)({
   marginBottom: "10px",
 });
 
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: (
@@ -107,18 +108,20 @@ const router = createHashRouter([
     path: "/eats/checkout",
     element: <CheckoutPage />,
   },
-  // {
-  //   path: "/toss-checkout",
-  //   element: <TossCheckoutMain />,
-  // },
+  {
+  path: "/eats/checkout/success",
+    element: <CheckoutSuccessPage />,
+  },
+   {
+      path: "/eats/checkout/fail",
+      element: <CheckoutFailPage />,
+   }
 ]);
 
 
-const queryClient = new QueryClient();
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
      <RouterProvider router={router} />
-    </QueryClientProvider>);
+  );
 }

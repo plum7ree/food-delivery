@@ -16,6 +16,14 @@ const SearchBar = styled(Grid)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
 }));
 
+const CategoryLink = styled(Link)({
+  textDecoration: 'none',
+  color: 'inherit',
+  '&:hover': {
+    textDecoration: 'none',
+  },
+});
+
 const EatsMain = () => {
   const categories = [
     { name: '피자', icon: '🍕', type: 'pizza' },
@@ -65,7 +73,7 @@ const EatsMain = () => {
         <Typography variant="h6" mb={3}>인기 카테고리</Typography>
         <Grid container spacing={2} mb={3} alignItems="center" justifyContent="space-between" >
           {categories.map((category, index) => (
-            <Grid item key={index} onClick={() => handleCategoryClick(category.type)}>
+            <Grid item key={index} component={CategoryLink} to={`/eats/restaurants/${category.type}`} state={{ type: category.type }}>
               <Grid container direction="column" alignItems="center">
                 <Typography variant="h4">{category.icon}</Typography>
                 <Typography>{category.name}</Typography>

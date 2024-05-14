@@ -3,7 +3,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {Box, Grid, Typography, Button, RadioGroup, FormControlLabel, Radio, Divider} from '@mui/material';
 import {Container} from "@mui/system";
 import {useSelector} from "react-redux";
-import {TossCheckoutPage} from "./checkout/TossCheckoutPage";
+import {TossCheckoutComponent} from "./checkout/TossCheckoutComponent";
 
       /**
        * menuItem = {
@@ -100,7 +100,7 @@ const calculateTotalPrice = ({optionGroupDtoList, selectedOptions}) => {
       optionGroupDtoList && optionGroupDtoList.map((optionGroup, optionGroupIndex) => {
          optionGroup.optionDtoList.map((option, optionIndex) => {
             if (selectedOptions[optionGroupIndex] && selectedOptions[optionGroupIndex][optionIndex]) {
-               total += Number(option.cost);
+               total += option.cost;
             }
          });
       })
@@ -113,7 +113,7 @@ const PaymentMethod = {
   TOSS: 'toss',
 };
 
-const CheckoutPage = () => {
+export const CheckoutPage = () => {
    const location = useLocation();
    const navigate = useNavigate();
    const [paymentMethod, setPaymentMethod] = useState('credit_card');
@@ -194,9 +194,7 @@ useEffect(() => {
          {/*      <FormControlLabel value={PaymentMethod.TOSS} control={<Radio/>} label="Toss"/>*/}
          {/*   </RadioGroup>*/}
          {/*</Grid>*/}
-          <div className="popup-container">
-            <TossCheckoutPage />
-          </div>
+            <TossCheckoutComponent />
          {/*<Grid container item mt={2}>*/}
          {/*   <Button variant="contained" color="success" fullWidth onClick={handleCheckout}>*/}
          {/*      Pay*/}

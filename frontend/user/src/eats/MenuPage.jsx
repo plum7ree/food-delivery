@@ -1,17 +1,37 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
-import {Box, Button, Checkbox, FormControl, FormGroup, Grid, Typography} from "@mui/material";
+import {Box, Button, Checkbox, FormControl, FormGroup, Grid, IconButton, Typography} from "@mui/material";
 import {v4 as uuidv4} from 'uuid';
 import {Container} from "@mui/system";
 import {useDispatch} from "react-redux";
 import {addMenu} from "../state/checkout/selectedMenuSlice";
+import {fetchProfilePicture} from "../state/fetchProfilePicture";
+import {ArrowBack, Home} from "@mui/icons-material";
 
 const MenuPicture = (props) => {
-   const {url1} = props;
+   const {pictureUrl} = props;
+   const navigate = useNavigate();
    return (
-      <Box>
-         MenuPicture Here
-      </Box>
+            <Grid container item>
+         <Grid container item justifyContent="space-between">
+            <Grid item>
+               <IconButton onClick={() => {navigate(-1)}}>
+               <ArrowBack />
+             </IconButton>
+            </Grid>
+            <Grid item>
+               <IconButton>
+                  <Home/>
+               </IconButton>
+            </Grid>
+         </Grid>
+
+         <Grid container item>
+            <img src={pictureUrl} style={{width: '100%', height: 'auto'}}/>
+
+         </Grid>
+
+      </Grid>
    )
 }
 
@@ -93,7 +113,18 @@ const MenuPage = () => {
     *
     */
    const [selectedOptionsState, setSelectedOptionsState] = useState({});
-   const [totalState, setTotalState] = useState(0);
+   const [thisMenuPriceWithAllOptions, setThisMenuPriceWithAllOptions] = useState(0);
+
+   useEffect(() => {
+      // Redux store에서 프로필 사진을 가져오는 액션을 디스패치합니다.
+      updateThisMenuPriceWithAllOptions([], {});
+   }, []);
+
+   useEffect(() => {
+       // 옵션 선택에 따른 총 금액 업데이트
+      updateThisMenuPriceWithAllOptions(optionGroups, selectedOptionsState);
+
+   }, [selectedOptionsState]);
 
    const handleOptionChange = (optionGroupIndex, optionIndex) => {
       setSelectedOptionsState((prevSelectedOptions) => {
@@ -116,12 +147,12 @@ const MenuPage = () => {
          return updatedOptions;
       });
 
-      // 옵션 선택에 따른 총 금액 업데이트
-      updateTotal(optionGroups, selectedOptionsState);
-   };
+     };
 
-   const updateTotal = (optionGroups, selectedOptions) => {
-      let newTotal = 0;
+   const updateThisMenuPriceWithAllOptions = (optionGroups, selectedOptions) => {
+      console.log(optionGroups);
+      console.log(selectedOptions)
+      let newTotal = menu.price;
       optionGroups.forEach((optionGroup, optionGroupIndex) => {
          optionGroup.optionDtoList.forEach((option, optionIndex) => {
             if (selectedOptions[optionGroupIndex] && selectedOptions[optionGroupIndex][optionIndex]) {
@@ -129,8 +160,9 @@ const MenuPage = () => {
             }
          });
       });
-      setTotalState(newTotal);
+      setThisMenuPriceWithAllOptions(newTotal);
    };
+   
 
   const dispatch = useDispatch();
   const handleAddToCart = () => {
@@ -140,8 +172,8 @@ const MenuPage = () => {
    return (
       <Container maxWidth="sm">
          <Grid container direction="column" spacing={4} justifyItems="center">
-            <Grid item>
-               <MenuPicture/>
+            <Grid container item>
+               <MenuPicture pictureUrl={menu.pictureUrl} />
 
             </Grid>
 
@@ -171,7 +203,7 @@ const MenuPage = () => {
                     color="success"
                     fullWidth
                     onClick={handleAddToCart}>
-               Add to Cart ({totalState}원)
+               Add to Cart ({thisMenuPriceWithAllOptions}원)
             </Button>
          </Grid>
       </Container>
