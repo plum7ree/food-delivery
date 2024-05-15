@@ -14,25 +14,6 @@ class RequestTypeEnum(Enum):
     GET = 'get'
 
 
-class HtmlTagNode:
-    def __init__(self, id, name, request_type: RequestTypeEnum, **kwargs):
-        self.id = id
-        self.name = name
-        self.request_type = request_type
-        self.kwargs = kwargs
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __eq__(self, other: object):
-        if not isinstance(other, HtmlTagNode):
-            return False
-        return self.id is other.id
-
-    def __repr__(self):
-        return f"HtmlTagNode(id='{self.id}' name='{self.name}', request_type='{self.request_type}' kwargs='{self.kwargs}')"
-
-
 # Selenium 드라이버 초기화
 driver = webdriver.Chrome()  # 크롬 드라이버 사용
 
@@ -46,26 +27,15 @@ SEARCH_PAGE_LIST = [
 
 G = nx.DiGraph()
 
-node0 = HtmlTagNode(0, 'div', request_type=RequestTypeEnum.FIND_ALL, class_="thum")
-node1 = HtmlTagNode(1, 'img', request_type=RequestTypeEnum.FIND)
-node2 = HtmlTagNode(2, 'src', request_type=RequestTypeEnum.GET)
+G.add_node(0, tag='div', request_type=RequestTypeEnum.FIND_ALL, kwargs={ "class_" :"thum"})
+G.add_node(1, tag='img', request_type=RequestTypeEnum.FIND)
+G.add_node(2, tag='src', request_type=RequestTypeEnum.GET)
+G.add_edges_from([(0, 1), (1, 2)])
 
-G.add_edges_from([(node0, node1), (node1, node2)])
-
+print(G.nodes[1])
 
 # strategy_list = [["prd_img",]]
 #
-# G.add_nodes_from([HtmlTagNode('prd_img'), HtmlTagNode'Bob', 'Charlie', 'David', 'Eve'])
-# G.add_edges_from([('Alice', 'Bob'), ('Bob', 'Charlie'), ('Charlie', 'David'), ('David', 'Eve'), ('Eve', 'Alice')])
-def crawl_page(soup, node):
-    results = []
-    if node.request_type == RequestTypeEnum.FIND:
-        results.append(soup.find(node.name, **node.kwargs))
-    elif node.request_type == RequestTypeEnum.FIND_ALL:
-        results = soup.find_all(node.name, **node.kwargs)
-    elif node.request_type == RequestTypeEnum.GET:
-        results.append(soup.get(node.name))
-    return results
 
 
 def topological_crawl(G: networkx.DiGraph, soup):
@@ -78,18 +48,42 @@ def topological_crawl(G: networkx.DiGraph, soup):
     """
     results = {}
     # { HtmlTagNode.id : inward_degree }
-    node_id_to_degree_map = {node.id: G.in_degree(node) for node in G.nodes}
+    node_id_to_degree_map = {node: G.in_degree(node) for node in G.nodes}
     # 1. put node degree starts with 0 or 1 (toppest level)
     html_tag_node_stack = deque()
-    for k, v in node_id_to_degree_map.items():
-        print(k, v)
-        if v == 0:
-            html_tag_node_stack.append(G.nodes.get(k)) # key 자체가 node 네 ... 어떻게 구하지 ?
-    # html_tag_node_stack = deque([G.nodes.get(k) for k, v in id_to_degree_map.items() if v == 0])
+    result_html_element_stack = deque()
+    for node, degree in node_id_to_degree_map.items():
+        if degree == 0:
+            # { node, G.nodes[node] } =  { 0: {'tag':'div', 'request_type' : ...} }
+            html_tag_node_stack.append((node, G.nodes[node])) #
     print(html_tag_node_stack)
-    # while html_tag_node_stack:
-    #     node = html_tag_node_stack.pop()
-    #     nx.descendants(G, node.id)
+    while len(html_tag_node_stack) > 0:
+        node, attrs = html_tag_node_stack.pop()
+
+        # result html. search from here
+        scoped_html = ''
+        if not len(result_html_element_stack):
+            scoped_html = soup
+        else:
+            n_neighbors_left, scoped_html = result_html_element_stack[-1]
+            if n_neighbors_left == 0:
+                result_html_element_stack.pop()
+                n_neighbors_left, scoped_html = result_html_element_stack[-1]
+            else:
+                result_html_element_stack[-1] = (n_neighbors_left - 1, scoped_html)
+
+        result = str()
+        if attrs['request_type'] == RequestTypeEnum.FIND_ALL:
+            result = scoped_html.find_all(attrs['tag'], **attrs['kwargs'])
+        if attrs['request_type'] == RequestTypeEnum.FIND:
+            result = scoped_html.find(attrs['tag'], **attrs['kwargs'])
+        if attrs['request_type'] == RequestTypeEnum.GET:
+            result = scoped_html.get(attrs['tag'], **attrs['kwargs'])
+
+
+        neighbors = list(G.neighbors(node)) # dict_keyiterator -> list
+        result_html_element_stack.append((len(neighbors), result))
+        html_tag_node_stack.append((neighbor, G.nodes[neighbor]) for neighbor in neighbors)
 
 
 result_get_list = list()
