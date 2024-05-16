@@ -20,6 +20,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import {Container, styled} from '@mui/system';
 import axiosInstance from "../state/axiosInstance";
+import RestaurantType from "./RestaurantType";
 
 const StyledButton = styled(Button)(({theme}) => ({
    backgroundColor: 'white',
@@ -359,16 +360,16 @@ const RestaurantRegistration = () => {
                   onChange={(e) => setRestaurantType(e.target.value)}
                   select
                >
-                  <MenuItem value="BURGER">Burger</MenuItem>
-                  <MenuItem value="PIZZA">Pizza</MenuItem>
-                  <MenuItem value="KOREAN">Korean</MenuItem>
-                  <MenuItem value="CHINESE">Chinese</MenuItem>
-                  <MenuItem value="JAPANESE">Japanese</MenuItem>
-                  <MenuItem value="MEXICAN">Mexican</MenuItem>
-                  <MenuItem value="ITALIAN">Italian</MenuItem>
-                  <MenuItem value="AMERICAN">American</MenuItem>
-                  <MenuItem value="FUSION">Fusion</MenuItem>
-                  <MenuItem value="MISC">Misc</MenuItem>
+                  <MenuItem value={RestaurantType.BURGER}>Burger</MenuItem>
+                  <MenuItem value={RestaurantType.PIZZA}>Pizza</MenuItem>
+                  <MenuItem value={RestaurantType.KOREAN}>Korean</MenuItem>
+                  <MenuItem value={RestaurantType.CHINESE}>Chinese</MenuItem>
+                  <MenuItem value={RestaurantType.JAPANESE}>Japanese</MenuItem>
+                  <MenuItem value={RestaurantType.MEXICAN}>Mexican</MenuItem>
+                  <MenuItem value={RestaurantType.ITALIAN}>Italian</MenuItem>
+                  <MenuItem value={RestaurantType.AMERICAN}>American</MenuItem>
+                  <MenuItem value={RestaurantType.FUSION}>Fusion</MenuItem>
+                  <MenuItem value={RestaurantType.MISC}>Misc</MenuItem>
                </TextField>
             </Grid>
             <Grid item xs={12} sm={6}>

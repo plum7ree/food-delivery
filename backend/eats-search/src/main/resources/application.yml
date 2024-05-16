@@ -1,9 +1,9 @@
 server:
-  port: 8075
+  port: 8079
 
 spring:
   application:
-    name: "route"
+    name: "eatssearch"
   profiles:
     active: native
   config:

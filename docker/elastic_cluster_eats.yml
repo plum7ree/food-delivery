@@ -58,7 +58,7 @@ services:
     command: >
       /bin/bash -c "if ! /usr/share/elasticsearch/bin/elasticsearch-plugin list | grep -q 'analysis-nori'; then /usr/share/elasticsearch/bin/elasticsearch-plugin install analysis-nori --batch; fi 
       && /usr/local/bin/docker-entrypoint.sh"
-  kibana:
+  kibana: # localhost:5601
     image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
     ports:
       - 5601:5601

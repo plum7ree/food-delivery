@@ -4,6 +4,7 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import jakarta.annotation.PostConstruct;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,9 +14,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class ElasticSearchConfig {
 
-    @Value("elasticsearch.hostname")
+    @Value("${elasticsearch.hostname}")
     private String hostName;
-    @Value("elasticsearch.port")
+    @Value("${elasticsearch.port}")
     private Integer port;
 
     @Bean
