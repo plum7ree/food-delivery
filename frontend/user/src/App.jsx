@@ -15,6 +15,7 @@ import MenuPage from "./eats/MenuPage";
 import CheckoutPage from "./eats/CheckoutPage";
 import {CheckoutSuccessPage} from "./eats/checkout/CheckoutSuccessPage";
 import {CheckoutFailPage} from "./eats/checkout/CheckoutFailPage";
+import RestaurantListFromSearch from "./eats/RestaurantListFromSearch";
 
 const IconContainer = styled(Box)({
   display: "flex",
@@ -95,6 +96,10 @@ const router = createBrowserRouter([
   {
     path: "/eats/restaurants/:type",
     element: <RestaurantList />,
+  },
+   {
+    path: "/eats/search/restaurants",
+    element: <RestaurantListFromSearch />,
   },
   {
     path: "/eats/restaurant/restaurant-page",

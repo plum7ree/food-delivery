@@ -77,6 +77,7 @@ def wendy_extract():
         print(img_tag.get_attribute('src'))
 
 
+
 links = burgerking_extract()
 print(links)
 

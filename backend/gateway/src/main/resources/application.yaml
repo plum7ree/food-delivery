@@ -43,4 +43,5 @@ info:
 
 logging:
   level:
-    com.example.gateway: DEBUG
+    com.example.gateway: INFO
+    org.springframework.cloud.gateway: TRACE

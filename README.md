@@ -131,6 +131,7 @@ monitoring: 8091
 route: 8075
 user: 8077
 driver-service: 8078
+eatssearch: 8079
 
 
 # port must be same.
