@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: es-pv-localhost
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem # 볼륨을 파일 시스템 형식으로 설정해서 사용
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual # 해당 스토리지 클래스에 맞는 PVC와 연결
+  hostPath: # 볼륨 플러그인
+    path: {{.Values.elasticsearch.diskPath}}
+

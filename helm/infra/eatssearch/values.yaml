@@ -1,0 +1,13 @@
+kibana:
+  version: 7.17.4
+
+elasticsearch:
+  replicas: 1 # more than 3 doesn't work. bc of cannot find discoveryHosts
+  image: docker.elastic.co/elasticsearch/elasticsearch
+  imageTag: 7.17.4
+  clusterName: es-eats-cluster
+  discoveryHosts: elasticsearch-0.elasticsearch,elasticsearch-1.elasticsearch,elasticsearch-2.elasticsearch
+  initialMasterNodes: elasticsearch-0,elasticsearch-1,elasticsearch-2
+  dataStorage: 10Gi
+#  diskPath: /tmp/eatssearch/data # not works.
+  diskPath: /Users/coding/code/uber-msa/helm/infra/eatssearch/es/data
