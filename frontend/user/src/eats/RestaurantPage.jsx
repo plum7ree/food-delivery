@@ -4,8 +4,8 @@ import {Box, Grid, Typography, Divider, IconButton, Rating, Tabs, Tab, Button, B
 import {ArrowBack, Call, FavoriteBorder, Home, Share, ShoppingCart} from "@mui/icons-material";
 import axiosInstance from "../state/axiosInstance";
 import {v4 as uuidv4} from 'uuid';
-import {RestaurantTestData as mockRestaurant} from "./resources/RestaurantTestData";
-import {Container} from "@mui/system";
+import {SearchRestaurantTestData as mockSearchRestaurant} from "./resources/RestaurantTestData";
+import {Container, maxWidth} from "@mui/system";
 import {selectCartItemCount} from "../state/checkout/selectedMenuSlice";
 import {useSelector} from "react-redux";
 
@@ -30,8 +30,8 @@ const RestaurantPicture = (props) => {
             </Grid>
          </Grid>
 
-         <Grid container item>
-            <img src={pictureUrl1} style={{width: '100%', height: 'auto'}}/>
+         <Grid container item justifyContent="center">
+            <img src={pictureUrl1} style={{width: '324px', height: '200'}}/>
 
          </Grid>
 
@@ -126,7 +126,7 @@ const RestaurantMenu = ({menus, onOptionSelect}) => {
                   </Grid>
                </Grid>
                <Grid item >
-                  <img src={menu.pictureUrl} style={{height: '100px'}} />
+                  <img src={menu.pictureUrl} style={{width:'162px', height: '100px'}} />
                </Grid>
             </Grid>
          ))}
@@ -145,13 +145,14 @@ const RestaurantPage = () => {
    const isTestMode = true;
 
    useEffect(() => {
-      console.log(mockRestaurant.menuDtoList)
+      const restaurant = location.state['restaurant']
       if (isTestMode) {
+         const mockRestaurant = restaurant
          console.log(mockRestaurant.menuDtoList)
          setRestaurantState(mockRestaurant);
       } else {
-         const {restaurantId} = location.state;
-         setRestaurantIdState(restaurantId);
+         const {restaurant} = location.state;
+         setRestaurantIdState(restaurant.id);
 
          const fetchRestaurantContent = async (restaurantId) => {
             try {

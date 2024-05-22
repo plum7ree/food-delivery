@@ -8,6 +8,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import {Container} from "@mui/system";
 import axiosInstance from "../state/axiosInstance";
+import RestaurantType from "./RestaurantType";
+import {GetAllTestRestaurantList as mockRestaurant} from "./resources/RestaurantListTestData";
+import RestaurantLabelLargePicture from "./RestaurantLabelLargePicture";
 
 const SearchBar = styled(Grid)(({theme}) => ({
    display: 'flex',
@@ -27,12 +30,16 @@ const CategoryLink = styled(Link)({
 
 const EatsMain = () => {
    const categories = [
-      {name: '피자', icon: '🍕', type: 'pizza'},
-      {name: '치킨', icon: '🍗', type: 'chicken'},
-      {name: '햄버거', icon: '🍔', type: 'BURGER'},
-      {name: '아시안', icon: '🍜', type: 'asian'},
-      {name: '멕시코', icon: '🌮', type: 'mexican'},
-      {name: '디저트', icon: '🍰', type: 'desert'},
+      {name: '햄버거', icon: '🍔', type: RestaurantType.BURGER},
+      {name: '피자', icon: '🍕', type: RestaurantType.PIZZA},
+      {name: '한식', icon: '🍲', type: RestaurantType.KOREAN},
+      {name: '중식', icon: '🍜', type: RestaurantType.CHINESE},
+      {name: '일식', icon: '🍣', type: RestaurantType.JAPANESE},
+      {name: '멕시칸', icon: '🌮', type: RestaurantType.MEXICAN},
+      {name: '이탈리안', icon: '🍝', type: RestaurantType.ITALIAN},
+      {name: '미국식', icon: '🍗', type: RestaurantType.AMERICAN},
+      {name: '퓨전', icon: '🥗', type: RestaurantType.FUSION},
+      {name: '기타', icon: '🍽️', type: RestaurantType.MISC},
    ];
 
    const dispatch = useDispatch();
@@ -42,7 +49,12 @@ const EatsMain = () => {
    const [restaurantIdsFromSearchResult, setRestaurantIdsFromSearchResult] = useState([]);
    const [searchText, setSearchText] = useState('');
    const navigate = useNavigate();
+   const [restaurantState, setRestaurantState] = useState({});
 
+   useEffect(() => {
+      console.log(mockRestaurant)
+      setRestaurantState(mockRestaurant)
+   }, []);
 
    useEffect(() => {
       dispatch(fetchProfilePicture());
@@ -89,7 +101,14 @@ const EatsMain = () => {
          });
       }
    };
-
+   const handleRestaurantClick = (restaurant) => {
+      console.log(restaurant)
+      navigate(`/eats/restaurant/restaurant-page`, {
+         state: {
+            restaurant: restaurant
+         }
+      });
+   };
    return (
       <Container maxWidth="sm">
          <Grid container direction="column" spacing={2}>
@@ -113,13 +132,12 @@ const EatsMain = () => {
                      {profilePictureUrl ? (
                         <img src={profilePictureUrl} alt="Profile"/>
                      ) : (
-                        <AccountCircleIcon fontSize="large"/>
-                     )}
+                        <AccountCircleIcon fontSize="large"/>)}
                   </IconButton>
                </Grid>
             </Grid>
 
-            <Grid item>
+            <Grid item mb={3} justifyContent="center" alignItems="center">
                <Typography variant="h6" mb={3}>인기 카테고리</Typography>
                <Grid container spacing={2} mb={3} alignItems="center" justifyContent="space-between">
                   {categories.map((category, index) => (
@@ -134,15 +152,28 @@ const EatsMain = () => {
                </Grid>
             </Grid>
 
-            <Grid item>
-               <Typography variant="h6">인기 음식점</Typography>
-               {/* 인기 음식점 목록 */}
+            <Grid container item justifyContent="center" alignItems="center">
+               <Typography variant="h6" mb={3}>인기 음식점</Typography>
+               <Grid item container spacing={5} justifyContent="center" alignItems="center" direction="column">
+                  {Array.from({length: 10}, (_, i) => (
+
+                     restaurantState &&
+                     restaurantState[i] &&
+                     <RestaurantLabelLargePicture key={restaurantState[i].id}
+                                                  restaurant={restaurantState[i]}
+                                                  handleRestaurantClick={handleRestaurantClick}
+
+
+                     />
+                  ))}
+               </Grid>
             </Grid>
          </Grid>
 
 
       </Container>
-   );
+   )
+      ;
 };
 
 export default EatsMain;

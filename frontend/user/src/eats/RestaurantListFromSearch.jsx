@@ -6,7 +6,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
 import {Tabs, Tab} from "@mui/material";
 import {Container} from "@mui/system";
-import {RestaurantListTestData as mockRestaurants} from './resources/RestaurantListTestData'; // restaurants 데이터 가져오기
+import { GetAllTestRestaurantList as mockRestaurants } from './resources/RestaurantListTestData';
+import RestaurantLabel from "./RestaurantLabel"; // restaurants 데이터 가져오기
 
 const StyledTab = styled(Tab)(({theme}) => ({
    '&.Mui-selected .MuiAvatar-root': {
@@ -61,11 +62,11 @@ const RestaurantListFromSearch = () => {
   }, [restaurantIds, isTestMode]);
 
 
-   const handleCategoryClick = (restaurant) => {
+   const handleRestaurantClick = (restaurant) => {
       console.log(restaurant)
       navigate(`/eats/restaurant/restaurant-page`, {
          state: {
-            restaurantId: restaurant.id
+            restaurant: restaurant
          }
       });
    };
@@ -98,35 +99,11 @@ const RestaurantListFromSearch = () => {
             </Grid>
             <Grid item container spacing={2} direction="column" style={{overflowY: 'scroll'}}>
                {restaurants.map((restaurant) => (
-                  <Grid item key={restaurant.id} onClick={() => handleCategoryClick(restaurant)}>
-                     <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={4}>
-                           <img src={restaurant.imageUrl} alt={restaurant.name}
-                                style={{width: '100%', height: 'auto'}}/>
-                        </Grid>
-                        <Grid item xs={8}>
-                           <Typography variant="subtitle1" align="left">{restaurant.name}</Typography>
-                           <Grid container alignItems="center" spacing={1}>
-                              <Grid item>
-                                 <Rating name="half-rating" defaultValue={2.5} precision={0.5} max={1}/>
-                              </Grid>
-                              <Grid item>
-                                 <Typography variant="body2">{restaurant.rating}</Typography>
-                              </Grid>
-                              <Grid item>
-                                 <Typography variant="body2">{restaurant.distance} km</Typography>
-                              </Grid>
-                              <Grid item>
-                                 <Typography variant="body2">{restaurant.deliveryTime} 분</Typography>
-                              </Grid>
-                              <Grid item>
-                                 <Typography variant="body2">{restaurant.deliveryFee} 원</Typography>
-                              </Grid>
-                           </Grid>
-                        </Grid>
-                     </Grid>
-                  </Grid>
-               ))}
+                     <RestaurantLabel key={restaurant.id}
+                                      restaurant={restaurant}
+                                      handleRestaurantClick={handleRestaurantClick}
+                     />
+                  ))}
             </Grid>
          </Grid>
       </Container>
