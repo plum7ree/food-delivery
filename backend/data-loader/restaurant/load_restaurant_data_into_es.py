@@ -1,16 +1,21 @@
 import json
 from elasticsearch import Elasticsearch
-from elasticsearch.helpers import bulk
+from elasticsearch.helpers import bulk, streaming_bulk
 from elasticsearch_dsl import Search, Q
 
-DATA_LOAD_FLAG= False
+
+LOCAL_URL = 'http://localhost:9200'
+URL = LOCAL_URL
+
+
+DATA_LOAD_FLAG= True
 if DATA_LOAD_FLAG:
     # JSON 파일 읽기
-    with open('./restaurant_data.json', 'r') as f:
+    with open('./web_crawled_restaurant_data.json', 'r') as f:
         restaurant_data = json.load(f)
 
     # Elasticsearch 클라이언트 생성
-    es = Elasticsearch(['http://localhost:9200'])
+    es = Elasticsearch([URL])
 
     # 인덱스 생성
     index_name = 'restaurants'
@@ -25,12 +30,17 @@ if DATA_LOAD_FLAG:
                 '_id': restaurant['id'],
                 '_source': restaurant
             }
-
-    bulk(es, generate_actions())
+    try:
+        # Streaming bulk operation
+        for ok, action in streaming_bulk(es, generate_actions(), chunk_size=100, raise_on_error=False):
+            if not ok:
+                print(f'Failed to index document: {action}')
+    except Exception as e:
+        print(f'Streaming bulk failed error: {e}')
 
 
 def search_restaurants(text):
-    es = Elasticsearch(["http://localhost:9200"])
+    es = Elasticsearch([URL])
     s = Search(using=es, index="restaurants")
 
     # Searching for restaurant name

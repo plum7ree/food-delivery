@@ -24,6 +24,11 @@
         <module>call-service/call-dataaccess</module>
         <module>call-service/call-config-data</module>
         <module>call-service/call-application</module>
+        <module>eats-order-service</module>
+        <module>eats-order-service/eats-order-domain</module>
+        <module>eats-order-service/eats-order-dataaccess</module>
+        <module>eats-order-service/eats-order-config-data</module>
+        <module>eats-order-service/eats-order-application</module>
         <module>payment-service</module>
         <module>eats-search</module>
     </modules>

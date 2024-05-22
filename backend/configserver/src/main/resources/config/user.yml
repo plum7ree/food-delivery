@@ -23,10 +23,10 @@ spring:
     username: admin
     password: 1234
     driver-class-name: org.postgresql.Driver
-  sql:
-    init:
-      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
-      mode: always
-      platform: postgres
-      schema-locations: classpath:init-schema.sql
-      data-locations: classpath:init-data.sql
+#  sql:
+#    init:
+#      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
+#      mode: always
+#      platform: postgres
+#      schema-locations: classpath:init-schema.sql
+#      data-locations: classpath:init-data.sql
