@@ -13,6 +13,13 @@ spec:
       labels:
         app: elasticsearch
     spec:
+      initContainers:
+        - name: init-data-dir
+          image: busybox
+          command: ["/bin/sh", "-c", "mkdir -p /usr/share/elasticsearch/data && chmod -R 777 /usr/share/elasticsearch/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data
       containers:
         - name: elasticsearch
           image: docker.elastic.co/elasticsearch/elasticsearch:{{ .Values.elasticsearch.imageTag }}
@@ -39,7 +46,8 @@ spec:
       volumes:
         - name: data
           persistentVolumeClaim:
-            claimName: es-pvc-localhost
+            # claimName: es-pvc-localhost
+            claimName: ebs-eatssearch-pv-claim
         - name: config
           configMap:
             name: elasticsearch-config

@@ -11,3 +11,4 @@ elasticsearch:
   dataStorage: 10Gi
 #  diskPath: /tmp/eatssearch/data # not works.
   diskPath: /Users/coding/code/uber-msa/helm/infra/eatssearch/es/data
+
