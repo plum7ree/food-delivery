@@ -75,6 +75,8 @@ public class PayController {
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
         responseStream.close();
 
+        // 성공시 Restaurant 에게 승인 요청해야함.
+
         return ResponseEntity.status(code).body(jsonObject);
     }
 }

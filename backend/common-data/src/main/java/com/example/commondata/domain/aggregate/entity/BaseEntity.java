@@ -1,7 +1,13 @@
 package com.example.commondata.domain.aggregate.entity;
 
-import java.util.Objects;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
+import java.util.Objects;
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class BaseEntity<ID> {
     private ID id;
 

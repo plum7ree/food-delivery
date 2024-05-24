@@ -1,7 +1,7 @@
 package com.example.calldomain.data.aggregate;
 
 import com.example.calldomain.data.event.CallCreatedEvent;
-import com.example.commondata.domain.aggregate.AggregateRoot;
+import com.example.commondata.domain.aggregate.AggregateRootV1;
 import com.example.commondata.domain.aggregate.valueobject.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Slf4j
-public class Call extends AggregateRoot<CallId> {
+public class Call extends AggregateRootV1<CallId> {
 
     // private final: these are immutable.
     private final UserId userId;

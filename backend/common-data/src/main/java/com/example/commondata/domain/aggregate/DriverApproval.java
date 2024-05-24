@@ -8,7 +8,7 @@ import com.example.kafka.avro.model.DriverApprovalStatus;
 import lombok.Getter;
 
 @Getter
-public class DriverApproval extends AggregateRoot<DriverApprovalId> {
+public class DriverApproval extends AggregateRootV1<DriverApprovalId> {
     private CallId callId;
     private DriverId driverId;
     private Money price;

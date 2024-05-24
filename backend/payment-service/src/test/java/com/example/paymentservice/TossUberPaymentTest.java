@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class TossPaymentTest {
+public class TossUberPaymentTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -31,6 +31,8 @@ public class RestaurantDto {
     @JsonDeserialize(using = LocalTimeDeserializer.class)
     LocalTime closeTime;
 
+    Float rating;
+
     private String pictureUrl1;
     private String pictureUrl2;
 
