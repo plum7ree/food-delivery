@@ -5,7 +5,8 @@
   </div>
 </div>
 
-###  Tech Stack
+### Tech Stack
+
 - - -
 <p>
   <img src="https://img.shields.io/badge/react-blue?logo=react&logoColor=f5f5f5"/>&nbsp
@@ -16,26 +17,27 @@
   <img src="https://img.shields.io/badge/-kubernetes-blue?logo=kubernetes&logoColor=f5f5f5"/>&nbsp
   <img src="https://img.shields.io/badge/-elasticsearch-green?logo=elasticsearch&logoColor=f5f5f5"/>&nbsp
 </p>
-   
-### Sample Images 
+
+### Sample Images
+
 - - -
 <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
   <div style="flex: 1; text-align: center; margin: 10px;">
     <b>Category </b>
     <br>
-    <img src="readme/category2checkout.gif" alt="Category and Checkout" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+    <img src="readme/category2checkout.gif" alt="Category and Checkout" style="max-width: 300px;  max-height: 500px;">
   </div>
 
   <div style="flex: 1; text-align: center; margin: 10px;">
     <b>Search Bar</b>
     <br>
-    <img src="readme/search.gif" alt="Restaurant Search" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+    <img src="readme/search.gif" alt="Restaurant Search" style="max-width: 300px; max-height: 500px;">
   </div>
 
   <div style="flex: 1; text-align: center; margin: 10px;">
     <b>Checkout</b>
     <br>
-    <img src="readme/checkoutconfirm.gif" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+    <img src="readme/checkoutconfirm.gif" alt="Checkout Confirm" style=" max-width: 300px;max-height: 500px;">
   </div>
 </div>
 
@@ -43,13 +45,13 @@
   <div style="flex: 1; text-align: center; margin: 10px;">
     <b>My Page</b>
     <br>
-    <img src="readme/my_page.png" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+    <img src="readme/my_page.png" alt="Checkout Confirm" style=" max-width: 300px;  max-height: 500px;">
   </div>
 
   <div style="flex: 1; text-align: center; margin: 10px;">
     <b>Register Page</b>
     <br>
-    <img src="readme/restaurant_registration.png" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+    <img src="readme/restaurant_registration.png" alt="Checkout Confirm" style="max-width: 300px; max-height: 500px;">
   </div>
   <div style="flex: 1; text-align: center; margin: 10px;">
   </div>
@@ -58,17 +60,22 @@
 
 <p><br></p>  
 
-### Frontend  
+### Frontend
+
 - - -
+
 - 상태관리 redux
 
-### Backend  
+### Backend
+
 - - -    
+
 - 레스토랑 등록, 검색, 주문
 - unit, integration 테스트
 - Selenium 구글 이미지 서치 크롤링 -> elastic search, postgresql 에 마이그레이션
 
 ### Infra
+
 - Kubernetes, helm chart 로 마이크로 서비스 운영 및 배포
 
 <p><br></p>   
@@ -208,15 +215,16 @@ user: 8077
 driver-service: 8078
 eatssearch: 8079
 
-
 # port must be same.
+
 # helm/.../user/values.yml
+
 containerPort: 8077
 
 service:
-  type: ClusterIP
-  port: 8077
-  targetPort: 8077
+type: ClusterIP
+port: 8077
+targetPort: 8077
 ---
 
 ### Kafka Module Architecture
