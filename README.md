@@ -1,4 +1,79 @@
-### Overview Architecture
+<div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+  <div style="flex: 1; text-align: center; margin: 10px;">
+    <h2>Food Delivery Service</h2>
+    <br>
+  </div>
+</div>
+
+###  Tech Stack
+- - -
+<p>
+  <img src="https://img.shields.io/badge/react-blue?logo=react&logoColor=f5f5f5"/>&nbsp
+  <img src="https://img.shields.io/badge/spring-green?logo=springboot&logoColor=f5f5f5"/>&nbsp
+  <img src="https://img.shields.io/badge/-PostgreSQL-blue?logo=postgresql&logoColor=f5f5f5"/>&nbsp
+  <img src="https://img.shields.io/badge/-AWS-orange"/>&nbsp
+  <img src="https://img.shields.io/badge/-redis-red?logo=redis&logoColor=f5f5f5"/>&nbsp
+  <img src="https://img.shields.io/badge/-kubernetes-blue?logo=kubernetes&logoColor=f5f5f5"/>&nbsp
+  <img src="https://img.shields.io/badge/-elasticsearch-green?logo=elasticsearch&logoColor=f5f5f5"/>&nbsp
+</p>
+   
+### Sample Images 
+- - -
+<div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+  <div style="flex: 1; text-align: center; margin: 10px;">
+    <b>Category </b>
+    <br>
+    <img src="readme/category2checkout.gif" alt="Category and Checkout" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+  </div>
+
+  <div style="flex: 1; text-align: center; margin: 10px;">
+    <b>Search Bar</b>
+    <br>
+    <img src="readme/search.gif" alt="Restaurant Search" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+  </div>
+
+  <div style="flex: 1; text-align: center; margin: 10px;">
+    <b>Checkout</b>
+    <br>
+    <img src="readme/checkoutconfirm.gif" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+  </div>
+</div>
+
+<div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
+  <div style="flex: 1; text-align: center; margin: 10px;">
+    <b>My Page</b>
+    <br>
+    <img src="readme/my_page.png" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+  </div>
+
+  <div style="flex: 1; text-align: center; margin: 10px;">
+    <b>Register Page</b>
+    <br>
+    <img src="readme/restaurant_registration.png" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+  </div>
+  <div style="flex: 1; text-align: center; margin: 10px;">
+  </div>
+</div>
+
+
+<p><br></p>  
+
+### Frontend  
+- - -
+- 상태관리 redux
+
+### Backend  
+- - -    
+- 레스토랑 등록, 검색, 주문
+- unit, integration 테스트
+- Selenium 구글 이미지 서치 크롤링 -> elastic search, postgresql 에 마이그레이션
+
+### Infra
+- Kubernetes, helm chart 로 마이크로 서비스 운영 및 배포
+
+<p><br></p>   
+
+### Taxi Call Service
 
 <p>
 <b>Overview</b>   
