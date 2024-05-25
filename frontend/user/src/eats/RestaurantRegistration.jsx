@@ -3,7 +3,7 @@ import {
    Box,
    Button,
    Collapse,
-   Grid,
+   Grid, IconButton,
    MenuItem,
    Paper,
    Table,
@@ -15,12 +15,13 @@ import {
    TextField,
    Typography,
 } from '@mui/material';
-import {ExpandLess, ExpandMore} from '@mui/icons-material';
+import {ArrowBack, ExpandLess, ExpandMore, Home} from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import {Container, styled} from '@mui/system';
 import axiosInstance from "../state/axiosInstance";
 import RestaurantType from "./RestaurantType";
+import {useNavigate} from "react-router-dom";
 
 const StyledButton = styled(Button)(({theme}) => ({
    backgroundColor: 'white',
@@ -157,6 +158,8 @@ const RestaurantRegistration = () => {
          optionGroups: null,
       },
    ]);
+      const navigate = useNavigate();
+
    useEffect(() => {
       fetchRegisteredRestaurants();
    }, []);
@@ -319,7 +322,22 @@ const RestaurantRegistration = () => {
    };
 
    return (
-      <Grid container item lg={6}>
+      <Container maxWidth="sm">
+         <Grid container item justifyContent="space-between">
+            <Grid item>
+               <IconButton onClick={() => {
+                  navigate(-1)
+               }}>
+                  <ArrowBack/>
+               </IconButton>
+            </Grid>
+            <Grid item>
+               <IconButton>
+                  <Home/>
+               </IconButton>
+            </Grid>
+         </Grid>
+      <Grid container item ml={2} mt={2} >
          <Grid item>
             <Typography variant="h4" align="left" gutterBottom>
                Restaurant Registration
@@ -558,6 +576,7 @@ const RestaurantRegistration = () => {
             </TableContainer>
          </Grid>
       </Grid>
+      </Container>
    )
       ;
 };

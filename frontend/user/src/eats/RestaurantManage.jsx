@@ -1,11 +1,16 @@
 import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
-import {Box, Fab, List, ListItem, ListItemText} from '@mui/material';
+import {Link, useNavigate} from 'react-router-dom';
+import {Box, Fab, Grid, IconButton, List, ListItem, ListItemText, Typography} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import axiosInstance from "../state/axiosInstance";
+import {Container} from "@mui/system";
+import {ArrowBack, Home} from "@mui/icons-material";
+import { useTheme } from '@mui/material/styles';
 
 const RestaurantManage = () => {
    const [restaurants, setRestaurants] = useState([]);
+   const theme = useTheme();
+   const navigate = useNavigate();
 
    useEffect(() => {
       fetchRegisteredRestaurants();
@@ -27,18 +32,25 @@ const RestaurantManage = () => {
    };
 
    return (
-      <div>
-         <Box sx={{position: 'fixed', bottom: 16, right: 16}}>
-            <Fab
-               color="primary"
-               component={Link}
-               to="/eats/restaurant-registration"
-               aria-label="add"
-            >
-               <AddIcon/>
-            </Fab>
-         </Box>
-         <h2>등록된 레스토랑 목록</h2>
+      <Container maxWidth="sm">
+         <Grid container item justifyContent="space-between">
+            <Grid item>
+               <IconButton onClick={() => {
+                  navigate(-1)
+               }}>
+                  <ArrowBack/>
+               </IconButton>
+            </Grid>
+            <Grid item>
+               <IconButton>
+                  <Home/>
+               </IconButton>
+            </Grid>
+         </Grid>
+          <Grid item sx={{  padding: 2 }}>
+             <Typography variant="h5">레스토랑 관리</Typography>
+          </Grid>
+          <Grid item sx={{  padding: 2 }}>
          <List>
             {restaurants.map((restaurant, index) => (
                <ListItem
@@ -51,7 +63,20 @@ const RestaurantManage = () => {
                </ListItem>
             ))}
          </List>
-      </div>
+          </Grid>
+         <Grid container item justifyContent="flex-end">
+         <Fab
+            color="primary"
+            component={Link}
+            to="/eats/restaurant-registration"
+            aria-label="add"
+
+         >
+            <AddIcon/>
+         </Fab>
+
+         </Grid>
+      </Container>
    );
 };
 
