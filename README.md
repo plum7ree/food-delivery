@@ -19,29 +19,34 @@
 - - -
 <table>
     <tr>
+      <td style="text-align: center;"><b>Category</b></td>
+      <td style="text-align: center;"><b>Search</b></td>
+      <td style="text-align: center;"><b>Checkout</b></td>
+    </tr>
+    <tr>
         <td style="text-align: center;">    
-          <b>Category</b>
-          <img src="readme/category2checkout.gif" alt="Category and Checkout" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+          <img src="readme/category2checkout.gif" alt="Category and Checkout" style="width:250px; height:350px" >
         </td>
         <td style="text-align: center;">    
-          <b>Search</b>
-          <img src="readme/search.gif" alt="Restaurant Search" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+          <img src="readme/search.gif" alt="Restaurant Search" style="width:250px; height:350px">
         </td>
         <td style="text-align: center;">  
-          <b>Checkout</b>
-          <img src="readme/checkoutconfirm.gif" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+          <img src="readme/checkoutconfirm.gif" alt="Checkout Confirm" style="width:250px; height:350px">
         </td>
     </tr>
 </table>
 <table>
     <tr>
+      <td style="text-align: center;"><b>My Page</b></td>
+      <td style="text-align: center;"><b>Restaurant Registration</b></td>
+      <td style="text-align: center;"><b></b></td>
+    </tr>
+    <tr>
         <td style="text-align: center;">    
-          <b>My Page</b>
-          <img src="readme/my_page.png" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+          <img src="readme/my_page.png" alt="Checkout Confirm" style="width:250px; height:350px">
         </td>
         <td style="text-align: center;">    
-            <b>Restaurant Registraction</b>
-            <img src="readme/restaurant_registration.png" alt="Checkout Confirm" style="width: 100%; max-width: 300px; height: auto; max-height: 500px;">
+            <img src="readme/restaurant_registration.png" alt="Checkout Confirm" style="width:250px; height:350px">
         </td>
         <td style="text-align: center;">    
         </td>
