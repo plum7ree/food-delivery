@@ -1,13 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Delivery Service</title>
+</head>
+<body>
 <div style="display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap;">
   <div style="flex: 1; text-align: center; margin: 10px;">
     <h2>Food Delivery Service</h2>
     <br>
   </div>
-</div>
+</div></body>
+</html>
 
 ### Tech Stack
 
 - - -
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Delivery Service</title>
+</head>
+<body>
 <p>
   <img src="https://img.shields.io/badge/react-blue?logo=react&logoColor=f5f5f5"/>&nbsp
   <img src="https://img.shields.io/badge/spring-green?logo=springboot&logoColor=f5f5f5"/>&nbsp
@@ -17,6 +34,8 @@
   <img src="https://img.shields.io/badge/-kubernetes-blue?logo=kubernetes&logoColor=f5f5f5"/>&nbsp
   <img src="https://img.shields.io/badge/-elasticsearch-green?logo=elasticsearch&logoColor=f5f5f5"/>&nbsp
 </p>
+</body>
+</html>
 
 ### Sample Images
 
