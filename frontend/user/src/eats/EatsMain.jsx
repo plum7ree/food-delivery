@@ -46,7 +46,7 @@ const EatsMain = () => {
    const profilePictureUrl = useSelector((state) => state.profilePicture.url);
    const [searchResult, setSearchResult] = useState([]);
    const [recommendedRestaurantNamesForSearch, setRecommendedRestaurantNamesForSearch] = useState([]);
-   const [restaurantIdsFromSearchResult, setRestaurantIdsFromSearchResult] = useState([]);
+   const [restaurantsFromSearchResult, setRestaurantsFromSearchResult] = useState([]);
    const [searchText, setSearchText] = useState('');
    const navigate = useNavigate();
    const [restaurantState, setRestaurantState] = useState({});
@@ -64,8 +64,7 @@ const EatsMain = () => {
       const restaurantsNames = searchResult.map((restaurant) => restaurant.name);
       setRecommendedRestaurantNamesForSearch(restaurantsNames)
 
-      const restaurantIds = searchResult.map((restaurant) => restaurant.id);
-      setRestaurantIdsFromSearchResult(restaurantIds)
+      setRestaurantsFromSearchResult(searchResult)
    }, [searchResult]);
 
    const handleCategoryClick = (categoryType) => {
@@ -96,7 +95,7 @@ const EatsMain = () => {
       if (searchText) {
          navigate(`/eats/search/restaurants`, {
             state: {
-               restaurantIds: restaurantIdsFromSearchResult
+               restaurants: restaurantsFromSearchResult
             }
          });
       }

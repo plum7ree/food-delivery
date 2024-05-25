@@ -133,6 +133,7 @@ public class SellerController {
     @GetMapping("/restaurant/{restaurantId}")
     @Transactional
     public ResponseEntity<RestaurantDto> getRestaurantAndAllChildren(@PathVariable("restaurantId") String restaurantId) {
+        log.info("/restaurant/{restaurantId} id: {}", restaurantId);
         RestaurantDto restaurantDto = null;
         try {
             restaurantDto = restaurantService.findRestaurantById(restaurantId);
@@ -140,7 +141,7 @@ public class SellerController {
             return ResponseEntity.notFound().build();
         }
         log.info("getRestaurant restairamtEntity: {} ", restaurantDto.toString());
-        restaurantDto = imageService.createPresignedUrlForRestaurant(restaurantDto);
+        //        restaurantDto = imageService.createPresignedUrlForRestaurant(restaurantDto);
 
         var menuDtoList = restaurantService.findMenuAndAllChildrenByRestaurantId(restaurantId).orElse(null);
         menuDtoList = menuDtoList.stream().map(imageService::createPresignedUrlForMenuAndAllChildren).collect(Collectors.toList());

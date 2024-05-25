@@ -8,6 +8,7 @@ import {Tabs, Tab} from "@mui/material";
 import {Container} from "@mui/system";
 import { GetAllTestRestaurantList as mockRestaurants } from './resources/RestaurantListTestData';
 import RestaurantLabel from "./RestaurantLabel"; // restaurants 데이터 가져오기
+import {v4 as uuidv4} from 'uuid';
 
 const StyledTab = styled(Tab)(({theme}) => ({
    '&.Mui-selected .MuiAvatar-root': {
@@ -19,7 +20,6 @@ const StyledTab = styled(Tab)(({theme}) => ({
 }));
 
 const RestaurantListFromSearch = () => {
-  const [restaurantIds, setRestaurantIds] = useState([]);
    const [restaurants, setRestaurants] = useState([]);
    const [type, setType] = useState(null);
    const [selectedTab, setSelectedTab] = useState(0);
@@ -32,34 +32,17 @@ const RestaurantListFromSearch = () => {
 
 
    useEffect(() => {
-      var _restaurantIds = location.state['restaurantIds']
-      if (_restaurantIds) {
-         setRestaurantIds(_restaurantIds);
-      }
-   }, [location]);
-
-  useEffect(() => {
-    const fetchRestaurants = async () => {
       if (isTestMode) {
         // 테스트 모드인 경우 가짜 데이터 사용
         setRestaurants(mockRestaurants);
       } else {
-        // 실제 모드인 경우 Axios 요청으로 데이터 가져오기
-        try {
-          const promises = restaurantIds.map((restaurantId) =>
-            axiosInstance.get(`/user/api/seller/restaurant/${restaurantId}`)
-          );
-          const responses = await Promise.all(promises);
-          const fetchedRestaurants = responses.map((response) => response.data.content);
-          setRestaurants(fetchedRestaurants);
-        } catch (error) {
-          console.error("Error fetching restaurants:", error);
-        }
+         var _restaurants = location.state['restaurants']
+         if (_restaurants) {
+            setRestaurants(_restaurants);
+         }
       }
-    };
+   }, [location]);
 
-    fetchRestaurants();
-  }, [restaurantIds, isTestMode]);
 
 
    const handleRestaurantClick = (restaurant) => {
@@ -98,9 +81,9 @@ const RestaurantListFromSearch = () => {
                </IconButton>
             </Grid>
             <Grid item container spacing={2} direction="column" style={{overflowY: 'scroll'}}>
-               {restaurants.map((restaurant) => (
-                     <RestaurantLabel key={restaurant.id}
-                                      restaurant={restaurant}
+               {restaurants && restaurants.map((restaurant) => (
+                     <RestaurantLabel key={uuidv4()}
+                                       restaurant={restaurant}
                                       handleRestaurantClick={handleRestaurantClick}
                      />
                   ))}
