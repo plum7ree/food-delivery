@@ -1,0 +1,28 @@
+apiVersion: aws.crossplane.io/v1beta1
+kind: RDSInstance
+metadata:
+  name: { { .Release.Name } }-rds
+spec:
+  forProvider:
+    region: { { .Values.region } }
+    dbInstanceClass: { { .Values.rds.instanceType } }
+    allocatedStorage: { { .Values.rds.storageSize } }
+    storageType: { { .Values.rds.storageType } }
+    engine: { { .Values.rds.engine } }
+    engineVersion: { { .Values.rds.engineVersion } }
+    masterUsername: { { .Values.rds.username } }
+    masterUserPassword:
+      namespace: { { .Release.Namespace } }
+      name: { { .Release.Name } }-rds-password
+      key: password
+    dbName: { { .Values.rds.dbName } }
+    port: { { .Values.rds.port } }
+    backupRetentionPeriod: { { .Values.rds.backupRetentionPeriod } }
+    preferredBackupWindow: { { .Values.rds.preferredBackupWindow } }
+    preferredMaintenanceWindow: { { .Values.rds.preferredMaintenanceWindow } }
+    publiclyAccessible: { { .Values.rds.publiclyAccessible } }
+    vpcSecurityGroupIDs: { { .Values.rds.vpcSecurityGroupIds } }
+    dbSubnetGroupName: { { .Release.Name } }-rds-subnet-group
+  writeConnectionSecretToRef:
+    namespace: { { .Release.Namespace } }
+    name: { { .Release.Name } }-rds-connection

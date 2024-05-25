@@ -1,0 +1,40 @@
+{
+  "name": "myapp",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "main": "src/main.jsx",
+  "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/icons-material": "^5.15.15",
+    "@mui/material": "^5.15.15",
+    "@mui/system": "^5.15.15",
+    "@reduxjs/toolkit": "^2.2.3",
+    "@tanstack/react-query": "^5.35.5",
+    "@tosspayments/payment-sdk": "1.7.1",
+    "@tosspayments/payment-widget-sdk": "^0.10.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "axios": "1.6.8",
+    "leaflet": "1.9.4",
+    "nanoid": "^5.0.7",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-icons": "^5.2.0",
+    "react-redux": "^9.1.1",
+    "react-router-dom": "^6.22.3",
+    "uuid": "^9.0.1",
+    "vite": "^5.2.11"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}

@@ -46,7 +46,6 @@ Content-Type: application/json
 GET http://localhost:8072/route/api/query?startLat=37.564902366024384&startLon=126.97670057064717&
     destLat=37.56343884506724&destLon=126.97670715173366
 
-
 ###
 POST http://localhost:8074/api/call
 Content-Type: application/json

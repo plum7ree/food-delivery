@@ -1,0 +1,31 @@
+# Default values for user.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+deploymentName: user-deployment
+serviceName: user
+appLabel: user
+appName: user
+
+replicaCount: 1
+
+image:
+  repository: lomojiki/uber-msa-user
+  # Always, IfNotPresent, Never
+  imagePullPolicy: Never
+  tag: latest
+
+containerPort: 8077
+
+service:
+  type: ClusterIP
+  port: 8077
+  targetPort: 8077
+
+appname_enabled: true
+profile_enabled: true # get profile from config server
+config_enabled: true # get config server url.
+#server_side_discovery_enabled: false
+eureka_enabled: true
+resourceserver_enabled: false # gateway server which only needs keycloak url.
+#otel_enabled: true # grafana
+#kafka_enabled: true

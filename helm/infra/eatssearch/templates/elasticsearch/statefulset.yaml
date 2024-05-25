@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+spec:
+  serviceName: elasticsearch
+  replicas: {{ .Values.elasticsearch.replicas }}
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      initContainers:
+        - name: init-data-dir
+          image: busybox
+          command: ["/bin/sh", "-c", "mkdir -p /usr/share/elasticsearch/data && chmod -R 777 /usr/share/elasticsearch/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:{{ .Values.elasticsearch.imageTag }}
+          env:
+#            - name: ES_JAVA_OPTS
+#              value: {{ .Values.elasticsearch.javaOpts }}
+            - name: node.name
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 9200
+              name: rest
+            - containerPort: 9300
+              name: inter-node
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data # 컨테이너 내부의 path
+            - name: config
+              mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+              # volume 이 참조하는 elasticsearch-config (configmap.yaml)
+              # 의 keyname elasticsearch.yaml
+              subPath: elasticsearch.yml
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            # claimName: es-pvc-localhost
+            claimName: ebs-eatssearch-pv-claim
+        - name: config
+          configMap:
+            name: elasticsearch-config
+

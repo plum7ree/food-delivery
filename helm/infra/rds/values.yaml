@@ -1,0 +1,19 @@
+rds:
+  instanceType: db.t3.micro
+  dbName: mydb
+  username: myuser
+  password: mypassword
+  storageSize: 20
+  storageType: gp2
+  engine: postgres
+  engineVersion: "12"
+  port: 5432
+  backupRetentionPeriod: 7
+  preferredBackupWindow: "02:00-03:00"
+  preferredMaintenanceWindow: "sun:05:00-sun:06:00"
+  publiclyAccessible: false
+  vpcSecurityGroupIds:
+    - sg-12345678
+  subnetIds:
+    - subnet-12345678
+    - subnet-87654321

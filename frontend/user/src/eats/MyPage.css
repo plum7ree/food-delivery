@@ -1,0 +1,32 @@
+/* MyPage.css */
+.mypage-screen {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.mypage-content {
+    margin-top: 40px;
+}
+
+.mypage-menu {
+    list-style: none;
+    padding: 0;
+}
+
+.mypage-menu li {
+    margin-bottom: 20px;
+}
+
+.mypage-menu a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    font-size: 18px;
+}
+
+.mypage-menu a i {
+    margin-right: 10px;
+    font-size: 24px;
+}
