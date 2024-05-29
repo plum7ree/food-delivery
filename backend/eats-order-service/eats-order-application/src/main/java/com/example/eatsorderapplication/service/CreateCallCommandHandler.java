@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class CreateCallCommandHandler {
 
     private final CreateCallCommandManager createCallCommandManager;
-    private final DataMapper dataMapper;
+//    private final DataMapper dataMapper;
     private final RestaurantApprovalRequestKafkaProducer requestPaymentKafkaPublisher;
 
 

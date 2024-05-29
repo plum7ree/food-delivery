@@ -1,6 +1,6 @@
 package com.example.eatsorderapplication.service.publisher.kafka;
 
-import com.example.eatsorderconfigdata.CallServiceConfigData;
+import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.event.CallCreatedEvent;
 import com.example.eatsorderdomain.data.mapper.DataMapper;
 import com.example.commondata.domain.event.publisher.DomainEventPublisher;
@@ -18,7 +18,7 @@ public class RestaurantApprovalRequestKafkaProducer implements DomainEventPublis
     private static final Logger log = LoggerFactory.getLogger(RestaurantApprovalRequestKafkaProducer.class);
 
     private final DataMapper callMessagingDataMapper;
-    private final CallServiceConfigData callServiceConfigData;
+    private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final KafkaProducer<String, RequestAvroModel> kafkaProducer;
 
     @Override
@@ -27,8 +27,8 @@ public class RestaurantApprovalRequestKafkaProducer implements DomainEventPublis
 
         RequestAvroModel restaurantApprovalRequestAvroModel = callMessagingDataMapper
                 .callCreatedEventToRestaurantApprovalRequestAvroModel(domainEvent);
-        log.info("kafka producer send. topic name: {} key: {}", callServiceConfigData.getRestaurantApprovalRequestTopicName(), callId);
-        kafkaProducer.send(callServiceConfigData.getRestaurantApprovalRequestTopicName(),
+        log.info("kafka producer send. topic name: {} key: {}", eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName(), callId);
+        kafkaProducer.send(eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName(),
                 callId,
                 restaurantApprovalRequestAvroModel);
 

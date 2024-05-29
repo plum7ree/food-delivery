@@ -1,6 +1,6 @@
 package com.example.eatsorderapplication.service.publisher.kafka;
 
-import com.example.eatsorderconfigdata.CallServiceConfigData;
+import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.event.CallPaidEvent;
 import com.example.eatsorderdomain.data.mapper.DataMapper;
 import com.example.commondata.domain.event.publisher.DomainEventPublisher;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallPaidEvent> {
 
     private final DataMapper dataMapper;
-    private final CallServiceConfigData callServiceConfigData;
+    private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final KafkaProducer<String, DriverApprovalRequestAvroModel> kafkaProducer;
 
     @Override
@@ -27,7 +27,7 @@ public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallPai
         var RequestAvroModel = dataMapper
                 .callPaidEventToRequestAvroModel(domainEvent);
 
-        kafkaProducer.send(callServiceConfigData.getDriverApprovalRequestTopicName(),
+        kafkaProducer.send(eatsOrderServiceConfigData.getDriverApprovalRequestTopicName(),
                 callId,
                 RequestAvroModel);
 

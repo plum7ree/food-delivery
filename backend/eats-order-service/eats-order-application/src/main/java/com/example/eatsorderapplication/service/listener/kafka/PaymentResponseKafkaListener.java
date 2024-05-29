@@ -1,7 +1,7 @@
 package com.example.eatsorderapplication.service.listener.kafka;
 
 import com.example.eatsorderapplication.service.CallAndPaymentSaga;
-import com.example.eatsorderconfigdata.CallServiceConfigData;
+import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.dto.ResponseDto;
 import com.example.eatsorderdomain.data.mapper.DataMapper;
 import com.example.kafka.avro.model.ResponseAvroModel;
@@ -32,7 +32,7 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<ResponseAvroM
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     private final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
-    private final CallServiceConfigData callServiceConfigData;
+    private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final CallAndPaymentSaga callAndPaymentSaga;
     private final DataMapper dataMapper;
 
