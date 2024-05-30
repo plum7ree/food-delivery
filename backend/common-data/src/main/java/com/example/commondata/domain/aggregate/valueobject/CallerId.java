@@ -2,8 +2,8 @@ package com.example.commondata.domain.aggregate.valueobject;
 
 import java.util.UUID;
 
-public class DriverId extends BaseId<UUID> {
-    public DriverId(UUID value) {
+public class CallerId extends BaseId<UUID> {
+    public CallerId(UUID value) {
         super(value);
     }
 }

@@ -4,7 +4,7 @@ import com.example.commondata.domain.aggregate.UberPayment;
 import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
-import com.example.commondata.domain.aggregate.valueobject.UserId;
+import com.example.commondata.domain.aggregate.valueobject.CallerId;
 import com.example.kafka.avro.model.PaymentRequestAvroModel;
 import com.example.kafka.avro.model.PaymentResponseAvroModel;
 import com.example.kafka.avro.model.PaymentStatus;
@@ -62,7 +62,7 @@ class UberPaymentRequestKafkaListenerTest {
 
         var paymentDto = UberPayment.builder()
                 .paymentId(new PaymentId(UUID.fromString(paymentRequestAvroModel.getId().toString())))
-                .userId(new UserId(UUID.fromString(paymentRequestAvroModel.getUserId().toString())))
+                .userId(new CallerId(UUID.fromString(paymentRequestAvroModel.getUserId().toString())))
                 .callId(new CallId(UUID.fromString(paymentRequestAvroModel.getCallId().toString())))
                 .price(new Money(decimalConversion.fromBytes(paymentRequestAvroModel.getPrice(), paymentRequestAvroModel.getSchema().getField("price").schema(), paymentRequestAvroModel.getSchema().getField("price").schema().getLogicalType())))
                 .paymentStatus(paymentRequestAvroModel.getPaymentStatus())
@@ -77,7 +77,7 @@ class UberPaymentRequestKafkaListenerTest {
                 .setId(paymentDto.getId().getValue().toString())
                 .setPrice(decimalConversion.toBytes(paymentDto.getPrice().getAmount(), PaymentResponseAvroModel.getClassSchema().getField("price").schema(), PaymentResponseAvroModel.getClassSchema().getField("price").schema().getLogicalType()))
                 .setSagaId("")
-                .setUserId(paymentDto.getUserId().getValue().toString())
+                .setUserId(paymentDto.getCallerId().getValue().toString())
                 .setFailureMessages("")
                 .setCreatedAt(now.toInstant())
                 .build();

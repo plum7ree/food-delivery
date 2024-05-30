@@ -3,7 +3,7 @@ package com.example.commondata.domain.aggregate;
 import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
-import com.example.commondata.domain.aggregate.valueobject.UserId;
+import com.example.commondata.domain.aggregate.valueobject.CallerId;
 import com.example.kafka.avro.model.Status;
 import jakarta.persistence.Transient;
 import lombok.*;
@@ -17,8 +17,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class Payment extends AggregateRoot<PaymentId> {
     private CallId callId;
-    private UserId callerId;
-    private UserId calleeId;
+    private CallerId callerId;
+    private CallerId calleeId;
     private Money price;
     private String type;
     private String orderId;

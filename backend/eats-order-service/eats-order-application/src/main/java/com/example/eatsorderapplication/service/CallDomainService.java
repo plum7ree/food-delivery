@@ -1,5 +1,6 @@
 package com.example.eatsorderapplication.service;
 
+import com.example.commondata.domain.aggregate.valueobject.CallStatus;
 import com.example.eatsorderdomain.data.aggregate.Call;
 import com.example.eatsorderdomain.data.event.CallPaidEvent;
 import com.example.eatsorderdomain.data.event.CallRejectedEvent;
@@ -15,17 +16,17 @@ public class CallDomainService {
 
 
     CallPaidEvent processCallPaid(Call call, DomainEventPublisher<CallPaidEvent> domainEventPublisher) {
-        call.updateStatusToPaid();
+        call.updateCallStatus(CallStatus.PAID);
         return new CallPaidEvent(call, ZonedDateTime.now(ZoneId.of("UTC")), domainEventPublisher);
     }
 
     public CallRejectedEvent processCallRejected(Call call) {
-        call.updateStatusToRejected();
+        call.updateCallStatus(CallStatus.CALLEE_REJECTED);
         return new CallRejectedEvent(call, ZonedDateTime.now(ZoneId.of("UTC")));
     }
 
     public EmptyEvent processCallApproved(Call call) {
-        call.updateStatusToApproved();
+        call.updateCallStatus(CallStatus.APPROVED);
         return new EmptyEvent();
     }
 }

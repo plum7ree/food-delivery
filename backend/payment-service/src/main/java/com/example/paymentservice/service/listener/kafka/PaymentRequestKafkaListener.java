@@ -4,14 +4,13 @@ import com.example.commondata.domain.aggregate.Payment;
 import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
-import com.example.commondata.domain.aggregate.valueobject.UserId;
+import com.example.commondata.domain.aggregate.valueobject.CallerId;
 import com.example.kafka.avro.model.*;
 import com.example.kafkaconsumer.KafkaConsumer;
 import com.example.kafkaproducer.KafkaProducer;
 import com.example.paymentservice.config.CallServiceConfigData;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.Conversions.DecimalConversion;
-import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +23,6 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -72,8 +70,8 @@ public class PaymentRequestKafkaListener implements KafkaConsumer<RequestAvroMod
 //                BeanUtils.copyProperties(payment, avroModel);
 
             payment.setId(new PaymentId(UUID.fromString(avroModel.getId().toString())));
-            payment.setCallerId(new UserId(UUID.fromString(avroModel.getCallerId().toString())));
-            payment.setCalleeId(new UserId(UUID.fromString(avroModel.getCalleeId().toString())));
+            payment.setCallerId(new CallerId(UUID.fromString(avroModel.getCallerId().toString())));
+            payment.setCalleeId(new CallerId(UUID.fromString(avroModel.getCalleeId().toString())));
             payment.setCallId(new CallId(UUID.fromString(avroModel.getCallId().toString())));
             payment.setPrice(new Money(decimalConversion.fromBytes(avroModel.getPrice(),
                     avroModel.getSchema().getField("price").schema(),

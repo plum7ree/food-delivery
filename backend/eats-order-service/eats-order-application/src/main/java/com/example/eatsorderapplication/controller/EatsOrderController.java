@@ -31,7 +31,7 @@ public class EatsOrderController {
     @PostMapping("/eatsorder")
     public ResponseEntity<EatsOrderResponseDto> callDriver(@RequestBody CreateEatsOrderCommandDto createEatsOrderCommandDto) {
         try {
-            var response = eatsOrderCommandService.createCall(createEatsOrderCommandDto);
+            var response = eatsOrderCommandService.createAndPublishOrder(createEatsOrderCommandDto);
             return ResponseEntity.ok(response);
 //            return ResponseEntity.ok(null);
         } catch (Exception e) {

@@ -4,7 +4,7 @@ import com.example.commondata.domain.aggregate.Payment;
 import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
-import com.example.commondata.domain.aggregate.valueobject.UserId;
+import com.example.commondata.domain.aggregate.valueobject.CallerId;
 import com.example.kafka.avro.model.*;
 import com.example.kafkaproducer.KafkaProducer;
 import com.example.paymentservice.config.CallServiceConfigData;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
@@ -71,8 +70,8 @@ class PaymentRequestKafkaListenerTest {
 
         var paymentEntity = Payment.builder()
                 .id(new PaymentId(UUID.fromString(paymentRequestAvroModel.getId().toString())))
-                .callerId(new UserId(UUID.fromString(paymentRequestAvroModel.getCallerId().toString())))
-                .calleeId(new UserId(UUID.fromString(paymentRequestAvroModel.getCalleeId().toString())))
+                .callerId(new CallerId(UUID.fromString(paymentRequestAvroModel.getCallerId().toString())))
+                .calleeId(new CallerId(UUID.fromString(paymentRequestAvroModel.getCalleeId().toString())))
                 .callId(new CallId(UUID.fromString(paymentRequestAvroModel.getCallId().toString())))
                 .price(new Money(decimalConversion.fromBytes(paymentRequestAvroModel.getPrice(), paymentRequestAvroModel.getSchema().getField("price").schema(), paymentRequestAvroModel.getSchema().getField("price").schema().getLogicalType())))
                 .status(paymentRequestAvroModel.getStatus())

@@ -1,11 +1,8 @@
-package com.example.eatsorderapplication;
+package com.example.eatsorderapplication.controller;
 
 import com.example.commondata.domain.aggregate.valueobject.*;
 import com.example.eatsorderapplication.controller.EatsOrderController;
-import com.example.eatsorderapplication.service.CreateCallCommandHandler;
-import com.example.eatsorderapplication.service.CreateCallCommandManager;
 import com.example.eatsorderapplication.service.EatsOrderCommandService;
-import com.example.eatsorderapplication.service.publisher.kafka.RestaurantApprovalRequestKafkaProducer;
 import com.example.eatsorderdataaccess.repository.CallRepository;
 import com.example.eatsorderdomain.data.aggregate.Call;
 import com.example.eatsorderdomain.data.dto.CreateEatsOrderCommandDto;
@@ -13,7 +10,6 @@ import com.example.eatsorderdomain.data.event.CallCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,10 +85,13 @@ public class EatsOrderControllerTest {
         UUID userId = UUID.fromString("d290f1ee-6c54-4b01-90e6-d701748f0851");
         UUID driverId = UUID.fromString("c240a1ee-6c54-4b01-90e6-d701748f0852");
         BigDecimal price = new BigDecimal("100.50");
+        var street = "123 Main St";
+        var postalCode = "12345";
+        var city = "City";
         Address address = Address.builder()
-                .street("123 Main St")
-                .postalCode("12345")
-                .city("City")
+                .street(street)
+                .postalCode(postalCode)
+                .city(city)
                 .build();
         String addressJson = objectMapper.writeValueAsString(address);
 
@@ -99,7 +100,7 @@ public class EatsOrderControllerTest {
                         {
                             "userId": "%s",
                             "driverId": "%s",
-                            "price": %d,
+                            "price": %f,
                             "address": %s,
                             "payment": null,
                             "route": null
@@ -107,7 +108,7 @@ public class EatsOrderControllerTest {
                         """,
                 userId,
                 driverId,
-                price.toBigInteger(),
+                price,
                 objectMapper.writeValueAsString(address));
         CreateEatsOrderCommandDto commandDto = new CreateEatsOrderCommandDto(
                 userId,
@@ -120,13 +121,14 @@ public class EatsOrderControllerTest {
 
         var trackingId = UUID.randomUUID();
         Call call = Call.builder()
-                .driverId(new DriverId(driverId))
-                .userId(new UserId(userId))
+                .calleeId(new CalleeId(driverId))
+                .callerId(new CallerId(userId))
                 .price(new Money(price))
                 .callStatus(CallStatus.PENDING)
                 .build();
+        var now = ZonedDateTime.now(ZoneId.of("UTC"));
 
-        CallCreatedEvent callCreatedEvent = call.updateIdsAndCreateEvent();
+        CallCreatedEvent callCreatedEvent = new CallCreatedEvent(call, now);
 
 
         // when
@@ -153,14 +155,16 @@ public class EatsOrderControllerTest {
 
         // then
         ArgumentCaptor<CreateEatsOrderCommandDto> captor = ArgumentCaptor.forClass(CreateEatsOrderCommandDto.class);
-        verify(eatsOrderCommandServiceInjected, times(1)).createCall(captor.capture());
+        verify(eatsOrderCommandServiceInjected, times(1)).createAndPublishOrder(captor.capture());
 
         CreateEatsOrderCommandDto capturedArgument = captor.getValue();
 
         assertThat(capturedArgument.getUserId()).isEqualTo(userId);
         assertThat(capturedArgument.getDriverId()).isEqualTo(driverId);
         assertThat(capturedArgument.getPrice()).isEqualByComparingTo(price);
-        assertThat(capturedArgument.getAddress()).isEqualTo(address);
+        assertThat(capturedArgument.getAddress().getCity()).isEqualTo(city);
+        assertThat(capturedArgument.getAddress().getPostalCode()).isEqualTo(postalCode);
+        assertThat(capturedArgument.getAddress().getStreet()).isEqualTo(street);
         assertThat(capturedArgument.getPayment()).isNull();
         assertThat(capturedArgument.getRoute()).isNull();
     }

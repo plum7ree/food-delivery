@@ -3,7 +3,7 @@ package com.example.driverservice.kafka;
 import com.example.commondata.domain.aggregate.DriverApproval;
 import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.aggregate.valueobject.DriverApprovalId;
-import com.example.commondata.domain.aggregate.valueobject.DriverId;
+import com.example.commondata.domain.aggregate.valueobject.CalleeId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.driverservice.config.CallServiceConfigData;
 import com.example.kafka.avro.model.DriverApprovalRequestAvroModel;
@@ -59,7 +59,7 @@ public class DriverApprovalRequestListener implements KafkaConsumer<DriverApprov
             //TODO save into DB
             var dto = DriverApproval.builder()
                     .id(new DriverApprovalId(UUID.fromString(avroModel.getId().toString())))
-                    .driverId(new DriverId(UUID.fromString(avroModel.getDriverId().toString())))
+                    .driverId(new CalleeId(UUID.fromString(avroModel.getDriverId().toString())))
                     .callId(new CallId(UUID.fromString(avroModel.getCallId().toString())))
                     .price(new Money(decimalConversion.fromBytes(avroModel.getPrice(),
                             avroModel.getSchema().getField("price").schema(),
@@ -77,7 +77,7 @@ public class DriverApprovalRequestListener implements KafkaConsumer<DriverApprov
                     .setCallId(dto.getCallId().getValue().toString())
                     .setId(dto.getId().getValue().toString())
                     .setSagaId("")
-                    .setDriverId(dto.getDriverId().getValue().toString())
+                    .setDriverId(dto.getCalleeId().getValue().toString())
                     .setFailureMessages("")
                     .setCreatedAt(now.toInstant())
                     .build();

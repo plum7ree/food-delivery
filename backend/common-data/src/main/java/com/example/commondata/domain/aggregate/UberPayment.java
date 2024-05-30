@@ -3,7 +3,7 @@ package com.example.commondata.domain.aggregate;
 import com.example.commondata.domain.aggregate.valueobject.CallId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
-import com.example.commondata.domain.aggregate.valueobject.UserId;
+import com.example.commondata.domain.aggregate.valueobject.CallerId;
 import com.example.kafka.avro.model.PaymentStatus;
 import jakarta.persistence.Transient;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.Getter;
 @Getter
 public class UberPayment extends AggregateRootV1<PaymentId> {
     private CallId callId;
-    private UserId userId;
+    private CallerId callerId;
     private Money price;
     private String type;
     private String orderId;
@@ -24,7 +24,7 @@ public class UberPayment extends AggregateRootV1<PaymentId> {
     private UberPayment(Builder builder) {
         setId(builder.paymentId);
         callId = builder.callId;
-        userId = builder.userId;
+        callerId = builder.callerId;
         price = builder.price;
         paymentStatus = builder.paymentStatus;
     }
@@ -37,7 +37,7 @@ public class UberPayment extends AggregateRootV1<PaymentId> {
     public static final class Builder {
         private PaymentId paymentId;
         private CallId callId;
-        private UserId userId;
+        private CallerId callerId;
         private Money price;
         private PaymentStatus paymentStatus;
 
@@ -49,8 +49,8 @@ public class UberPayment extends AggregateRootV1<PaymentId> {
             return this;
         }
 
-        public Builder userId(UserId val) {
-            userId = val;
+        public Builder userId(CallerId val) {
+            callerId = val;
             return this;
         }
 
