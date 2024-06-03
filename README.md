@@ -212,7 +212,7 @@ route: 8075
 user: 8077
 driver-service: 8078
 eatssearch: 8079
-
+eatsorderservice: 8074
 # port must be same.
 
 # helm/.../user/values.yml

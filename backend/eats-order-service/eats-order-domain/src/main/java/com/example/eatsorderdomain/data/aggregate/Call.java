@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
-public class Call extends AggregateRoot<CallId> {
+public class Call extends AggregateRoot<CallId> implements Cloneable {
 
     // private final: these are immutable.
     private CallerId callerId;
@@ -38,4 +38,6 @@ public class Call extends AggregateRoot<CallId> {
     public void validateCall() {
 
     }
+
+
 }

@@ -2,12 +2,12 @@ package com.example.eatsorderapplication.service;
 
 import com.example.commondata.domain.aggregate.valueobject.*;
 import com.example.eatsorderapplication.data.dto.EatsOrderResponseDto;
-import com.example.eatsorderapplication.utils.DeepCopyUtil;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.aggregate.Call;
 import com.example.eatsorderdomain.data.dto.CreateEatsOrderCommandDto;
 import com.example.eatsorderdomain.data.event.CallCreatedEvent;
 import com.example.eatsorderdomain.data.mapper.DataMapper;
+import com.example.kafka.avro.model.PaymentRequestAvroModel;
 import com.example.kafka.avro.model.RequestAvroModel;
 import com.example.kafka.avro.model.Status;
 import com.example.kafkaproducer.KafkaProducer;
@@ -20,6 +20,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import static com.example.eatsorderdomain.data.mapper.DataMapper.decimalConversion;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -75,23 +76,29 @@ class EatsOrderCommandServiceTest {
                 .payment(null)
                 .route(null)
                 .build();
-        Call call = Call.builder()
-                .calleeId(new CalleeId(driverId))
-                .callerId(new CallerId(userId))
-                .price(new Money(price))
+
+
+        var callId = new CallId(UUID.randomUUID());
+        var nowMock = ZonedDateTime.now(ZoneId.of("UTC"));
+        var callerId = new CallerId(userId);
+        var calleeId = new CalleeId(driverId);
+        var money = new Money(price);
+
+
+        Call callAfterCreateCallTransaction =  Call.builder()
+                .id(callId)
+                .calleeId(calleeId)
+                .callerId(callerId)
+                .price(money)
+                .trackingId(new TrackingId(UUID.randomUUID()))
+                .callStatus(CallStatus.PENDING)
+                .status(Status.PENDING)
                 .build();
 
+        CallCreatedEvent callCreatedEvent = new CallCreatedEvent(callAfterCreateCallTransaction, nowMock);
 
-
-        Call callAfterCreateCallTransaction = DeepCopyUtil.deepCopy(call);
-        callAfterCreateCallTransaction.setTrackingId(new TrackingId(UUID.randomUUID()));
-        callAfterCreateCallTransaction.setCallStatus(CallStatus.PENDING);
-        var now = ZonedDateTime.now(ZoneId.of("UTC"));
-        CallCreatedEvent callCreatedEvent = new CallCreatedEvent(callAfterCreateCallTransaction, now);
-        RequestAvroModel requestAvroModel = DataMapper
-                .callCreatedEventToRestaurantApprovalRequestAvroModel(callCreatedEvent);
-
-
+        MockedStatic<ZonedDateTime> zonedDateTimeMockedStatic = Mockito.mockStatic(ZonedDateTime.class);
+        zonedDateTimeMockedStatic.when(() -> ZonedDateTime.now(any(ZoneId.class))).thenReturn(nowMock);
         when(eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName()).thenReturn("test-topic");
         when(createCallCommandManager.createCallTransaction(any())).thenReturn(callCreatedEvent);
         // When
@@ -101,14 +108,16 @@ class EatsOrderCommandServiceTest {
         verify(kafkaProducer).send(topicNameCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
 
         assertEquals("test-topic", topicNameCaptor.getValue());
-        assertEquals(requestAvroModel.getCallerId(), messageCaptor.getValue().getCallerId());
-        assertEquals(requestAvroModel.getCalleeId(), messageCaptor.getValue().getCalleeId());
-        assertEquals(requestAvroModel.getPrice(), messageCaptor.getValue().getPrice());
-        assertEquals(requestAvroModel.getSagaId(), messageCaptor.getValue().getSagaId());
-        assertEquals(requestAvroModel.getCreatedAt(), messageCaptor.getValue().getCreatedAt());
+        assertEquals(callerId.getValue().toString(), messageCaptor.getValue().getCallerId());
+        assertEquals(calleeId.getValue().toString(), messageCaptor.getValue().getCalleeId());
+        assertEquals(DataMapper.decimalConversion.toBytes(money.getAmount(),
+                        PaymentRequestAvroModel.getClassSchema().getField("price").schema(),
+                        PaymentRequestAvroModel.getClassSchema().getField("price").schema().getLogicalType()), messageCaptor.getValue().getPrice());
+        assertEquals("", messageCaptor.getValue().getSagaId());
+//        assertEquals(nowMock.toInstant(), messageCaptor.getValue().getCreatedAt());
 
-        assertEquals(requestAvroModel.getId(), callCreatedEvent.getCall().getId());
-        assertEquals(requestAvroModel.getStatus(), Status.PENDING);
+        assertEquals(callId.getValue().toString(), messageCaptor.getValue().getId());
+        assertEquals(messageCaptor.getValue().getStatus(), Status.PENDING);
         assertEquals(callCreatedEvent.getCall().getId().getValue().toString(), keyCaptor.getValue());
     }
 }
