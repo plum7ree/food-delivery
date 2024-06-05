@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class KafkaConsumerConfigData {
     private String keyDeserializer;
     private String valueDeserializer;
-    private String consumerGroupId;
     private String autoOffsetReset;
     private String specificAvroReaderKey;
     private String specificAvroReader;

@@ -18,7 +18,7 @@ import java.util.UUID;
 public class DataMapper {
     public static final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
 
-    public Call createCallCommandDtoToCall(CreateEatsOrderCommandDto createEatsOrderCommandDto) {
+    public static Call createCallCommandDtoToCall(CreateEatsOrderCommandDto createEatsOrderCommandDto) {
         return Call.builder()
                 .calleeId(new CalleeId(createEatsOrderCommandDto.getDriverId()))
                 .callerId(new CallerId(createEatsOrderCommandDto.getUserId()))

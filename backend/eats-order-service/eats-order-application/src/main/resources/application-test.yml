@@ -108,8 +108,6 @@ kafka-producer-config:
 kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-  payment-consumer-group-id: payment-topic-consumer-group-id
-  driver-approval-consumer-group-id: driver-approval-topic-consumer-group-id
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true
@@ -123,4 +121,8 @@ kafka-consumer-config:
   max-partition-fetch-bytes-default: 1048576
   max-partition-fetch-bytes-boost-factor: 1
   poll-timeout-ms: 150
+
+kafka-consumer-group-id:
+  payment-consumer-group-id: payment-topic-consumer-group-id
+  driver-approval-consumer-group-id: driver-approval-topic-consumer-group-id
 

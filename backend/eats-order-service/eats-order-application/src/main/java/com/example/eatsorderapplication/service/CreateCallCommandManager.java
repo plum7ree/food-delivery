@@ -20,7 +20,6 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class CreateCallCommandManager {
-    private final DataMapper dataMapper;
 
     private final CallRepositoryAdapter callRepositoryAdapter;
 
@@ -29,7 +28,7 @@ public class CreateCallCommandManager {
         // check User valid
         // check Driver valid
         // map
-        Call call = dataMapper.createCallCommandDtoToCall(createEatsOrderCommandDto);
+        Call call = DataMapper.createCallCommandDtoToCall(createEatsOrderCommandDto);
         // check call element (price > 0, callstatus, ) valid.
         call.validateCall();
         // create new CallId, new TrackingId

@@ -4,7 +4,9 @@ import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafka.config.data.KafkaConsumerConfigData;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -29,8 +31,8 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
     // kafka-config-data/.../KafkaConsumerConfigData.java
     private final KafkaConsumerConfigData kafkaConsumerConfigData;
 
-    @Bean
-    public Map<String, Object> consumerConfigs() {
+    @Bean(name = "commonKafkaConsumerConfigs")
+    public Map<String, Object> commonConsumerConfigs() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigData.getBootstrapServers());
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, kafkaConsumerConfigData.getKeyDeserializer());
@@ -51,13 +53,9 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
 
     @Bean
     public ConsumerFactory<K, V> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs());
+        return new DefaultKafkaConsumerFactory<>(commonConsumerConfigs());
     }
 
-    //    @Bean
-//    public KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry() {
-//        return new KafkaListenerEndpointRegistry();
-//    }
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<K, V>> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<K, V> factory = new ConcurrentKafkaListenerContainerFactory<>();

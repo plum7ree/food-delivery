@@ -27,9 +27,8 @@ public class RestaurantApprovalResponseKafkaListener implements KafkaConsumer<Re
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     private final RestaurantAndPaymentSaga restaurantAndPaymentSaga;
-    private final DataMapper dataMapper;
 
-    @Value("${kafka-consumer-config.driver-approval-consumer-group-id}")
+    @Value("${kafka-consumer-group-id.driver-approval-consumer-group-id}")
     private String consumerGroupId;
 
     @EventListener
@@ -41,7 +40,7 @@ public class RestaurantApprovalResponseKafkaListener implements KafkaConsumer<Re
 
 
     @Override
-    @KafkaListener(id = "${kafka-consumer-config.driver-approval-consumer-group-id}",
+    @KafkaListener(id = "${kafka-consumer-group-id.driver-approval-consumer-group-id}",
             topics = "${call-service.driver-approval-response-topic-name}")
     public void receive(@Payload List<ResponseAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
@@ -51,7 +50,7 @@ public class RestaurantApprovalResponseKafkaListener implements KafkaConsumer<Re
         messages.forEach(responseAvroModel -> {
             if (Status.APPROVED == responseAvroModel.getStatus()) {
                 var event = restaurantAndPaymentSaga.process(
-                        dataMapper.restaurantApprovalResponseToDto(responseAvroModel));
+                        DataMapper.restaurantApprovalResponseToDto(responseAvroModel));
                 log.info("Order completed!");
                 //TODO event back to the user!
             }

@@ -120,6 +120,40 @@ TODO
 
 ---  
 
+### Test Containers
+
+<b>important</b>   
+spring-test v6.1.2
+spring-boot-testcontainers
+
+```yaml
+            <spring-boot.version>3.1.3</spring-boot.version>
+            <spring-test.version>6.1.2</spring-test.version>
+            <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>${spring-boot.version}</version>
+            <type>pom</type>
+            <scope>import</scope>
+            </dependency>
+            <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring-test.version}</version>
+            </dependency>
+            <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+            </dependency>
+```
+
+ref: https://github.com/testcontainers/testcontainers-java-spring-boot-quickstart/blob/main/build.gradle
+
+
+---  
+
 ### Simulation Test
 
 - Multiple number of drivers

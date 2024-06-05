@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallPaidEvent> {
 
-    private final DataMapper dataMapper;
     private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final KafkaProducer<String, DriverApprovalRequestAvroModel> kafkaProducer;
 
@@ -24,7 +23,7 @@ public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallPai
     public void publish(CallPaidEvent domainEvent) {
         String callId = domainEvent.getCall().getId().getValue().toString();
 
-        var RequestAvroModel = dataMapper
+        var RequestAvroModel = DataMapper
                 .callPaidEventToRequestAvroModel(domainEvent);
 
         kafkaProducer.send(eatsOrderServiceConfigData.getDriverApprovalRequestTopicName(),

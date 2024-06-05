@@ -34,9 +34,8 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<ResponseAvroM
     private final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
     private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final CallAndPaymentSaga callAndPaymentSaga;
-    private final DataMapper dataMapper;
 
-    @Value("${kafka-consumer-config.payment-consumer-group-id}")
+    @Value("${kafka-consumer-group-id.payment-consumer-group-id}")
     private String consumerGroupId;
 
     @EventListener
@@ -46,8 +45,12 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<ResponseAvroM
         kafkaListenerEndpointRegistry.getListenerContainer(consumerGroupId).start();
     }
 
+    //TODO separate listener container id and consumer group id
+    // example) @KafkaListener(id = "${kafka-consumer-config.payment-listener-container-id-2}",
+    //            groupId = "${kafka-consumer-config.payment-consumer-group-id}",
+    //            topics = "${call-service.payment-response-topic-name}")
     @Override
-    @KafkaListener(id = "${kafka-consumer-config.payment-consumer-group-id}",
+    @KafkaListener(id = "${kafka-consumer-group-id.payment-consumer-group-id}",
             topics = "${call-service.payment-response-topic-name}")
     public void receive(@Payload List<ResponseAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
