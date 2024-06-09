@@ -15,7 +15,7 @@ __consumer_offsets 38 0
 __consumer_offsets 1 0
 __consumer_offsets 34 0
 __consumer_offsets 16 0
-_schemas 0 0
+_schemas 0 4
 __consumer_offsets 45 0
 payment-request-topic 2 0
 __consumer_offsets 12 0
@@ -25,7 +25,7 @@ driver-approval-request-topic 1 0
 __consumer_offsets 20 0
 __consumer_offsets 49 0
 __consumer_offsets 0 0
-__consumer_offsets 29 0
+__consumer_offsets 29 5
 __consumer_offsets 25 0
 __consumer_offsets 8 0
 __consumer_offsets 37 0
@@ -42,7 +42,7 @@ __consumer_offsets 32 0
 __consumer_offsets 28 0
 __consumer_offsets 7 0
 __consumer_offsets 40 0
-__consumer_offsets 3 0
+__consumer_offsets 3 8
 __consumer_offsets 36 0
 __consumer_offsets 47 0
 payment-request-topic 0 0
