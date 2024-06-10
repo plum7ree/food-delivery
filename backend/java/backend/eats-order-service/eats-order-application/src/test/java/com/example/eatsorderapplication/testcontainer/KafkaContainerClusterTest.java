@@ -30,7 +30,7 @@ class KafkaContainerClusterTest {
 
     @Test
     void testKafkaContainerCluster() throws Exception {
-        try (KafkaContainerCluster cluster = new KafkaContainerCluster("6.2.1", 3, 2)) {
+        try (KafkaContainerCluster cluster = new KafkaContainerCluster("7.5.2", 3, 2)) {
             cluster.start();
             String bootstrapServers = cluster.getBootstrapServers();
 

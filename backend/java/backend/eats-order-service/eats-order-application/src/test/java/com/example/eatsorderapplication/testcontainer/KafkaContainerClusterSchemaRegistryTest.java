@@ -1,5 +1,32 @@
 package com.example.eatsorderapplication.testcontainer;
 
+import com.example.eatsorderapplication.testcontainer.KafkaContainerCluster;
+import com.google.common.collect.ImmutableMap;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.junit.jupiter.api.Test;
+import org.rnorth.ducttape.unreliables.Unreliables;
+
+import java.time.Duration;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+
 import com.example.kafka.avro.model.PaymentRequestAvroModel;
 import com.example.kafka.avro.model.PaymentStatus;
 import com.google.common.collect.ImmutableMap;
@@ -32,50 +59,25 @@ class KafkaContainerClusterSchemaRegistryTest {
 
     @Test
     void testKafkaContainerCluster() throws Exception {
-        try (KafkaContainerCluster cluster = new KafkaContainerCluster("6.2.0", 3, 2)) {
+        try (KafkaContainerCluster cluster = new KafkaContainerCluster("7.5.2", 3, 2)) {
             cluster.start();
             String bootstrapServers = cluster.getBootstrapServers();
-            String schemaRegistryUrl = cluster.getSchemaRegistryUrl(); // Assuming KafkaContainerCluster provides this
 
             assertThat(cluster.getBrokers()).hasSize(3);
 
-            testKafkaFunctionality(bootstrapServers, schemaRegistryUrl, 3, 2);
+            testKafkaFunctionality(bootstrapServers, 3, 2);
         }
     }
 
-    protected void testKafkaFunctionality(String bootstrapServers, String schemaRegistryUrl, int partitions, int rf) throws Exception {
+    protected void testKafkaFunctionality(String bootstrapServers, int partitions, int rf) throws Exception {
         try (
             AdminClient adminClient = AdminClient.create(
                 ImmutableMap.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-            )
-//                KafkaProducer<String, PaymentRequestAvroModel> producer = new KafkaProducer<>(
-//                ImmutableMap.of(
-//                    ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-//                    bootstrapServers,
-//                    ProducerConfig.CLIENT_ID_CONFIG,
-//                    UUID.randomUUID().toString(),
-//                    "schema.registry.url",
-//                    schemaRegistryUrl
-//                ),
-//                new StringSerializer(),
-//                new KafkaAvroSerializer()
-//            );
 
-//                KafkaConsumer<String, PaymentRequestAvroModel> consumer = new KafkaConsumer<>(
-//                ImmutableMap.of(
-//                    ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-//                    bootstrapServers,
-//                    ConsumerConfig.GROUP_ID_CONFIG,
-//                    "tc-" + UUID.randomUUID(),
-//                    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
-//                    "earliest",
-//                    "schema.registry.url",
-//                    schemaRegistryUrl
-//                ),
-//                new StringDeserializer(),
-//                new KafkaAvroDeserializer()
-//            );
+            )
+
         ) {
+            var schemaRegistryUrl = "http://localhost:8081";
             Properties producerProps = new Properties();
             producerProps.put("bootstrap.servers", bootstrapServers);
             producerProps.put("key.serializer", KafkaAvroSerializer.class.getName());

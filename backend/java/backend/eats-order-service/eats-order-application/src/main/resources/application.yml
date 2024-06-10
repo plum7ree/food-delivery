@@ -84,8 +84,8 @@ kafka-config:
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://localhost:8081
   topic-names-to-create:
-    - payment-response-topic
     - payment-request-topic
+    - payment-response-topic
     - restaurant-approval-request-topic
     - restaurant-approval-response-topic
   num-of-partitions: 3

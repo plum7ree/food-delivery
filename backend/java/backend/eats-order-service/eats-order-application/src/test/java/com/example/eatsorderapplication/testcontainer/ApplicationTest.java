@@ -2,11 +2,14 @@ package com.example.eatsorderapplication.testcontainer;
 
 import com.example.eatsorderapplication.data.dto.EatsOrderResponseDto;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
+import com.example.kafka.avro.model.RequestAvroModel;
 import com.example.kafka.config.data.KafkaConsumerConfigData;
 import com.example.kafkaconsumer.config.KafkaConsumerConfig;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import io.confluent.kafka.serializers.KafkaAvroDeserializer;
+import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -14,11 +17,8 @@ import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.internals.Topic;
+import org.apache.kafka.common.KafkaFuture;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -40,27 +40,22 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.MessageListener;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
-import org.testcontainers.utility.DockerImageName;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -74,84 +69,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 public class ApplicationTest {
     private static final Network network = Network.newNetwork();
+    private static final String kafkaBootStrapServeres = "localhost:19092,localhost:29092,localhost:39092";
+    private static final List<String> topics = List.of(
+        "payment-response-topic",
+        "payment-request-topic",
+        "restaurant-approval-request-topic",
+        "restaurant-approval-response-topic");
     @Container
     public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("db")
-            .withUsername("admin")
-            .withPassword("1234")
-            .withNetwork(network)
-            .withExposedPorts(5432);
-
-    // ref: https://github.com/testcontainers/testcontainers-java/blob/main/examples/kafka-cluster/src/test/java/com/example/kafkacluster/KafkaContainerCluster.java
-
-//        this.zookeeper =
-//            new GenericContainer<>(DockerImageName.parse("confluentinc/cp-zookeeper").withTag(confluentPlatformVersion))
-//                .withNetwork(network)
-//                .withNetworkAliases("zookeeper")
-//                .withEnv("ZOOKEEPER_CLIENT_PORT", String.valueOf(KafkaContainer.ZOOKEEPER_PORT));
-//
-//        this.brokers =
-//            IntStream
-//                .range(0, this.brokersNum)
-//                .mapToObj(brokerNum -> {
-//                    return new KafkaContainer(
-//                        DockerImageName.parse("confluentinc/cp-kafka").withTag(confluentPlatformVersion)
-//                    )
-//                        .withNetwork(this.network)
-//                        .withNetworkAliases("broker-" + brokerNum)
-//                        .dependsOn(this.zookeeper)
-//                        .withExternalZookeeper("zookeeper:" + KafkaContainer.ZOOKEEPER_PORT)
-//                        .withEnv("KAFKA_BROKER_ID", brokerNum + "")
-//                        .withEnv("KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR", internalTopicsRf + "")
-//                        .withEnv("KAFKA_OFFSETS_TOPIC_NUM_PARTITIONS", internalTopicsRf + "")
-//                        .withEnv("KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR", internalTopicsRf + "")
-//                        .withEnv("KAFKA_TRANSACTION_STATE_LOG_MIN_ISR", internalTopicsRf + "")
-//                        .withStartupTimeout(Duration.ofMinutes(1));
-//                })
-//                .collect(Collectors.toList());
-
-
-//    @Container
-//    public static GenericContainer<?> zookeeperContainer = new GenericContainer<>(DockerImageName.parse("confluentinc/cp-zookeeper:latest"))
-//            .withNetwork(network)
-//            .withNetworkAliases("zookeeper")
-//            .withExposedPorts(2181)
-//            .withEnv("ZOOKEEPER_SERVER_ID", "1")
-//            .withEnv("ZOOKEEPER_CLIENT_PORT", "2181")
-//            .withEnv("ZOOKEEPER_TICK_TIME", "2000")
-//            .withEnv("ZOOKEEPER_SYNC_LIMIT", "2")
-//            .withEnv("ZOOKEEPER_SERVERS", "zookeeper:2888:3888");
-
-    // https://java.testcontainers.org/modules/kafka/
-//    @Container
-//    public static KafkaContainer kafkaBrokerContainer = new KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:latest"))
-//            .withNetwork(network)
-//            .withNetworkAliases("kafka");
-//            .withExposedPorts(9092, 19092) // Ensure ports are properly exposed
-//            .withEnv("KAFKA_BROKER_ID", "1")
-//            .withEnv("KAFKA_ZOOKEEPER_CONNECT", "zookeeper:2181")
-//            .withEnv("KAFKA_ADVERTISED_LISTENERS", "PLAINTEXT://kafka-broker-1:9092,LISTENER_LOCAL://localhost:19092")
-//            .withEnv("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT")
-//            .withEnv("KAFKA_INTER_BROKER_LISTENER_NAME", "PLAINTEXT")
-//            .withEnv("KAFKA_COMPRESSION_TYPE", "producer");
-//            .dependsOn(zookeeperContainer);
-//    @Container
-//    public static GenericContainer<?> schemaRegistryContainer = new GenericContainer<>(DockerImageName.parse("confluentinc/cp-schema-registry:latest"))
-//            .withNetwork(network)
-//            .withNetworkAliases("schema-registry")
-//            .withExposedPorts(8081)
-//            .withEnv("SCHEMA_REGISTRY_HOST_NAME", "schema-registry")
-//            .withEnv("SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL", "zookeeper:2181")
-//            .withEnv("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS", "PLAINTEXT://kafka-broker-2:9092,LISTENER_LOCAL://localhost:29092")
-//            .withEnv("SCHEMA_REGISTRY_LISTENERS", "http://0.0.0.0:8081")
-//            .dependsOn(zookeeperContainer)
-//            .dependsOn(kafkaBrokerContainer);
-
+        .withDatabaseName("db")
+        .withUsername("admin")
+        .withPassword("1234")
+        .withNetwork(network)
+        .withExposedPorts(5432)
+        .waitingFor(Wait.forListeningPort());
     private static KafkaContainerCluster cluster;
-    private static String kafkaBootStrapServeres = "";
     private static ConcurrentMessageListenerContainer<String, String> listenerContainer;
-    private static final CountDownLatch latch = new CountDownLatch(1);
     private static String receivedMessage;
+    private static AdminClient adminClient;
+
     @Autowired
     @Qualifier("testKafkaListenerContainerFactory")
     private final KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory;
@@ -162,43 +98,35 @@ public class ApplicationTest {
     @Autowired
     private EatsOrderServiceConfigData eatsOrderServiceConfigData;
 
+    //TODO for now, since schema registry testcontainer doesn't work well,
+    // please manually run kafka-cluster.yml
     @Autowired // @Autowired 명시해서 kafkaListenerContainerFactory 처리.
     public ApplicationTest(KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory) {
         this.kafkaListenerContainerFactory = kafkaListenerContainerFactory;
     }
 
 
-    private static void startKafkaCluster() {
-        try {
-            cluster = new KafkaContainerCluster("6.2.1", 3, 2);
-            cluster.start();
-            kafkaBootStrapServeres = cluster.getBootstrapServers();
-            log.info("boot strap servers: {}", kafkaBootStrapServeres);
-            assertThat(cluster.getBrokers()).hasSize(3);
-
-            AdminClient adminClient = AdminClient.create(
-                ImmutableMap.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootStrapServeres)
-            );
-            var topicNames = List.of("payment-request-topic", "payment-response-topic", "restaurant-approval-request-topic", "restaurant-approval-response-topic");
-            var topics = topicNames.stream().map(topicName -> new NewTopic(topicName, 3, (short) 2)).collect(Collectors.toList());
-            adminClient.createTopics(topics).all().get(30, TimeUnit.SECONDS);
-
-        } catch (ExecutionException | InterruptedException | TimeoutException e) {
-            log.error(e.getMessage());
-        }
-
-
-    }
+//    private static void startKafkaCluster() {
+//        try {
+//            cluster = new KafkaContainerCluster("6.2.1", 3, 2);
+//            cluster.start();
+//            kafkaBootStrapServeres = cluster.getBootstrapServers();
+//            log.info("boot strap servers: {}", kafkaBootStrapServeres);
+//            assertThat(cluster.getBrokers()).hasSize(3);
+//
+//        } catch (ExecutionException | InterruptedException | TimeoutException e) {
+//            log.error(e.getMessage());
+//        }
+//    }
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {
-        //Important. we must start container before accessing getFirstMappedPort(). @BeforeAll is called later than this.
-//        Startables.deepStart(postgresContainer, zookeeperContainer, kafkaBrokerContainer, schemaRegistryContainer).join();
-        postgresContainer.start();
-        startKafkaCluster();
+        // Important. we must start container before accessing getFirstMappedPort(). @BeforeAll is called later than this.
+        Startables.deepStart(postgresContainer).join();
+        // startKafkaCluster();
 
         var datasourceUrl = String.format("jdbc:postgresql://localhost:%d/db?currentSchema=call_schema&binaryTransfer=true&reWriteBatchedInserts=true",
-                postgresContainer.getFirstMappedPort());
+            postgresContainer.getFirstMappedPort());
 
         registry.add("spring.datasource.url", () -> datasourceUrl);
         registry.add("spring.datasource.username", () -> "admin");
@@ -211,17 +139,12 @@ public class ApplicationTest {
 
         registry.add("kafka-config.bootstrap-servers", () -> kafkaBootStrapServeres);
         registry.add("kafka-config.schema-registry-url-key", () -> "schema.registry.url");
-        registry.add("kafka-config.schema-registry-url", () -> "http://localhost:" + KafkaContainerCluster.schemaRegistryPort);
+        // registry.add("kafka-config.schema-registry-url", () -> "http://schema-registry:8081");
+        registry.add("kafka-config.schema-registry-url", () -> "http://localhost:8081");
         registry.add("kafka-config.topic-name", () -> "");
-        registry.add("kafka-config.topic-names-to-create", () -> List.of(
-            "payment-response-topic",
-            "payment-request-topic",
-            "restaurant-approval-request-topic",
-            "restaurant-approval-response-topic"));
+        registry.add("kafka-config.topic-names-to-create", () -> topics);
         registry.add("kafka-config.num-of-partitions", () -> 3);
         registry.add("kafka-config.replication-factor", () -> 3);
-//registry.add("kafka.properties.schemaRegistryUrl", () ->
-//    { "http://${schemaRegistryContainer.host}:${schemaRegistryContainer.firstMappedPort}" }
     }
 
     @AfterAll
@@ -232,122 +155,117 @@ public class ApplicationTest {
     @BeforeAll // run after spring boot app context loaded
     public void setUp() {
 
+        try {
+            adminClient = AdminClient.create(
+
+                ImmutableMap.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootStrapServeres)
+            );
+            KafkaFuture<Void> deleteFutures = adminClient.deleteTopics(topics).all();
+            deleteFutures.get();
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+
+//        listenerContainer = kafkaListenerContainerFactory.createContainer(eatsOrderServiceConfigData.getPaymentRequestTopicName());
+//        listenerContainer.setupMessageListener((MessageListener<String, String>) record -> {
+//            receivedMessage = record.value();
+//            latch.countDown();
+//        });
+//        listenerContainer.start();
     }
 
-//    @BeforeAll // if you want non-static. do it @BeforeEach. @BeforeAll will initiate only once for entire tests.
-//    public void setUp() {
-//        postgresContainer.start();
-//        kafkaContainer.start();
-//
-////        Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", kafkaContainer.getBootstrapServers());
-////        consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaContainer.getBootstrapServers());
-////        consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, "testGroup");
-////        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-////        consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
-////        DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps, new StringDeserializer(), new StringDeserializer());
-//
-////        ContainerProperties containerProperties = new ContainerProperties("eatsOrderTopic");
-//        log.info("kafka config data: {}", kafkaConfigData.getTopicName());
-//        ContainerProperties containerProperties = new ContainerProperties("eatsOrderTopic");
-//        listenerContainer = kafkaListenerContainerFactory.createContainer(Objects.requireNonNull(containerProperties.getTopicPattern()));
-//        listenerContainer.setupMessageListener((MessageListener<String, String>) record -> {
-//            receivedMessage = record.value();
-//            latch.countDown();
-//        });
-//        listenerContainer.start();
-//    }
-
     @Test
-    public void testPostRequestToEatsOrder() throws InterruptedException, JsonProcessingException {
-        // ref: Registered Lsiterner https://java.testcontainers.org/modules/kafka/
-//        KafkaContainer kafka = new KafkaContainer(KAFKA_KRAFT_TEST_IMAGE)
-//            .withListener(() -> "kafka:19092")
-//            .withNetwork(network);
+    public void testPostRequestToEatsOrderAndRestaurantRequestApprovalTopic() throws InterruptedException, JsonProcessingException {
 
-//        listenerContainer = kafkaListenerContainerFactory.createContainer(eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName());
-//        listenerContainer.setupMessageListener((MessageListener<String, String>) record -> {
-//            log.error("listenerContainer message received!");
-//            receivedMessage = record.value();
-//            latch.countDown();
-//        });
-//        listenerContainer.start();
-        try (
-//            AdminClient adminClient = AdminClient.create(
-//                ImmutableMap.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootStrapServeres)
-//            );
-            KafkaConsumer<String, String> consumer = new KafkaConsumer<>(
-                ImmutableMap.of(
-                    ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,
-                    kafkaBootStrapServeres,
-                    ConsumerConfig.GROUP_ID_CONFIG,
-                    "tc-" + UUID.randomUUID(),
-                    ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,
-                    "earliest"
-                ),
-                new StringDeserializer(),
-                new StringDeserializer()
-            );
-        ) {
+        String schemaRegistryUrl = "http://localhost:8081"; // Schema Registry URL 설정
+
+        try (KafkaConsumer<String, RequestAvroModel> consumer = new KafkaConsumer<>(
+            ImmutableMap.<String, Object>builder()
+                .put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootStrapServeres)
+                .put(ConsumerConfig.GROUP_ID_CONFIG, "tc-" + UUID.randomUUID())
+                .put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
+                .put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class)
+                .put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class)
+                .put(KafkaAvroDeserializerConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl)
+                .put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true)
+                .build()
+        )) {
             Collection<NewTopic> topics = Collections.singletonList(new NewTopic(eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName(), 3, (short) 2));
             consumer.subscribe(Collections.singletonList(eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName()));
 
+            // 추가: 현재 offset 확인
+            var partitionOffsets = consumer.endOffsets(consumer.assignment());
+            var currentOffset = partitionOffsets.values().stream().mapToLong(v -> v).sum();
+
+
+            // Given
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+
+            // given
+            UUID userId = UUID.fromString("d290f1ee-6c54-4b01-90e6-d701748f0851");
+            UUID driverId = UUID.fromString("c240a1ee-6c54-4b01-90e6-d701748f0852");
+            BigDecimal price = new BigDecimal("100.50");
+            var street = "123 Main St";
+            var postalCode = "12345";
+            var city = "City";
+            String address = String.format("""
+                    {
+                        "street": "%s",
+                        "postalCode": "%s",
+                        "city": "%s"
+                    }
+                    """,
+                street,
+                postalCode,
+                city);
+            String addressJson = objectMapper.writeValueAsString(address);
+
+            // adding " in "%s" is important!
+            String jsonPayload = String.format("""
+                    {
+                        "userId": "%s",
+                        "driverId": "%s",
+                        "price": %f,
+                        "address": %s,
+                        "payment": null,
+                        "route": null
+                    }
+                    """,
+                userId,
+                driverId,
+                price,
+                address);
+
+            HttpEntity<String> entity = new HttpEntity<>(jsonPayload, headers);
+
+            // When
+            ResponseEntity<EatsOrderResponseDto> response = restTemplate.postForEntity("/api/eatsorder", entity, EatsOrderResponseDto.class);
+
+            // Then
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+
+            assertNotNull(response.getBody());
+            assertEquals("PENDING", response.getBody().getCallStatus().toString());
+            assertNotNull(response.getBody().getCallTrackingId());
+
+            // 추가: 컨슈머 폴링 및 Avro 메시지 소비
+            var records = consumer.poll(Duration.ofSeconds(10));
+            RequestAvroModel paymentRequest = null;
+            for (var record : records) {
+                paymentRequest = record.value();
+                log.info("Consumed PaymentRequestAvroModel: {}", paymentRequest);
+            }
+            consumer.commitSync();
+            assertNotNull(paymentRequest);
+
+            partitionOffsets = consumer.endOffsets(consumer.assignment());
+            var newOffset = partitionOffsets.values().stream().mapToLong(v -> v).sum();
+            var messageCount = newOffset - currentOffset;
+            assertEquals(1, messageCount, "Producer should send only one message");
         }
-        // Given
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-
-        // given
-        UUID userId = UUID.fromString("d290f1ee-6c54-4b01-90e6-d701748f0851");
-        UUID driverId = UUID.fromString("c240a1ee-6c54-4b01-90e6-d701748f0852");
-        BigDecimal price = new BigDecimal("100.50");
-        var street = "123 Main St";
-        var postalCode = "12345";
-        var city = "City";
-        String address = String.format("""
-                {
-                    "street": "%s",
-                    "postalCode": "%s",
-                    "city": "%s"
-                }
-                """,
-            street,
-            postalCode,
-            city);
-        String addressJson = objectMapper.writeValueAsString(address);
-
-        // adding " in "%s" is important!
-        String jsonPayload = String.format("""
-                {
-                    "userId": "%s",
-                    "driverId": "%s",
-                    "price": %f,
-                    "address": %s,
-                    "payment": null,
-                    "route": null
-                }
-                """,
-            userId,
-            driverId,
-            price,
-            address);
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonPayload, headers);
-
-        // When
-        ResponseEntity<EatsOrderResponseDto> response = restTemplate.postForEntity("/api/eatsorder", entity, EatsOrderResponseDto.class);
-        Thread.sleep(1000000);
-
-        // Then
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        assertNotNull(response.getBody());
-        assertEquals("Order created successfully", response.getBody().getMessage());
-
-        // Kafka verification
-        boolean messageConsumed = latch.await(10, TimeUnit.SECONDS);
-        assertTrue(messageConsumed);
-        assertNotNull(receivedMessage);
-//        assertEquals(requestBody, receivedMessage);
     }
 
     @Test
