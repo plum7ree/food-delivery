@@ -2,8 +2,7 @@ package com.example.eatsorderapplication.controller;
 
 import com.example.eatsorderapplication.data.dto.EatsOrderResponseDto;
 import com.example.eatsorderapplication.service.EatsOrderCommandService;
-import com.example.eatsorderdataaccess.repository.CallRepository;
-import com.example.eatsorderdomain.data.dto.CreateEatsOrderCommandDto;
+import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +24,11 @@ public class EatsOrderController {
     @Autowired
     private final EatsOrderCommandService eatsOrderCommandService;
 
-    @Autowired
-    private final CallRepository callRepository;
 
     @PostMapping("/eatsorder")
-    public ResponseEntity<EatsOrderResponseDto> callDriver(@RequestBody CreateEatsOrderCommandDto createEatsOrderCommandDto) {
+    public ResponseEntity<EatsOrderResponseDto> callDriver(@RequestBody CreateOrderCommandDto createOrderCommandDto) {
         try {
-            var response = eatsOrderCommandService.createAndPublishOrder(createEatsOrderCommandDto);
+            var response = eatsOrderCommandService.createAndPublishOrder(createOrderCommandDto);
             return ResponseEntity.ok(response);
 //            return ResponseEntity.ok(null);
         } catch (Exception e) {

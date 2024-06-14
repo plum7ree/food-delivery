@@ -2,7 +2,7 @@ package com.example.eatsorderapplication;
 
 import com.example.eatsorderapplication.controller.EatsOrderController;
 import com.example.eatsorderapplication.service.EatsOrderCommandService;
-import com.example.eatsorderdataaccess.repository.CallRepository;
+import com.example.eatsorderdataaccess.repository.jpa.OrderRepository;
 import com.example.eatsorderapplication.controller.TestController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ public class MockMvcTest {
     EatsOrderCommandService eatsOrderCommandService;
     // 이거 두개 추가하니깐 바로 404 에러 뜨네 여기도
     @MockBean
-    CallRepository callRepository;
+    OrderRepository orderRepository;
 
         @Autowired
     private RequestMappingHandlerMapping handlerMapping;

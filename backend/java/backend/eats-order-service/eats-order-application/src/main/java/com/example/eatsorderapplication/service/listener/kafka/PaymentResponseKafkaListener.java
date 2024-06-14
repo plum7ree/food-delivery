@@ -1,6 +1,6 @@
 package com.example.eatsorderapplication.service.listener.kafka;
 
-import com.example.eatsorderapplication.service.CallAndPaymentSaga;
+//import com.example.eatsorderapplication.service.CallAndPaymentSaga;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.dto.ResponseDto;
 import com.example.eatsorderdomain.data.mapper.DataMapper;
@@ -33,7 +33,7 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<ResponseAvroM
 
     private final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
     private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
-    private final CallAndPaymentSaga callAndPaymentSaga;
+//    private final CallAndPaymentSaga callAndPaymentSaga;
 
     @Value("${kafka-consumer-group-id.payment-consumer-group-id}")
     private String consumerGroupId;
@@ -62,9 +62,9 @@ public class PaymentResponseKafkaListener implements KafkaConsumer<ResponseAvroM
             if (Status.COMPLETED == responseAvroModel.getStatus()) {
                 ResponseDto responseDto = new ResponseDto();
                 BeanUtils.copyProperties(responseAvroModel, responseDto);
-                var event = callAndPaymentSaga.process(responseDto);
-                log.info(String.valueOf(event));
-                event.fire();
+//                var event = callAndPaymentSaga.process(responseDto);
+//                log.info(String.valueOf(event));
+//                event.fire();
             }
         });
 

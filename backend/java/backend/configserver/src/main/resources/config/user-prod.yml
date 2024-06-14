@@ -20,9 +20,9 @@ spring:
   database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/db?currentSchema=user_schema&binaryTransfer=true&reWriteBatchedInserts=true
-    username: admin
-    password: 1234
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=user_schema&binaryTransfer=true&reWriteBatchedInserts=true
+    username: postgres
+    password: admin
     driver-class-name: org.postgresql.Driver
   sql:
     init:

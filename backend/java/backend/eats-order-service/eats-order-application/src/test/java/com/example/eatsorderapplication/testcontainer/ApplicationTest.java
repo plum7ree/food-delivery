@@ -32,29 +32,34 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.lifecycle.Startables;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Duration;
+import java.sql.Statement;
+
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,18 +76,23 @@ public class ApplicationTest {
     private static final Network network = Network.newNetwork();
     private static final String kafkaBootStrapServeres = "localhost:19092,localhost:29092,localhost:39092";
     private static final List<String> topics = List.of(
-        "payment-response-topic",
-        "payment-request-topic",
-        "restaurant-approval-request-topic",
-        "restaurant-approval-response-topic");
+        "payment-response",
+        "payment-request",
+        "restaurant-approval-request",
+        "restaurant-approval-response");
+
+
     @Container
-    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:latest")
-        .withDatabaseName("db")
-        .withUsername("admin")
-        .withPassword("1234")
-        .withNetwork(network)
+    public static GenericContainer<?> postgresContainer = new GenericContainer<>("debezium/example-postgres")
+        .withEnv("POSTGRES_USER", "postgres")
+        .withEnv("POSTGRES_PASSWORD", "admin")
+        .withEnv("POSTGRES_DB", "postgres")
         .withExposedPorts(5432)
-        .waitingFor(Wait.forListeningPort());
+        .withCommand("postgres", "-c", "max_connections=200", "-c", "max_replication_slots=4")
+        .withCreateContainerCmdModifier(cmd -> cmd.withName("postgres"))
+        .withNetworkMode("kafka_global-my-network");
+
+
     private static KafkaContainerCluster cluster;
     private static ConcurrentMessageListenerContainer<String, String> listenerContainer;
     private static String receivedMessage;
@@ -125,17 +135,17 @@ public class ApplicationTest {
         Startables.deepStart(postgresContainer).join();
         // startKafkaCluster();
 
-        var datasourceUrl = String.format("jdbc:postgresql://localhost:%d/db?currentSchema=call_schema&binaryTransfer=true&reWriteBatchedInserts=true",
+        var datasourceUrl = String.format("jdbc:postgresql://localhost:%d/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true",
             postgresContainer.getFirstMappedPort());
 
         registry.add("spring.datasource.url", () -> datasourceUrl);
-        registry.add("spring.datasource.username", () -> "admin");
-        registry.add("spring.datasource.password", () -> "1234");
+        registry.add("spring.datasource.username", () -> "postgres");
+        registry.add("spring.datasource.password", () -> "admin");
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
         registry.add("spring.sql.init.mode", () -> "always");
         registry.add("spring.sql.init.platform", () -> "postgres");
-        registry.add("spring.sql.init.schema-locations", () -> "classpath:sql/calls/init-schema.sql");
-        registry.add("spring.sql.init.data-locations", () -> "classpath:sql/calls/init-data.sql");
+        registry.add("spring.sql.init.schema-locations", () -> "classpath:sql/orders/init-schema.sql");
+        registry.add("spring.sql.init.data-locations", () -> "classpath:sql/orders/init-data.sql");
 
         registry.add("kafka-config.bootstrap-servers", () -> kafkaBootStrapServeres);
         registry.add("kafka-config.schema-registry-url-key", () -> "schema.registry.url");
@@ -154,26 +164,183 @@ public class ApplicationTest {
 
     @BeforeAll // run after spring boot app context loaded
     public void setUp() {
-
         try {
-            adminClient = AdminClient.create(
+            // PostgreSQL 컨테이너의 정보를 사용하여 DataSource 설정
+            String datasourceUrl = String.format("jdbc:postgresql://localhost:%d/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true",
+                postgresContainer.getFirstMappedPort());
+            String username = "postgres";
+            String password = "admin";
 
-                ImmutableMap.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootStrapServeres)
-            );
-            KafkaFuture<Void> deleteFutures = adminClient.deleteTopics(topics).all();
-            deleteFutures.get();
+            // DriverManagerDataSource를 사용하여 DataSource 생성
+            DriverManagerDataSource dataSource = new DriverManagerDataSource();
+            dataSource.setDriverClassName("org.postgresql.Driver");
+            dataSource.setUrl(datasourceUrl);
+            dataSource.setUsername(username);
+            dataSource.setPassword(password);
+
+            // ResourceDatabasePopulator를 사용하여 SQL 파일 로드
+            ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+            populator.addScript(new ClassPathResource("init-schema.sql"));
+            populator.execute(dataSource);
+            try (Connection connection = dataSource.getConnection()) {
+                DatabaseMetaData metaData = connection.getMetaData();
+                ResultSet resultSet = metaData.getSchemas();
+
+                // 1. schema exists check
+                boolean schemaExists = false;
+                while (resultSet.next()) {
+                    String schemaName = resultSet.getString("TABLE_SCHEM");
+                    if ("order".equals(schemaName)) {
+                        schemaExists = true;
+                        break;
+                    }
+                }
+
+                assertTrue(schemaExists, "order schema should exist");
+
+                // 2. order table exsists check
+                List<String> tableNames = new ArrayList<>();
+                resultSet = metaData.getTables(null, "order", null, new String[]{"TABLE"});
+                while (resultSet.next()) {
+                    tableNames.add(resultSet.getString("TABLE_NAME"));
+                }
+
+                // 2.5. column name and types
+                String tableName = "orders";
+                resultSet = metaData.getColumns(null, "order", tableName, null);
+
+                System.out.println("Columns in table " + tableName + ":");
+                while (resultSet.next()) {
+                    String columnName = resultSet.getString("COLUMN_NAME");
+                    String columnType = resultSet.getString("TYPE_NAME");
+                    System.out.println(columnName + " - " + columnType);
+                }
+
+
+                // 3. insert check
+                Statement statement = connection.createStatement();
+                String insertDataSql = "INSERT INTO payment_outbox(id, saga_id, created_at, type, payload, outbox_status, saga_status, order_status, version) " +
+                    "VALUES ('8904808e-286f-449b-9b56-b63ba8351cf2', '15a497c1-0f4b-4eff-b9f4-c402c8c07afa', current_timestamp, 'OrderProcessingSaga', " +
+                    "'{\"price\": 100, \"orderId\": \"ef471dac-ec22-43a7-a3f4-9d04195567a5\", \"createdAt\": \"2022-01-07T16:21:42.917756+01:00\", " +
+                    "\"customerId\": \"d215b5f8-0249-4dc5-89a3-51fd148cfb41\", \"paymentOrderStatus\": \"PENDING\"}', " +
+                    "'STARTED', 'STARTED', 'PENDING', 0);";
+                statement.execute(insertDataSql);
+            } catch (SQLException e) {
+                fail("Failed to check order schema existence or insert: " + e.getMessage());
+            }
 
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
 
-//        listenerContainer = kafkaListenerContainerFactory.createContainer(eatsOrderServiceConfigData.getPaymentRequestTopicName());
-//        listenerContainer.setupMessageListener((MessageListener<String, String>) record -> {
-//            receivedMessage = record.value();
-//            latch.countDown();
-//        });
-//        listenerContainer.start();
+        try {
+            adminClient = AdminClient.create(
+
+                ImmutableMap.of(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBootStrapServeres)
+            );
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
+
+        try {
+            KafkaFuture<Void> deleteFutures = adminClient.deleteTopics(topics).all();
+            deleteFutures.get();
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+        }
+
+        try {
+//            HttpClient client = HttpClient.newHttpClient();
+
+            String[] requests = {
+                "{" +
+                    "\"name\": \"order-payment-connector\"," +
+                    "\"config\": {" +
+                    "\"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\"," +
+                    "\"tasks.max\": \"1\"," +
+                    "\"database.hostname\": \"postgres\"," +
+                    "\"database.port\": \"5432\"," +
+                    "\"database.user\": \"postgres\"," +
+                    "\"database.password\": \"admin\"," +
+                    "\"database.dbname\" : \"postgres\"," +
+                    "\"database.server.name\": \"PostgreSQL-15\"," +
+                    "\"table.include.list\": \"order.payment_outbox\"," +
+                    "\"topic.prefix\": \"debezium\"," +
+                    "\"tombstones.on.delete\" : \"false\"," +
+                    "\"slot.name\" : \"order_payment_outbox_slot\"," +
+                    "\"plugin.name\": \"pgoutput\"," +
+                    "\"auto.create.topics.enable\": false," +
+                    "\"auto.register.schemas\": false" +
+                    "}" +
+                    "}",
+                "{" +
+                    "\"name\": \"order-restaurant-connector\"," +
+                    "\"config\": {" +
+                    "\"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\"," +
+                    "\"tasks.max\": \"1\"," +
+                    "\"database.hostname\": \"postgres\"," +
+                    "\"database.port\": \"5432\"," +
+                    "\"database.user\": \"postgres\"," +
+                    "\"database.password\": \"admin\"," +
+                    "\"database.dbname\" : \"postgres\"," +
+                    "\"database.server.name\": \"PostgreSQL-15\"," +
+                    "\"table.include.list\": \"order.restaurant_approval_outbox\"," +
+                    "\"topic.prefix\": \"debezium\"," +
+                    "\"tombstones.on.delete\" : \"false\"," +
+                    "\"slot.name\" : \"order_restaurant_approval_outbox_slot\"," +
+                    "\"plugin.name\": \"pgoutput\"," +
+                    "\"auto.create.topics.enable\": false," +
+                    "\"auto.register.schemas\": false" +
+                    "}" +
+                    "}",
+                "{" +
+                    "\"name\": \"payment-order-connector\"," +
+                    "\"config\": {" +
+                    "\"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\"," +
+                    "\"tasks.max\": \"1\"," +
+                    "\"database.hostname\": \"postgres\"," +
+                    "\"database.port\": \"5432\"," +
+                    "\"database.user\": \"postgres\"," +
+                    "\"database.password\": \"admin\"," +
+                    "\"database.dbname\" : \"postgres\"," +
+                    "\"database.server.name\": \"PostgreSQL-15\"," +
+                    "\"table.include.list\": \"payment.order_outbox\"," +
+                    "\"topic.prefix\": \"debezium\"," +
+                    "\"tombstones.on.delete\" : \"false\"," +
+                    "\"slot.name\" : \"payment_order_outbox_slot\"," +
+                    "\"plugin.name\": \"pgoutput\"," +
+                    "\"auto.create.topics.enable\": false," +
+                    "\"auto.register.schemas\": false" +
+                    "}" +
+                    "}",
+                "{" +
+                    "\"name\": \"restaurant-order-connector\"," +
+                    "\"config\": {" +
+                    "\"connector.class\": \"io.debezium.connector.postgresql.PostgresConnector\"," +
+                    "\"tasks.max\": \"1\"," +
+                    "\"database.hostname\": \"postgres\"," +
+                    "\"database.port\": \"5432\"," +
+                    "\"database.user\": \"postgres\"," +
+                    "\"database.password\": \"admin\"," +
+                    "\"database.dbname\" : \"postgres\"," +
+                    "\"database.server.name\": \"PostgreSQL-15\"," +
+                    "\"table.include.list\": \"restaurant.order_outbox\"," +
+                    "\"topic.prefix\": \"debezium\"," +
+                    "\"tombstones.on.delete\" : \"false\"," +
+                    "\"slot.name\" : \"restaurant_order_outbox_slot\"," +
+                    "\"plugin.name\": \"pgoutput\"," +
+                    "\"auto.create.topics.enable\": false," +
+                    "\"auto.register.schemas\": false" +
+                    "}" +
+                    "}"
+            };
+
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test
@@ -222,22 +389,37 @@ public class ApplicationTest {
                 postalCode,
                 city);
             String addressJson = objectMapper.writeValueAsString(address);
-
+            String orderItemJson = """
+                {
+                    "product": {
+                        "name": "Product Name",
+                        "description": "Description"
+                    },
+                    "quantity": 1,
+                    "price": {
+                        "amount": "50.25"
+                    },
+                    "subTotal": {
+                        "amount": "50.25"
+                    }
+                }
+                """;
             // adding " in "%s" is important!
             String jsonPayload = String.format("""
                     {
-                        "userId": "%s",
-                        "driverId": "%s",
+                        "callerId": "%s",
+                        "calleeId": "%s",
                         "price": %f,
                         "address": %s,
                         "payment": null,
-                        "route": null
+                        "items": [%s]
                     }
                     """,
                 userId,
                 driverId,
                 price,
-                address);
+                address,
+                orderItemJson);
 
             HttpEntity<String> entity = new HttpEntity<>(jsonPayload, headers);
 
@@ -248,7 +430,7 @@ public class ApplicationTest {
             assertEquals(HttpStatus.OK, response.getStatusCode());
 
             assertNotNull(response.getBody());
-            assertEquals("PENDING", response.getBody().getCallStatus().toString());
+            assertEquals("PENDING", response.getBody().getOrderStatus().toString());
             assertNotNull(response.getBody().getCallTrackingId());
 
             // 추가: 컨슈머 폴링 및 Avro 메시지 소비

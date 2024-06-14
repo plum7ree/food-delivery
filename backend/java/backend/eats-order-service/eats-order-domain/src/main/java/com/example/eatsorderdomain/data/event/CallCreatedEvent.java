@@ -1,6 +1,6 @@
 package com.example.eatsorderdomain.data.event;
 
-import com.example.eatsorderdomain.data.aggregate.Call;
+import com.example.eatsorderdomain.data.aggregate.OrderDomainObject;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,8 +11,8 @@ import java.time.ZonedDateTime;
 public class CallCreatedEvent extends AbstractCallEvent {
 //    DomainEventPublisher<CallCreatedEvent> domainEventPublisher;
 
-    public CallCreatedEvent(Call call, ZonedDateTime createAt) {
-        super(call, createAt);
+    public CallCreatedEvent(OrderDomainObject orderDomainObject, ZonedDateTime createAt) {
+        super(orderDomainObject, createAt);
     }
 
     @Override

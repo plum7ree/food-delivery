@@ -21,7 +21,7 @@ public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallPai
 
     @Override
     public void publish(CallPaidEvent domainEvent) {
-        String callId = domainEvent.getCall().getId().getValue().toString();
+        String callId = domainEvent.getOrderDomainObject().getId().getValue().toString();
 
         var RequestAvroModel = DataMapper
                 .callPaidEventToRequestAvroModel(domainEvent);
