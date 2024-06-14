@@ -4,6 +4,7 @@ import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
 import com.example.commondata.domain.aggregate.valueobject.OutboxStatus;
 import com.example.commondata.domain.aggregate.valueobject.SagaStatus;
 import com.example.eatsorderdataaccess.entity.OrderEntity;
+import com.example.eatsorderdataaccess.entity.RestaurantApprovalRequestEntity;
 import org.springframework.data.repository.query.Param;
 
 import java.time.ZonedDateTime;
@@ -19,13 +20,6 @@ public interface QueryDSLOrderRepository {
 
     void insertOrder(OrderEntity orderEntity);
 
-    void insertRestaurantApproval(UUID id, UUID sagaId,
-                                  ZonedDateTime createdAt,
-                                  ZonedDateTime processedAt,
-                                  String type,
-                                  String payload,
-                                  OrderStatus orderStatus,
-                                  OutboxStatus outboxStatus,
-                                  SagaStatus sagaStatus,
-                                  int version);
+
+    void insertRestaurantApproval(RestaurantApprovalRequestEntity entity);
 }

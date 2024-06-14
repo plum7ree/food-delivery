@@ -5,8 +5,9 @@ import com.example.commondata.domain.aggregate.valueobject.OutboxStatus;
 import com.example.commondata.domain.aggregate.valueobject.SagaStatus;
 import com.example.eatsorderapplication.data.dto.EatsOrderResponseDto;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
-import com.example.eatsorderdataaccess.repository.jdbc.OrderAppDao;
-import com.example.eatsorderdataaccess.repository.jpa.RestaurantApprovalRequestOutboxRepository;
+import com.example.eatsorderdataaccess.entity.OrderEntity;
+import com.example.eatsorderdataaccess.entity.RestaurantApprovalRequestEntity;
+import com.example.eatsorderdataaccess.repository.QueryDSLOrderRepositoryImpl;
 import com.example.eatsorderdomain.data.aggregate.OrderDomainObject;
 import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
 import com.example.eatsorderdomain.data.mapper.DataMapper;
@@ -30,10 +31,8 @@ public class EatsOrderCommandService {
     //    private final DataMapper dataMapper;
     private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final KafkaProducer<String, RequestAvroModel> kafkaProducer;
-    private final OrderAppDao orderDao;
-    private final RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository;
     private final ObjectMapper objectMapper;
-
+    private final QueryDSLOrderRepositoryImpl queryDSLOrderRepository;
     @Transactional
     public EatsOrderResponseDto createAndPublishOrder(CreateOrderCommandDto createOrderCommandDto) {
         try {
@@ -52,7 +51,17 @@ public class EatsOrderCommandService {
                 var price = orderDomainObject.getPrice().getAmount();
                 var orderStatus = orderDomainObject.getOrderStatus();
                 var failureMessages = "";
-                orderDao.insertOrder(id, customerId, restaurantId, trackingId, price, orderStatus, failureMessages);
+                var entity = OrderEntity.builder()
+                    .id(id)
+                    .customerId(customerId)
+                    .restaurantId(restaurantId)
+                    .trackingId(trackingId)
+                    .price(price)
+                    .orderStatus(orderStatus)
+                    .failureMessages(failureMessages)
+                    .build();
+
+                queryDSLOrderRepository.insertOrder(entity);
             }
 
             {
@@ -67,8 +76,20 @@ public class EatsOrderCommandService {
                 OutboxStatus outboxStatus = OutboxStatus.STARTED;  // Make sure this matches the enum value
                 SagaStatus sagaStatus = SagaStatus.STARTED;
                 int version = 1;
-                orderDao.insertRestaurantApproval(id, sagaId, createdAt, processedAt, type, payload, orderStatus, outboxStatus, sagaStatus, version);
+                var entity = RestaurantApprovalRequestEntity.builder()
+                    .id(id)
+                    .sagaId(sagaId)
+                    .createdAt(createdAt)
+                    .processedAt(processedAt)
+                    .type(type)
+                    .payload(payload)
+                    .orderStatus(orderStatus)
+                    .outboxStatus(outboxStatus)
+                    .sagaStatus(sagaStatus)
+                    .version(version)
+                    .build();
 
+                queryDSLOrderRepository.insertRestaurantApproval(entity);
             }
 
 

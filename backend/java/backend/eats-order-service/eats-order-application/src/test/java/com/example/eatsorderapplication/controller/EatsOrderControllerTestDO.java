@@ -2,7 +2,6 @@ package com.example.eatsorderapplication.controller;
 
 import com.example.commondata.domain.aggregate.valueobject.*;
 import com.example.eatsorderapplication.service.EatsOrderCommandService;
-import com.example.eatsorderdataaccess.repository.jpa.OrderRepository;
 import com.example.eatsorderdomain.data.aggregate.OrderDomainObject;
 import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
 import com.example.eatsorderdomain.data.event.CallCreatedEvent;
@@ -40,8 +39,6 @@ public class EatsOrderControllerTestDO {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    OrderRepository orderRepository;
 
     @MockBean
     private EatsOrderCommandService eatsOrderCommandServiceInjected;

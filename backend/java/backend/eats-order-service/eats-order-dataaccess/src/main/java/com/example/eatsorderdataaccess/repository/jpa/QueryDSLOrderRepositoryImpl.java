@@ -1,16 +1,13 @@
 package com.example.eatsorderdataaccess.repository;
 
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
-import com.example.commondata.domain.aggregate.valueobject.OutboxStatus;
-import com.example.commondata.domain.aggregate.valueobject.SagaStatus;
 import com.example.eatsorderdataaccess.entity.OrderEntity;
 import com.example.eatsorderdataaccess.entity.QOrderEntity;
 import com.example.eatsorderdataaccess.entity.QRestaurantApprovalRequestEntity;
+import com.example.eatsorderdataaccess.entity.RestaurantApprovalRequestEntity;
 import com.example.eatsorderdataaccess.repository.jpa.QueryDSLOrderRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,27 +46,19 @@ public class QueryDSLOrderRepositoryImpl implements QueryDSLOrderRepository {
     }
 
     @Override
-    public void insertRestaurantApproval(UUID id, UUID sagaId,
-                                         ZonedDateTime createdAt,
-                                         ZonedDateTime processedAt,
-                                         String type,
-                                         String payload,
-                                         OrderStatus orderStatus,
-                                         OutboxStatus outboxStatus,
-                                         SagaStatus sagaStatus,
-                                         int version) {
+    public void insertRestaurantApproval(RestaurantApprovalRequestEntity entity) {
         QRestaurantApprovalRequestEntity qRestaurantApprovalRequestEntity = QRestaurantApprovalRequestEntity.restaurantApprovalRequestEntity;
         queryFactory.insert(qRestaurantApprovalRequestEntity)
-            .set(qRestaurantApprovalRequestEntity.id, id)
-            .set(qRestaurantApprovalRequestEntity.sagaId, sagaId)
-            .set(qRestaurantApprovalRequestEntity.createdAt, createdAt)
-            .set(qRestaurantApprovalRequestEntity.processedAt, processedAt)
-            .set(qRestaurantApprovalRequestEntity.type, type)
-            .set(qRestaurantApprovalRequestEntity.payload, payload)
-            .set(qRestaurantApprovalRequestEntity.orderStatus, orderStatus)
-            .set(qRestaurantApprovalRequestEntity.outboxStatus, outboxStatus)
-            .set(qRestaurantApprovalRequestEntity.sagaStatus, sagaStatus)
-            .set(qRestaurantApprovalRequestEntity.version, version)
+            .set(qRestaurantApprovalRequestEntity.id, entity.getId())
+            .set(qRestaurantApprovalRequestEntity.sagaId, entity.getSagaId())
+            .set(qRestaurantApprovalRequestEntity.createdAt, entity.getCreatedAt())
+            .set(qRestaurantApprovalRequestEntity.processedAt, entity.getProcessedAt())
+            .set(qRestaurantApprovalRequestEntity.type, entity.getType())
+            .set(qRestaurantApprovalRequestEntity.payload, entity.getPayload())
+            .set(qRestaurantApprovalRequestEntity.orderStatus, entity.getOrderStatus())
+            .set(qRestaurantApprovalRequestEntity.outboxStatus, entity.getOutboxStatus())
+            .set(qRestaurantApprovalRequestEntity.sagaStatus, entity.getSagaStatus())
+            .set(qRestaurantApprovalRequestEntity.version, entity.getVersion())
             .execute();
     }
 }
