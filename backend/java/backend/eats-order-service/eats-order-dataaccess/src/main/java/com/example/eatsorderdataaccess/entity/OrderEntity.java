@@ -4,6 +4,8 @@ import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnTransformer;
+import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -28,8 +30,8 @@ public class OrderEntity {
     private UUID trackingId;
     private BigDecimal price;
 
-    @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "order_status")
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
     private String failureMessages;
 

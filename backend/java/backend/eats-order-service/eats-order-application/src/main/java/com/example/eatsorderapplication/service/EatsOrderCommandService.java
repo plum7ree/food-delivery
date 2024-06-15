@@ -7,7 +7,8 @@ import com.example.eatsorderapplication.data.dto.EatsOrderResponseDto;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdataaccess.entity.OrderEntity;
 import com.example.eatsorderdataaccess.entity.RestaurantApprovalRequestEntity;
-import com.example.eatsorderdataaccess.repository.QueryDSLOrderRepositoryImpl;
+import com.example.eatsorderdataaccess.repository.jpa.OrderRepository;
+import com.example.eatsorderdataaccess.repository.jpa.RestaurantApprovalRequestOutboxRepository;
 import com.example.eatsorderdomain.data.aggregate.OrderDomainObject;
 import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
 import com.example.eatsorderdomain.data.mapper.DataMapper;
@@ -32,7 +33,8 @@ public class EatsOrderCommandService {
     private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final KafkaProducer<String, RequestAvroModel> kafkaProducer;
     private final ObjectMapper objectMapper;
-    private final QueryDSLOrderRepositoryImpl queryDSLOrderRepository;
+    private final OrderRepository orderRepository;
+    private final RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository;
     @Transactional
     public EatsOrderResponseDto createAndPublishOrder(CreateOrderCommandDto createOrderCommandDto) {
         try {
@@ -61,7 +63,7 @@ public class EatsOrderCommandService {
                     .failureMessages(failureMessages)
                     .build();
 
-                queryDSLOrderRepository.insertOrder(entity);
+                orderRepository.save(entity);
             }
 
             {
@@ -89,7 +91,7 @@ public class EatsOrderCommandService {
                     .version(version)
                     .build();
 
-                queryDSLOrderRepository.insertRestaurantApproval(entity);
+                restaurantApprovalRequestOutboxRepository.save(entity);
             }
 
 

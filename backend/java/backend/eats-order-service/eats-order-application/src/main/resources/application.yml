@@ -22,7 +22,7 @@ spring:
     # binaryTransfer
     # reWriteBatchedInserts: batch optimization
     #TODO CQRS possible with replica DB? access conflict with user micro service?
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver

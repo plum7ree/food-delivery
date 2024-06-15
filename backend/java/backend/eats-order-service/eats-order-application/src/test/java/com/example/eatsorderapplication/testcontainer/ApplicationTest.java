@@ -135,7 +135,7 @@ public class ApplicationTest {
         Startables.deepStart(postgresContainer).join();
         // startKafkaCluster();
 
-        var datasourceUrl = String.format("jdbc:postgresql://localhost:%d/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true",
+        var datasourceUrl = String.format("jdbc:postgresql://localhost:%d/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified",
             postgresContainer.getFirstMappedPort());
 
         registry.add("spring.datasource.url", () -> datasourceUrl);
