@@ -127,3 +127,5 @@ kafka-consumer-group-id:
 logging:
   level:
     org.springframework.jdbc: DEBUG
+    com.querydsl.sql: DEBUG
+    org.hibernate.SQL: debug

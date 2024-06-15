@@ -33,7 +33,7 @@ public class QueryDSLOrderRepositoryImpl implements QueryDSLOrderRepository {
 
     @Override
     public void insertOrder(OrderEntity orderEntity) {
-        QOrderEntity qOrderEntity = QOrderEntity.orderEntity;
+        QOrderEntity qOrderEntity = new QOrderEntity("orders");
         queryFactory.insert(qOrderEntity)
             .set(qOrderEntity.id, orderEntity.getId())
             .set(qOrderEntity.customerId, orderEntity.getCustomerId())
