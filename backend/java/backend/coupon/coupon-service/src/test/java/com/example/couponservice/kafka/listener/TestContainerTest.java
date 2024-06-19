@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -47,7 +48,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(SpringExtension.class)
 @ExtendWith(MockitoExtension.class)
 @EmbeddedKafka(partitions = 1, topics = {"coupon-issue-request-topic"})
-@Transactional
+//@Transactional
+@Profile("test")
 class TestContainerTest {
 
     @Autowired
@@ -55,7 +57,7 @@ class TestContainerTest {
 
 
     private KafkaTemplate<String, CouponIssueRequestAvroModel> kafkaTemplate;
-    private AdminClient adminClient;
+//    private AdminClient adminClient;
 
     @DynamicPropertySource
     static void dynamicProperties(DynamicPropertyRegistry registry) {
@@ -74,9 +76,9 @@ class TestContainerTest {
         kafkaTemplate = new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(producerProps));
 
         // AdminClient 설정
-        Map<String, Object> adminProps = new HashMap<>(KafkaTestUtils.consumerProps("testGroup", "false", embeddedKafkaBroker));
-        adminProps.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafkaBroker.getBrokersAsString());
-        adminClient = AdminClient.create(adminProps);
+//        Map<String, Object> adminProps = new HashMap<>(KafkaTestUtils.consumerProps("testGroup", "false", embeddedKafkaBroker));
+//        adminProps.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafkaBroker.getBrokersAsString());
+//        adminClient = AdminClient.create(adminProps);
     }
 
     @Test

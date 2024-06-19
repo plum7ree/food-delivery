@@ -8,12 +8,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>coupon-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>coupon-service</name>
-    <description>coupon-service</description>
-    <properties>
-        <java.version>17</java.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,13 +50,17 @@
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-schema-registry-client</artifactId>
-            <version>7.4.0</version>
             <scope>test</scope>
+            <version>7.4.0</version>
         </dependency>
         <dependency>
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
     </dependencies>
 

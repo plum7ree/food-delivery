@@ -51,9 +51,8 @@
 
         <lombok.version>1.18.28</lombok.version>
 
-        <spring-boot.version>3.1.3</spring-boot.version>
+        <spring-boot.version>3.3.0</spring-boot.version>
         <spring-test.version>6.1.2</spring-test.version>
-        <spring-kafka.version>3.2.0</spring-kafka.version>
         <spring-retry.version>2.0.2</spring-retry.version>
         <spring-cloud.version>4.0.3</spring-cloud.version>
         <spring-cloud-dependencies.version>2022.0.4</spring-cloud-dependencies.version>
@@ -65,11 +64,13 @@
 
         <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
 
-        <kafka-streams.version>3.5.1</kafka-streams.version>
-        <kafka-clients.version>3.5.1</kafka-clients.version>
-        <kafka-avro-serializer.version>7.4.0</kafka-avro-serializer.version>
-        <kafka-streams-avro-serde.version>7.4.0</kafka-streams-avro-serde.version>
-        <avro.version>1.11.2</avro.version>
+        <spring-kafka.version>3.2.0</spring-kafka.version>
+        <spring-kafka-test.version>3.2.0</spring-kafka-test.version>
+        <apache-avro.version>1.11.2</apache-avro.version>
+        <!-- apache kafka <-> confluent version dep: https://docs.confluent.io/platform/current/installation/versions-interoperability.html -->
+        <confluent-kafka-schema-registry-clients.version>7.5.0</confluent-kafka-schema-registry-clients.version>
+        <confluent-kafka-avro-serializer.version>7.5.0</confluent-kafka-avro-serializer.version>
+        <confluent-kafka-streams-avro-serde.version>7.5.0</confluent-kafka-streams-avro-serde.version>
 
         <micrometer-registry-prometheus.version>1.11.3</micrometer-registry-prometheus.version>
 
@@ -228,7 +229,12 @@
                 <artifactId>spring-kafka</artifactId>
                 <version>${spring-kafka.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>io.confluent</groupId>
+                <artifactId>kafka-schema-registry-client</artifactId>
+                <version>${confluent-kafka-schema-registry-clients.version}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.retry</groupId>
                 <artifactId>spring-retry</artifactId>
@@ -269,7 +275,7 @@
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>${avro.version}</version>
+                <version>${apache-avro.version}</version>
             </dependency>
 
             <dependency>
@@ -293,43 +299,31 @@
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-avro-serializer</artifactId>
-                <version>${kafka-avro-serializer.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.slf4j</groupId>
-                        <artifactId>slf4j-log4j12</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.swagger</groupId>
-                        <artifactId>swagger-annotations</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>io.swagger</groupId>
-                        <artifactId>swagger-core</artifactId>
-                    </exclusion>
-                </exclusions>
+                <version>${confluent-kafka-avro-serializer.version}</version>
+                <!--                <exclusions>-->
+                <!--                    <exclusion>-->
+                <!--                        <groupId>org.slf4j</groupId>-->
+                <!--                        <artifactId>slf4j-log4j12</artifactId>-->
+                <!--                    </exclusion>-->
+                <!--                    <exclusion>-->
+                <!--                        <groupId>log4j</groupId>-->
+                <!--                        <artifactId>log4j</artifactId>-->
+                <!--                    </exclusion>-->
+                <!--                    <exclusion>-->
+                <!--                        <groupId>io.swagger</groupId>-->
+                <!--                        <artifactId>swagger-annotations</artifactId>-->
+                <!--                    </exclusion>-->
+                <!--                    <exclusion>-->
+                <!--                        <groupId>io.swagger</groupId>-->
+                <!--                        <artifactId>swagger-core</artifactId>-->
+                <!--                    </exclusion>-->
+                <!--                </exclusions>-->
             </dependency>
 
             <dependency>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-streams-avro-serde</artifactId>
-                <version>${kafka-streams-avro-serde.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-streams</artifactId>
-                <version>${kafka-streams.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.kafka</groupId>
-                <artifactId>kafka-clients</artifactId>
-                <version>${kafka-clients.version}</version>
+                <version>${confluent-kafka-streams-avro-serde.version}</version>
             </dependency>
 
             <dependency>
@@ -436,7 +430,7 @@
             <dependency>
                 <groupId>org.springframework.kafka</groupId>
                 <artifactId>spring-kafka-test</artifactId>
-                <version>3.2.0</version>
+                <version>${spring-kafka-test.version}</version>
                 <scope>test</scope>
             </dependency>
 

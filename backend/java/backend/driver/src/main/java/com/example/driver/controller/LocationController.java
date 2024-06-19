@@ -6,7 +6,6 @@ import com.example.driver.data.transformer.LocationToAvroTransformer;
 import com.example.kafka.avro.model.LocationAvroModel;
 import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafkaproducer.KafkaProducer;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +43,7 @@ public class LocationController {
     // 주기적으로 ranking TreeSet 업데이트.
 
     // 주의. schema registered 가 잘 되었는가?
-    @Operation(
-            summary = "update location",
-            description = "POST {gateway-server-url}/driver/location/api/update"
-    )
+
     @PostMapping("/update")
     public Mono<ResponseEntity<ResponseDto>> monoExample(@RequestBody LocationDto locationDto) throws IOException {
         //TODO key based on userId or user location?

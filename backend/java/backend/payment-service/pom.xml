@@ -39,10 +39,6 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.example</groupId>
             <artifactId>kafka-consumer</artifactId>
             <version>0.0.1-SNAPSHOT</version>
