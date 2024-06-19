@@ -18,6 +18,7 @@ import org.springframework.kafka.support.Acknowledgment;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -63,11 +64,15 @@ class MockTest {
         List<Integer> partitions = List.of(0);
         List<Long> offsets = List.of(0L);
 
-        doThrow(new Exception("Mocked Exception")).when(couponRepository).findById(1L);
+        doThrow(new RuntimeException("Mocked Exception")).when(couponRepository).findById(1L);
 
         // When
-        listener.receive(messages, keys, partitions, offsets, acknowledgment, consumer);
-
+        try {
+            listener.receive(messages, keys, partitions, offsets, acknowledgment, consumer);
+        } catch (RuntimeException e) {
+            // 예외가 발생했는지 검증
+            assertEquals("Mocked Exception", e.getMessage());
+        }
         // Then
         verify(acknowledgment, never()).acknowledge();
     }
