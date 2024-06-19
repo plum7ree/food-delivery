@@ -36,10 +36,6 @@ retry-config:
   maxAttempts: 3
   sleep-time-ms: 2000
 
-
-topic-names:
-  coupon-issue-request-topic-name: coupon-issue-request
-
 kafka-config:
   bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
   schema-registry-url-key: schema.registry.url
@@ -68,6 +64,12 @@ kafka-consumer-config:
   poll-timeout-ms: 150
   enable-auto-commit: false # important!
 
+topic-names:
+  coupon-issue-request-topic-name: coupon-issue-request
 
 kafka-consumer-group-id:
   coupon-issue-request-consumer-group-id: coupon-issue-request-topic-consumer-group-id
+
+kafka-listener-id: coupon-issue-request-listener
+
+

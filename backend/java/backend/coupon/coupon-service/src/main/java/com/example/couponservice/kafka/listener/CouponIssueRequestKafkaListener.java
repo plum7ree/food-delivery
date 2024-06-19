@@ -33,7 +33,7 @@ public class CouponIssueRequestKafkaListener implements GeneralKafkaConsumer<Cou
     private final CouponRepository couponRepository;
     private final CouponIssueRepository couponIssueRepository;
 
-    @Value("${kafka-consumer-group-id.payment-consumer-group-id}")
+    @Value("${kafka-consumer-group-id.coupon-issue-request-consumer-group-id}")
     private String consumerGroupId;
 
     @EventListener
@@ -45,7 +45,7 @@ public class CouponIssueRequestKafkaListener implements GeneralKafkaConsumer<Cou
 
     // auto.offset
     @Override
-    @KafkaListener(id = "${kafka-consumer-group-id.coupon-issue-consumer-group-id}",
+    @KafkaListener(id = "${kafka-listener-id}",
         topics = "${topic-names.coupon-issue-request-topic-name}")
     public void receive(@Payload List<CouponIssueRequestAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
