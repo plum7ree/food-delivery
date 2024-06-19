@@ -33,6 +33,7 @@ services:
 
       echo -e 'Successfully created the following topics:'
       kafka-topics --bootstrap-server kafka-broker-1:9092 --list
+      tail -f /dev/null
       "
     networks:
       - ${GLOBAL_NETWORK:-kafka}

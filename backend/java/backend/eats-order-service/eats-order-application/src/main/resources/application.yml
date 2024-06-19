@@ -118,7 +118,7 @@ kafka-consumer-config:
   max-partition-fetch-bytes-default: 1048576
   max-partition-fetch-bytes-boost-factor: 1
   poll-timeout-ms: 150
-
+  enable-auto-commit: true
 kafka-consumer-group-id:
   payment-consumer-group-id: payment-topic-consumer-group-id
   driver-approval-consumer-group-id: driver-approval-topic-consumer-group-id

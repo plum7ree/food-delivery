@@ -36,10 +36,10 @@ CREATE TABLE "order".order_items
 );
 
 ALTER TABLE "order".order_items
-    ADD CONSTRAINT "FK_ORDER_ID" FOREIGN KEY (order_id)
-        REFERENCES "order".orders (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE CASCADE
+    ADD CONSTRAINT "FK_ORDER_ID" FOREIGN KEY (order_id) -- 추가할 제약 조건 이름 "FK_ORDER_ID", column "order_id"
+        REFERENCES "order".orders (id) MATCH SIMPLE -- foreign key 와 연결시킬 table, column. MATCH SIMPLE: 왜래키 열중 하나라도 null 일 경우 무효
+        ON UPDATE NO ACTION -- 참조된 기본 키가 업데이트될 때 외래 키에는 아무런 동작을 취하지 않도록 함. default. ON UPDATE CASCADE 로 바꿀까??
+        ON DELETE CASCADE -- 참조된 기본 키가 삭제될 때, 이를 참조하는 외래 키 열을 가진 행도 함께 삭제
     NOT VALID;
 
 DROP TABLE IF EXISTS "order".order_address CASCADE;

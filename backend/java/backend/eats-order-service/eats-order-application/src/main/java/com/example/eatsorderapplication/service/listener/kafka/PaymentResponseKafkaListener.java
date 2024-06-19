@@ -3,10 +3,9 @@ package com.example.eatsorderapplication.service.listener.kafka;
 //import com.example.eatsorderapplication.service.CallAndPaymentSaga;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.dto.ResponseDto;
-import com.example.eatsorderdomain.data.mapper.DataMapper;
 import com.example.kafka.avro.model.ResponseAvroModel;
 import com.example.kafka.avro.model.Status;
-import com.example.kafkaconsumer.KafkaConsumer;
+import com.example.kafkaconsumer.GeneralKafkaConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Conversions;
@@ -27,7 +26,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class PaymentResponseKafkaListener implements KafkaConsumer<ResponseAvroModel> {
+public class PaymentResponseKafkaListener implements GeneralKafkaConsumer<ResponseAvroModel> {
 
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 

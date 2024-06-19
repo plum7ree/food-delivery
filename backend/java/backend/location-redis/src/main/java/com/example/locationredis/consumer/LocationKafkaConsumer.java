@@ -3,7 +3,7 @@ package com.example.locationredis.consumer;
 import com.example.kafka.admin.client.KafkaAdminClient;
 import com.example.kafka.avro.model.LocationAvroModel;
 import com.example.kafka.config.data.KafkaConfigData;
-import com.example.kafkaconsumer.KafkaConsumer;
+import com.example.kafkaconsumer.GeneralKafkaConsumer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class LocationKafkaConsumer implements KafkaConsumer<LocationAvroModel> {
+public class LocationKafkaConsumer implements GeneralKafkaConsumer<LocationAvroModel> {
     private static final Logger LOG = LoggerFactory.getLogger(LocationKafkaConsumer.class);
 
     // @ComponentScan needed

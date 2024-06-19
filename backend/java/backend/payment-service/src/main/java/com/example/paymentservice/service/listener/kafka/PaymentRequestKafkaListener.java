@@ -6,7 +6,7 @@ import com.example.commondata.domain.aggregate.valueobject.Money;
 import com.example.commondata.domain.aggregate.valueobject.PaymentId;
 import com.example.commondata.domain.aggregate.valueobject.CallerId;
 import com.example.kafka.avro.model.*;
-import com.example.kafkaconsumer.KafkaConsumer;
+import com.example.kafkaconsumer.GeneralKafkaConsumer;
 import com.example.kafkaproducer.KafkaProducer;
 import com.example.paymentservice.config.CallServiceConfigData;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentRequestKafkaListener implements KafkaConsumer<RequestAvroModel> {
+public class PaymentRequestKafkaListener implements GeneralKafkaConsumer<RequestAvroModel> {
     private static final Logger log = LoggerFactory.getLogger(PaymentRequestKafkaListener.class);
 
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;

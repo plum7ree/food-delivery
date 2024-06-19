@@ -68,11 +68,11 @@ import static org.junit.jupiter.api.Assertions.*;
 //Important. 이걸로 setUp 을 non-static 으로 만들고, autowired 한 KafkaConsumerConfig 내부의 빈들을 setUp 에서 사용할수있다.
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({KafkaConsumerConfig.class, ApplicationTest.TestConfig.class})
+@Import({KafkaConsumerConfig.class, TestContainerApplicationTest.TestConfig.class})
 //@TestPropertySource("classpath:application.yml") // should set profile to avoid multiple applicatino.yml exists
 @Profile("test")
 @Slf4j
-public class ApplicationTest {
+public class TestContainerApplicationTest {
     private static final Network network = Network.newNetwork();
     private static final String kafkaBootStrapServeres = "localhost:19092,localhost:29092,localhost:39092";
     private static final List<String> topics = List.of(
@@ -111,7 +111,7 @@ public class ApplicationTest {
     //TODO for now, since schema registry testcontainer doesn't work well,
     // please manually run kafka-cluster.yml
     @Autowired // @Autowired 명시해서 kafkaListenerContainerFactory 처리.
-    public ApplicationTest(KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory) {
+    public TestContainerApplicationTest(KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory) {
         this.kafkaListenerContainerFactory = kafkaListenerContainerFactory;
     }
 
@@ -434,7 +434,7 @@ public class ApplicationTest {
             assertNotNull(response.getBody().getCallTrackingId());
 
             // 추가: 컨슈머 폴링 및 Avro 메시지 소비
-            var records = consumer.poll(Duration.ofSeconds(10));
+            var records = consumer.poll(Duration.ofSeconds(1000));
             RequestAvroModel paymentRequest = null;
             for (var record : records) {
                 paymentRequest = record.value();

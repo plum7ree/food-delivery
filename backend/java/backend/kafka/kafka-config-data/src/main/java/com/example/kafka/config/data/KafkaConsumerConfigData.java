@@ -1,6 +1,7 @@
 package com.example.kafka.config.data;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -23,4 +24,6 @@ public class KafkaConsumerConfigData {
     private Integer maxPartitionFetchBytesDefault;
     private Integer maxPartitionFetchBytesBoostFactor;
     private Long pollTimeoutMs;
+    @Value("${kafka-consumer-config.enable-auto-commit:true}")
+    private Boolean enableAutoCommit;
 }
