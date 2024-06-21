@@ -18,15 +18,14 @@ spring:
     # binaryTransfer
     # reWriteBatchedInserts: batch optimization
     #TODO CQRS possible with replica DB? access conflict with user micro service?
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://localhost:5433/postgres?currentSchema=coupon&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       platform: postgres
-      schema-locations: classpath:sql/orders/init-schema.sql
-      data-locations: classpath:sql/orders/init-data.sql
+      schema-locations: classpath:sql/postgresql/init-schema.sql
       mode: always
 
 retry-config:
@@ -35,6 +34,8 @@ retry-config:
   multiplier: 2.0
   maxAttempts: 3
   sleep-time-ms: 2000
+
+spring.kafka.listener.ack-mode: manual
 
 kafka-config:
   bootstrap-servers: localhost:19092, localhost:29092, localhost:39092

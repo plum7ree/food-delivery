@@ -48,8 +48,7 @@ class MockTest {
 
     @BeforeEach
     void setUp() {
-        listener = new CouponIssueRequestKafkaListener(
-            kafkaListenerEndpointRegistry, couponRepository, couponIssueRepository);
+        listener = new CouponIssueRequestKafkaListener(kafkaListenerEndpointRegistry, couponRepository, couponIssueRepository);
     }
 
     @Test

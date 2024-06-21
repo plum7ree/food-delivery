@@ -51,7 +51,7 @@
 
         <lombok.version>1.18.28</lombok.version>
 
-        <spring-boot.version>3.3.0</spring-boot.version>
+        <spring-boot.version>3.2.0</spring-boot.version>
         <spring-test.version>6.1.2</spring-test.version>
         <spring-retry.version>2.0.2</spring-retry.version>
         <spring-cloud.version>4.0.3</spring-cloud.version>
@@ -75,6 +75,7 @@
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <testcontainers.version>1.19.0</testcontainers.version>
 
+        <snake-yaml.version>2.0</snake-yaml.version>
 
     </properties>
 
@@ -105,31 +106,7 @@
     <dependencyManagement>
         <dependencies>
             <!-- LOCAL -->
-            <dependency>
-                <groupId>com.example</groupId>
-                <artifactId>common-config</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.example</groupId>
-                <artifactId>configserver</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.example</groupId>
-                <artifactId>kafka-model</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.example</groupId>
-                <artifactId>kafka-admin</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.example</groupId>
-                <artifactId>kafka-config-data</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -357,13 +334,12 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
-                <version>RELEASE</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-test</artifactId>
-                <version>RELEASE</version>
+                <version>${spring-boot.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -415,8 +391,38 @@
                 <version>${spring-kafka-test.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snake-yaml.version}</version>
+            </dependency>
 
 
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>common-config</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>configserver</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>kafka-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>kafka-admin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.example</groupId>
+                <artifactId>kafka-config-data</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

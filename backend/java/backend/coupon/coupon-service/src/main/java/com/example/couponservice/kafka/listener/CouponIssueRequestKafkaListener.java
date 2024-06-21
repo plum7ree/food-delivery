@@ -4,15 +4,14 @@ import com.example.couponservice.repository.CouponIssueRepository;
 import com.example.couponservice.repository.CouponRepository;
 import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
 import com.example.kafkaconsumer.GeneralKafkaConsumer;
+import com.example.kafkaconsumer.config.KafkaConsumerConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
-import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -23,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class CouponIssueRequestKafkaListener implements GeneralKafkaConsumer<CouponIssueRequestAvroModel> {
 
@@ -33,29 +31,41 @@ public class CouponIssueRequestKafkaListener implements GeneralKafkaConsumer<Cou
     private final CouponRepository couponRepository;
     private final CouponIssueRepository couponIssueRepository;
 
-    @Value("${kafka-consumer-group-id.coupon-issue-request-consumer-group-id}")
-    private String consumerGroupId;
+    @Value("${kafka-listener-id}")
+    private String kafkaListenerId;
+
+    public CouponIssueRequestKafkaListener(KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry,
+                                           CouponRepository couponRepository,
+                                           CouponIssueRepository couponIssueRepository) {
+        this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
+        this.couponRepository = couponRepository;
+        this.couponIssueRepository = couponIssueRepository;
+    }
 
     @EventListener
     public void OnAppStarted(ApplicationStartedEvent event) {
         log.info("on app started!");
-        log.info("consumer group id: {}", consumerGroupId);
-        kafkaListenerEndpointRegistry.getListenerContainer(consumerGroupId).start();
+        log.info("kafkaListenerId: {}", kafkaListenerId);
+        var container = kafkaListenerEndpointRegistry.getListenerContainer(kafkaListenerId);
+        assert container != null;
+        log.info("container properties: {}", container.getContainerProperties().toString());
+        container.start();
     }
 
     // auto.offset
     @Override
-    @KafkaListener(id = "${kafka-listener-id}",
+    @KafkaListener(id = "${kafka-listener-id}", groupId = "${kafka-consumer-group-id.coupon-issue-request-consumer-group-id}",
         topics = "${topic-names.coupon-issue-request-topic-name}")
     public void receive(@Payload List<CouponIssueRequestAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
-                        @Header(KafkaHeaders.OFFSET) List<Long> offsets,
-                        Acknowledgment acknowledgment,
-                        Consumer<?, ?> consumer) {
+                        @Header(KafkaHeaders.OFFSET) List<Long> offsets
+//                        Acknowledgment acknowledgment,
+//                        Consumer<?, ?> consumer
+    ) {
 
         messages.forEach(message -> {
-            log.info("payment response topic received");
+            log.info("coupon issue request topic received");
             var couponId = message.getCouponId();
             var issueId = message.getIssueId();
             CommitChain commitChain = new CommitChain();
@@ -64,8 +74,9 @@ public class CouponIssueRequestKafkaListener implements GeneralKafkaConsumer<Cou
                 .addCommand(new CommitCouponIssueCommand(couponIssueRepository, issueId));
 
             try {
-                commitChain.execute();
-                acknowledgment.acknowledge();  // 성공적으로 처리된 경우에만 오프셋을 커밋
+//                commitChain.execute();
+//                acknowledgment.acknowledge();  // 성공적으로 처리된 경우에만 오프셋을 커밋
+
             } catch (Exception e) {
                 log.error("Error processing message: {}, exception: {}", message, e.getMessage());
                 // offset rollback 을 위해 acknowledgment를 호출하지 않음
