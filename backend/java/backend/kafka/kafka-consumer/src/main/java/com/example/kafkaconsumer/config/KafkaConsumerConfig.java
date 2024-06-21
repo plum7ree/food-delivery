@@ -15,6 +15,7 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ContainerProperties;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -65,6 +66,7 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
         factory.setConcurrency(kafkaConsumerConfigData.getConcurrencyLevel());
         factory.setAutoStartup(kafkaConsumerConfigData.getAutoStartup());
         factory.getContainerProperties().setPollTimeout(kafkaConsumerConfigData.getPollTimeoutMs());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.valueOf(kafkaConsumerConfigData.getAckMode()));
         return factory;
 
 

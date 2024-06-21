@@ -7,17 +7,20 @@ import com.example.kafkaconsumer.GeneralKafkaConsumer;
 import com.example.kafkaconsumer.config.KafkaConsumerConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.support.Acknowledgment;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,9 +62,9 @@ public class CouponIssueRequestKafkaListener implements GeneralKafkaConsumer<Cou
     public void receive(@Payload List<CouponIssueRequestAvroModel> messages,
                         @Header(KafkaHeaders.RECEIVED_KEY) List<String> keys,
                         @Header(KafkaHeaders.RECEIVED_PARTITION) List<Integer> partitions,
-                        @Header(KafkaHeaders.OFFSET) List<Long> offsets
-//                        Acknowledgment acknowledgment,
-//                        Consumer<?, ?> consumer
+                        @Header(KafkaHeaders.OFFSET) List<Long> offsets,
+                        Acknowledgment acknowledgment,
+                        Consumer<?, ?> consumer
     ) {
 
         messages.forEach(message -> {
@@ -74,12 +77,13 @@ public class CouponIssueRequestKafkaListener implements GeneralKafkaConsumer<Cou
                 .addCommand(new CommitCouponIssueCommand(couponIssueRepository, issueId));
 
             try {
-//                commitChain.execute();
-//                acknowledgment.acknowledge();  // 성공적으로 처리된 경우에만 오프셋을 커밋
+                commitChain.execute();
+                acknowledgment.acknowledge();  // 성공적으로 처리된 경우에만 오프셋을 커밋
 
             } catch (Exception e) {
                 log.error("Error processing message: {}, exception: {}", message, e.getMessage());
                 // offset rollback 을 위해 acknowledgment를 호출하지 않음
+                acknowledgment.nack(Duration.ofSeconds(0));
             }
 
 

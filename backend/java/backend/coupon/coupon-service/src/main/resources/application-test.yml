@@ -29,7 +29,6 @@ retry-config:
   sleep-time-ms: 2000
 
 
-spring.kafka.listener.ack-mode: manual
 
 kafka-config:
   bootstrap-servers: localhost:49092 # EmbeddedKafka so @DynamicPropertySource
@@ -58,7 +57,7 @@ kafka-consumer-config:
   max-partition-fetch-bytes-boost-factor: 1
   poll-timeout-ms: 150
   enable-auto-commit: false # important!
-
+  ack-mode: MANUAL # https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/message-listener-container.html#committing-offsets
 
 topic-names:
   coupon-issue-request-topic-name: coupon-issue-request

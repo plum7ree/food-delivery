@@ -26,4 +26,6 @@ public class KafkaConsumerConfigData {
     private Long pollTimeoutMs;
     @Value("${kafka-consumer-config.enable-auto-commit:true}")
     private Boolean enableAutoCommit;
+    @Value("${kafka-consumer-config.ack-mode:BATCH}")
+    private String ackMode;
 }
