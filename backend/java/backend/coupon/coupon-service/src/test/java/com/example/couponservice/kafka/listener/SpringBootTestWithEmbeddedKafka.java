@@ -2,6 +2,8 @@
 // ref: https://github.com/ivlahek/kafka-avro-without-registry
 package com.example.couponservice.kafka.listener;
 
+import com.example.couponservice.entity.Coupon;
+import com.example.couponservice.entity.CouponIssue;
 import com.example.couponservice.repository.CouponIssueRepository;
 import com.example.couponservice.repository.CouponRepository;
 import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
@@ -12,6 +14,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.ListConsumerGroupOffsetsResult;
+import org.apache.kafka.clients.admin.OffsetSpec;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
+import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +39,7 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.ContainerTestUtils;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -41,27 +47,25 @@ import org.springframework.test.context.TestPropertySource;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ExtendWith(MockitoExtension.class)
-@EmbeddedKafka(partitions = 3, topics = {"coupon-issue-request-topic"}, brokerProperties = "listeners=PLAINTEXT://localhost:49092")
+@EmbeddedKafka(partitions = 1, topics = {"coupon-issue-request-topic"}, brokerProperties = "listeners=PLAINTEXT://localhost:49092")
 @ActiveProfiles("test") // application-test.yml
 @Slf4j
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class SpringBootTestWithEmbeddedKafka {
     @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
     private AdminClient adminClient;
     private KafkaTemplate<String, CouponIssueRequestAvroModel> kafkaTemplate;
-    @Autowired
-    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
     @MockBean
     private CouponRepository couponRepository;
     @MockBean
@@ -79,7 +83,6 @@ class SpringBootTestWithEmbeddedKafka {
         Map<String, Object> producerProps = KafkaTestUtils.producerProps(embeddedKafkaBroker);
         producerProps.put("key.serializer", StringSerializer.class);
         producerProps.put("value.serializer", KafkaAvroSerializer.class);
-//        producerProps.put("value.serializer", KafkaAvroSerializer.class);
         producerProps.put("schema.registry.url", "mock://test-uri");
         kafkaTemplate = new KafkaTemplate<>(new DefaultKafkaProducerFactory<>(producerProps));
 
@@ -88,11 +91,8 @@ class SpringBootTestWithEmbeddedKafka {
         adminProps.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafkaBroker.getBrokersAsString());
         adminClient = AdminClient.create(adminProps);
 
-
-        for (var messageListenerContainer : kafkaListenerEndpointRegistry.getListenerContainers()) {
-            ContainerTestUtils.waitForAssignment(messageListenerContainer, embeddedKafkaBroker.getPartitionsPerTopic());
-        }
     }
+
 
     @Test
     void givenRepositoryThrowsError_whenKafkaListenerReceives_thenOffsetShouldNotBeCommitted() throws ExecutionException, InterruptedException {
@@ -107,8 +107,6 @@ class SpringBootTestWithEmbeddedKafka {
         // 첫 번째 메시지 처리 시 예외 발생
         doThrow(new RuntimeException("Mocked Exception")).when(couponRepository).findById(1L);
         doThrow(new RuntimeException("Mocked Exception")).when(couponIssueRepository).findById(1L);
-//        // 두 번째 메시지 처리 시 예외 발생하지 않음
-//        doReturn(Optional.of(new Coupon())).when(couponRepository).findById(1L);
 
         // Send the first message to the topic
         kafkaTemplate.send(topicName, "partition-key", message).get();
@@ -116,42 +114,46 @@ class SpringBootTestWithEmbeddedKafka {
         // Allow some time for the listener to process
         Thread.sleep(1000);
 
-        // Poll the message to simulate receiving by listener
-        log.info(kafkaListenerEndpointRegistry.getAllListenerContainers().toString());
-        MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer(listenerId);
-        assert listenerContainer != null;
-        log.info("get assigned partition: {} group id: {}", listenerContainer.getAssignedPartitions(), listenerContainer.getGroupId());
-        listenerContainer.stop();
-//
-//        // When
-//        listenerContainer.start();
 
-//
         // Check the consumer group offsets after the first failure
         ListConsumerGroupOffsetsResult offsetsResult = adminClient.listConsumerGroupOffsets(consumerGroupId);
         Map<TopicPartition, Long> offsets = offsetsResult.partitionsToOffsetAndMetadata().get().entrySet().stream()
             .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue().offset()), HashMap::putAll);
         assertEquals(0L, offsets.get(new TopicPartition(topicName, 0)));
-//
-//        // Reset mocks for the second message
-//        reset(couponRepository);
-//
-//        // Send the second message to the topic
-//        kafkaTemplate.send("coupon-issue-request-topic", message).get();
-//
-//        // Poll the message to simulate receiving by listener
-//        KafkaTestUtils.getRecords((KafkaConsumer<?, ?>) listenerContainer.getAssignedConsumer());
-//
-//        // Allow some time for the listener to process
-//        Thread.sleep(2000);
-//
-//        // Check the consumer group offsets after the second successful processing
-//        offsetsResult = adminClient.listConsumerGroupOffsets("coupon-issue-consumer-group-id");
-//        offsets = offsetsResult.partitionsToOffsetAndMetadata().get().entrySet().stream()
-//            .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue().offset()), HashMap::putAll);
-//        assertEquals(1L, offsets.get(new TopicPartition("coupon-issue-request-topic", 0)));
+
     }
 
+    @Test
+    void givenRepositoryFirstThrowsErrorAndSecondNotThrowsError_whenKafkaListenerReceives_thenOffsetShouldBeCommitted() throws ExecutionException, InterruptedException {
+        // Given
+        var message = new CouponIssueRequestAvroModel();
+        message.setCallerId(UUID.randomUUID().toString());
+        message.setCouponId(1L);
+        message.setIssueId(1L);
+        message.setAmount(1000);
+        message.setCreatedAt(Instant.from(ZonedDateTime.now()));
+
+        // 첫 번째 메시지 처리 시 예외 발생
+//        doThrow(new RuntimeException("Mocked Exception")).when(couponRepository).findById(1L);
+//        doThrow(new RuntimeException("Mocked Exception")).when(couponIssueRepository).findById(1L);
+//        // 두 번째 메시지 처리 시 예외 발생하지 않음
+        doReturn(Optional.of(new Coupon())).when(couponRepository).findById(1L);
+        doReturn(Optional.of(new CouponIssue())).when(couponIssueRepository).findById(1L);
+
+        // Send the first message to the topic
+        kafkaTemplate.send(topicName, "partition-key", message).get();
+
+        // Allow some time for the listener to process
+        Thread.sleep(1000);
+
+
+        // Check the consumer group offsets after the first failure
+        ListConsumerGroupOffsetsResult offsetsResult = adminClient.listConsumerGroupOffsets(consumerGroupId);
+        Map<TopicPartition, Long> offsets = offsetsResult.partitionsToOffsetAndMetadata().get().entrySet().stream()
+            .collect(HashMap::new, (m, e) -> m.put(e.getKey(), e.getValue().offset()), HashMap::putAll);
+        assertEquals(1L, offsets.get(new TopicPartition(topicName, 0)));
+
+    }
 
     @Configuration
     public class TestConfig {
