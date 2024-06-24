@@ -317,7 +317,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>31.1-jre</version> <!-- 버전은 필요에 따라 변경하세요 -->
+                <version>31.1-jre</version>
             </dependency>
             <dependency>
                 <groupId>org.json</groupId>

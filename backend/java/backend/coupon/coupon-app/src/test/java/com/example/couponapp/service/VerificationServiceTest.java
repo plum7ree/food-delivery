@@ -1,75 +1,143 @@
-//package com.example.couponapp.service;
-//
-//import com.example.couponapp.dto.IssueRequestDto;
-//import com.google.common.collect.HashBasedTable;
-//import com.google.common.collect.Table;
-//import org.junit.jupiter.api.AfterEach;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.redisson.api.RMapReactive;
-//import org.redisson.api.RedissonReactiveClient;
-//import org.redisson.client.RedisClient;
-//import org.redisson.client.RedisClientConfig;
-//import org.redisson.client.protocol.RedisCommands;
-//import org.redisson.client.protocol.RedisStrictCommand;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.data.redis.core.ReactiveRedisTemplate;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//import org.springframework.test.context.web.WebAppConfiguration;
-//
-//import static org.mockito.ArgumentMatchers.anyString;
-//import static org.mockito.BDDMockito.given;
-//import static org.mockito.Mockito.when;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
-//
-//@SpringBootTest
-//@ActiveProfiles("test")
-//@WebAppConfiguration
-//class VerificationServiceTest {
-//
-//    @MockBean
-//    private RedissonReactiveClient redissonReactiveClient;
-//
-//    @Autowired
-//    private VerificationService verificationService;
-//
-//    private RMapReactive<String, String> couponMap;
-//
-//    @BeforeEach
-//    void setUp() {
-//        // Setup RedissonReactiveClient mock
-//        couponMap = redissonReactiveClient.getMap("coupon:1000000:issue");
-//        given(redissonReactiveClient.getMap(anyString())).willReturn(couponMap);
-//
-//        // Initialize local cache
-//        Table<Long, String, String> localCache = HashBasedTable.create();
-//        localCache.put(1000000L, "startDate", "2022-01-01T00:00:00");
-//        localCache.put(1000000L, "endDate", "2023-01-01T00:00:00");
-//        verificationService.localCache = localCache;
-//
-//        // Setup mock data in Redis
-//        when(couponMap.get("startDate")).thenReturn("2022-01-01T00:00:00");
-//        when(couponMap.get("endDate")).thenReturn("2023-01-01T00:00:00");
-//    }
-//
-//    @Test
-//    void testCheckPeriodAndTime() {
-//        // Given
-//        IssueRequestDto issueRequestDto = new IssueRequestDto();
-//        issueRequestDto.setCouponId(1000000L);
-//
-//        // When
-//        boolean result = verificationService.checkPeriodAndTime(issueRequestDto);
-//
-//        // Then
-//        assertTrue(result);
-//    }
-//
-//    @AfterEach
-//    void tearDown() {
-//        // Clean up code if necessary
-//    }
-//}
+package com.example.couponapp.service;
+
+import com.example.couponapp.dto.IssueRequestDto;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.redisson.api.RBucketReactive;
+import org.redisson.api.RMapReactive;
+import org.redisson.api.RedissonReactiveClient;
+import org.springframework.test.util.ReflectionTestUtils;
+import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+
+import static com.example.couponapp.service.VerificationService.COUPON_COUNT_KEY;
+import static com.example.couponapp.service.VerificationService.COUPON_INFO_KEY;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
+class VerificationServiceTest {
+
+    private VerificationService verificationService;
+
+    @Mock
+    private RedissonReactiveClient redissonReactiveClient;
+
+    @Mock
+    private RMapReactive<String, String> couponStaticInfoMap;
+
+    @Mock
+    private RBucketReactive<String> couponIssueCountBucket;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        verificationService = new VerificationService(redissonReactiveClient);
+
+        when(redissonReactiveClient.<String, String>getMap(anyString())).thenReturn(couponStaticInfoMap);
+        when(redissonReactiveClient.<String>getBucket(anyString())).thenReturn(couponIssueCountBucket);
+
+        var couponId = 1000000L;
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+
+        Table<String, String, String> localCache = HashBasedTable.create();
+        localCache.put(couponInfoKey, "startDate", "1900-01-01T00:00:00");
+        localCache.put(couponInfoKey, "endDate", "2100-12-31T23:59:59");
+
+        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCache);
+
+    }
+
+    @Test
+    void checkPeriodAndTime_ShouldReturnTrue_WhenWithinPeriod() {
+        var couponId = 1000000L;
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+
+
+        IssueRequestDto requestDto = new IssueRequestDto();
+        requestDto.setUserId("1000000");
+        requestDto.setCouponId(couponId);
+
+        boolean result = verificationService.checkPeriodAndTime(requestDto).block();
+
+        assertTrue(result);
+    }
+
+    @Test
+    void checkPeriodAndTime_ShouldReturnFalse_WhenOutsidePeriod() {
+        var couponId = 1000000L;
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+
+        IssueRequestDto requestDto = new IssueRequestDto();
+        requestDto.setUserId("1000000");
+        requestDto.setCouponId(couponId);
+
+        Table<String, String, String> localCache = HashBasedTable.create();
+        localCache.put(couponInfoKey, "startDate", "2925-01-01T00:00:00");
+        localCache.put(couponInfoKey, "endDate", "2925-12-31T23:59:59");
+
+        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCache);
+
+        boolean result = verificationService.checkPeriodAndTime(requestDto).block();
+
+        assertFalse(result);
+    }
+
+    @Test
+    void checkCouponInventory_ShouldReturnTrue_WhenInventoryAvailable() {
+        var couponId = 1000000L;
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+
+        IssueRequestDto requestDto = new IssueRequestDto();
+        requestDto.setUserId("1000000");
+        requestDto.setCouponId(couponId);
+
+        Table<String, String, String> localCouponStaticInfoCache = HashBasedTable.create();
+        HashMap<String, String> localCouponIssueCountCache = new HashMap<>();
+
+        localCouponStaticInfoCache.put(couponInfoKey, "maxCount", "10");
+        when(couponIssueCountBucket.get()).thenReturn(Mono.just("9"));
+
+        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCouponStaticInfoCache);
+
+
+        boolean result = verificationService.checkCouponInventory(requestDto).block();
+
+        assertTrue(result);
+    }
+
+    @Test
+    void checkCouponInventory_ShouldReturnFalse_WhenInventoryNotAvailable() {
+        var couponId = 1000000L;
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+
+        IssueRequestDto requestDto = new IssueRequestDto();
+        requestDto.setUserId("1000000");
+        requestDto.setCouponId(couponId);
+
+        Table<String, String, String> localCouponStaticInfoCache = HashBasedTable.create();
+        HashMap<String, String> localCouponIssueCountCache = new HashMap<>();
+
+        localCouponStaticInfoCache.put(couponInfoKey, "maxCount", "10");
+        when(couponIssueCountBucket.get()).thenReturn(Mono.just("10"));
+
+        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCouponStaticInfoCache);
+
+
+        boolean result = verificationService.checkCouponInventory(requestDto).block();
+
+        assertFalse(result);
+    }
+}

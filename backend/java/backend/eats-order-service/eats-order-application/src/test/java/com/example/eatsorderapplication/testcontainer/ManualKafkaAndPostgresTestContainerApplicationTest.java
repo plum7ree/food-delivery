@@ -68,11 +68,11 @@ import static org.junit.jupiter.api.Assertions.*;
 //Important. 이걸로 setUp 을 non-static 으로 만들고, autowired 한 KafkaConsumerConfig 내부의 빈들을 setUp 에서 사용할수있다.
 @Testcontainers
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import({KafkaConsumerConfig.class, TestContainerApplicationTest.TestConfig.class})
+@Import({KafkaConsumerConfig.class, ManualKafkaAndPostgresTestContainerApplicationTest.TestConfig.class})
 //@TestPropertySource("classpath:application.yml") // should set profile to avoid multiple applicatino.yml exists
 @Profile("test")
 @Slf4j
-public class TestContainerApplicationTest {
+public class ManualKafkaAndPostgresTestContainerApplicationTest {
     private static final Network network = Network.newNetwork();
     private static final String kafkaBootStrapServeres = "localhost:19092,localhost:29092,localhost:39092";
     private static final List<String> topics = List.of(
@@ -111,7 +111,7 @@ public class TestContainerApplicationTest {
     //TODO for now, since schema registry testcontainer doesn't work well,
     // please manually run kafka-cluster.yml
     @Autowired // @Autowired 명시해서 kafkaListenerContainerFactory 처리.
-    public TestContainerApplicationTest(KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory) {
+    public ManualKafkaAndPostgresTestContainerApplicationTest(KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory) {
         this.kafkaListenerContainerFactory = kafkaListenerContainerFactory;
     }
 

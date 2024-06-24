@@ -1,9 +1,9 @@
 server:
-  port: 8074
+  port: 8093
 
 spring:
   application:
-    name: eats-order-application
+    name: coupon-service
 
   jpa:
     database: h2

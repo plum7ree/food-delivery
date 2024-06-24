@@ -249,6 +249,8 @@ schema-registry: 8081
 route(python): 8082
 driver: 8090
 monitoring: 8091
+coupon-app: 8092
+coupon-service: 8093
 # port must be same.
 
 # helm/.../user/values.yml

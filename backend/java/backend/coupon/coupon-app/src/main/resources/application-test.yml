@@ -1,0 +1,11 @@
+server:
+  port: 8092
+
+
+spring:
+  application:
+    name: coupon-app
+  data:
+    redis-server: redis://coupon-redis:6379
+
+
