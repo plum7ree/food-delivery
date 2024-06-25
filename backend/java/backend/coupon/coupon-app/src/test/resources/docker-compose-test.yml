@@ -10,12 +10,14 @@ services:
     ports:
       - "5432:5432"
     restart: always
+  #    hostname: coupon-db
 
   coupon-redis:
     image: redis:latest
     container_name: coupon-redis
     ports:
       - "6379:6379"
+    #    hostname: coupon-redis
     command: redis-server --loglevel debug
 
   zookeeper:
@@ -31,9 +33,6 @@ services:
       ZOOKEEPER_SYNC_LIMIT: 2
       ZOOKEEPER_SERVERS: zookeeper:2888:3888
       KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
-    volumes:
-      - "./volumes/zookeeper/data:/var/lib/zookeeper/data"
-      - "./volumes/zookeeper/transactions:/var/lib/zookeeper/log"
 
   schema-registry:
     image: confluentinc/cp-schema-registry:7.3.0
@@ -62,6 +61,4 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
-    volumes:
-      - "./volumes/kafka/broker-1:/var/lib/kafka/data"
 
