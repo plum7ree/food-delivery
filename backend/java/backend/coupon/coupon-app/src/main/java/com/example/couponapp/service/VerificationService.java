@@ -4,17 +4,16 @@ import com.example.couponapp.dto.IssueRequestDto;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.primitives.UnsignedLong;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RBucketReactive;
+import org.redisson.api.RLockReactive;
 import org.redisson.api.RMapReactive;
 import org.redisson.api.RedissonReactiveClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -38,7 +37,7 @@ public class VerificationService {
         _couponId -> String.format("coupon:%d:issue:count", _couponId);
 
     public static final BiFunction<String, Long, String> USER_COUPON_ISSUE_KEY =
-        (userId, _couponId) -> String.format("user:%s:coupon:issue:%s", userId, _couponId);
+        (userId, _couponId) -> String.format("user:%s:coupon:%d:issued", userId, _couponId);
 
     public Mono<Boolean> checkLocalCache(IssueRequestDto issueRequestDto) {
         var couponId = issueRequestDto.getCouponId();
@@ -73,7 +72,12 @@ public class VerificationService {
                 LocalDateTime startDate = LocalDateTime.parse(row.get("startDate"));
                 LocalDateTime endDate = LocalDateTime.parse(row.get("endDate"));
                 return Mono.just(!now.isBefore(startDate) && !now.isAfter(endDate));
-            });
+            })
+            .onErrorResume(e -> {
+                System.err.println("checkPeriodAndTime" + couponId + ": " + e.getMessage());
+                return Mono.just(false);
+            })
+            .defaultIfEmpty(false);
     }
 
     public Mono<Boolean> checkCouponInventory(IssueRequestDto issueRequestDto) {
@@ -91,7 +95,34 @@ public class VerificationService {
                 return Mono.justOrEmpty(localCouponStaticInfoCache.row(couponInfoKey))
                     .flatMap(row -> {
                         UnsignedLong maxCount = UnsignedLong.valueOf(row.get("maxCount"));
-                        return Mono.just(issuedCount.compareTo(maxCount) < 0);
+                        // 분산 락 생성
+                        RLockReactive lock = redissonReactiveClient.getLock("couponLock:" + couponId);
+                        return lock.tryLock(10, TimeUnit.SECONDS)  // 1초 동안 락 획득 시도
+                            .flatMap(acquired -> {
+                                if (acquired) {
+                                    return redissonReactiveClient.getBucket(couponCountKey).get()
+                                        .flatMap(currentIssuedCountObj -> {
+                                            if (!(currentIssuedCountObj instanceof String)) {
+                                                lock.unlock(); // 예외 처리: issuedCount를 얻지 못한 경우 락 해제
+                                                return Mono.just(false);
+                                            }
+                                            String currentIssuedCountStr = (String) currentIssuedCountObj;
+                                            UnsignedLong currentIssuedCount = UnsignedLong.valueOf(currentIssuedCountStr);
+                                            if (currentIssuedCount.compareTo(maxCount) < 0) {
+                                                // issuedCount 증가
+                                                return redissonReactiveClient.getBucket(couponCountKey)
+                                                    .set(issuedCount.plus(UnsignedLong.ONE).toString())
+                                                    .doFinally(signalType -> lock.unlock())
+                                                    .thenReturn(true);
+                                            } else {
+                                                lock.unlock(); // maxCount를 초과하는 경우 락 해제
+                                                return Mono.just(false);
+                                            }
+                                        });
+                                } else {
+                                    return Mono.just(false); // 락 획득 실패 시 처리
+                                }
+                            });
                     });
             })
             .defaultIfEmpty(false); // Redis에서 값을 찾지 못한 경우 false 반환
