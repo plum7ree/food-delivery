@@ -17,8 +17,15 @@ services:
     container_name: coupon-redis
     ports:
       - "6379:6379"
-    #    hostname: coupon-redis
+    #    hostname: coupon-redis # hostname 을 comment 처리 해도, coupon-app 실행하면 coupon-redis 로 url해야 연결됨.
     command: redis-server --loglevel debug
+
+  coupon-app:
+    image: lomojiki/uber-msa-coupon-app
+    container_name: coupon-app
+    ports:
+      - "8092:8092"
+
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0

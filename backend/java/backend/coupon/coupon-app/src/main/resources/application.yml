@@ -7,7 +7,7 @@ spring:
   application:
     name: coupon-app
   data:
-    redis-server: redis://localhost:6379
+    redis-server: redis://coupon-redis:6379
     jpa:
       repositories:
         enabled: false
@@ -26,9 +26,9 @@ retry-config:
 
 
 kafka-config:
-  bootstrap-servers: localhost:19092
+  bootstrap-servers: kafka-broker-1:19092
   schema-registry-url-key: schema.registry.url
-  schema-registry-url: http://localhost:8081
+  schema-registry-url: http://schema-registry:8081
   topic-names-to-create:
     - coupon-issue-request
   num-of-partitions: 3

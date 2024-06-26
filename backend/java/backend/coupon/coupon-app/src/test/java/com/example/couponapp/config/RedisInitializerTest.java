@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.redisson.Redisson;
 import org.redisson.api.RMapReactive;
 import org.redisson.api.RedissonReactiveClient;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
 import reactor.core.publisher.Mono;
 
@@ -34,7 +36,9 @@ public class RedisInitializerTest {
 
         Config config = new Config();
         config.useSingleServer().setAddress("redis://localhost:6379");
+        config.setCodec(StringCodec.INSTANCE); // Codec 설정 필수!
         redissonReactiveClient = Redisson.create(config).reactive();
+        redisInitializer = new RedisInitializer(redissonReactiveClient);
     }
 
     @AfterAll
@@ -56,11 +60,13 @@ public class RedisInitializerTest {
     @Test
     public void testRedisInitialization() {
         // Check if the data was inserted into Redis correctly
-        RMapReactive<String, String> couponInfoMap = redissonReactiveClient.getMap(COUPON_INFO_KEY.apply(1000000L));
+        RMapReactive<String, String> couponInfoMap = redissonReactiveClient
+            .getMap(COUPON_INFO_KEY.apply(1000000L));
         Mono<Map<String, String>> mapMono = couponInfoMap.readAllMap();
 
         Map<String, String> result = mapMono.block();
         assertThat(result).isNotNull();
+        assertThat(result.size()).isGreaterThan(0);
         assertThat(result.get("maxCount")).isEqualTo("1000");
 
         RMapReactive<String, String> couponInfoMap2 = redissonReactiveClient.getMap(COUPON_INFO_KEY.apply(2000000L));

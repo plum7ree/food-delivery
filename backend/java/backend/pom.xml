@@ -66,7 +66,7 @@
 
         <spring-kafka.version>3.2.0</spring-kafka.version>
         <spring-kafka-test.version>3.2.0</spring-kafka-test.version>
-        <apache-avro.version>1.11.2</apache-avro.version>
+        <apache-avro.version>1.11.3</apache-avro.version>
         <!-- apache kafka <-> confluent version dep: https://docs.confluent.io/platform/current/installation/versions-interoperability.html -->
         <confluent-kafka.version>7.5.0</confluent-kafka.version>
 

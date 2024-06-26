@@ -1,5 +1,6 @@
 package com.example.couponapp;
 
+import com.example.couponapp.config.RedisInitializer;
 import com.example.couponapp.dto.IssueRequestDto;
 import com.example.couponapp.dto.ResponseDto;
 import com.example.couponapp.utils.DockerComposeStarter;
@@ -7,6 +8,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonReactiveClient;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.config.Config;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -25,6 +30,9 @@ public class IntegrationTest {
     private static final String DOCKER_COMPOSE_FILE_PATH = ClassLoader.getSystemResource("docker-compose-test.yml").getPath();
 
     private static DockerComposeStarter dockerComposeStarter;
+
+    private static RedissonReactiveClient redissonReactiveClient;
+    private static RedisInitializer redisInitializer;
 
     @BeforeAll
     public static void setup() throws Exception {
@@ -45,7 +53,15 @@ public class IntegrationTest {
 //
 //        // Start your application services
 //        dockerComposeStarter.startServiceAndWaitForLog("coupon-service", "Started CouponServiceApplication", 5, TimeUnit.MINUTES);
-        dockerComposeStarter.startServiceAndWaitForLog("lomojiki/uber-msa-coupon-app", "Started CouponAppApplication", 5, TimeUnit.MINUTES);
+        dockerComposeStarter.startServiceAndWaitForLog("coupon-app", "Started CouponAppApplication", 5, TimeUnit.MINUTES);
+
+
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://localhost:6379");
+        config.setCodec(StringCodec.INSTANCE); // Codec 설정 필수!
+        redissonReactiveClient = Redisson.create(config).reactive();
+        redisInitializer = new RedisInitializer(redissonReactiveClient);
+
     }
 
     @AfterAll
@@ -56,46 +72,22 @@ public class IntegrationTest {
     }
 
     @BeforeEach
-    public void reInitData() throws InterruptedException, IOException {
-        initRedisData();
+    public void reInitData() throws Exception {
+        redisInitializer.initRedis().run();
     }
 
-    public boolean initRedisData() throws InterruptedException, IOException {
-        // Redis 초기화 스크립트 실행
-        String scriptPath = Objects.requireNonNull(getClass().getClassLoader().getResource("init_redis.sh")).getPath();
-        ProcessBuilder processBuilder = new ProcessBuilder(scriptPath);
-        processBuilder.redirectErrorStream(true);
-        Process process = processBuilder.start();
-
-        // 스크립트 실행 결과 출력
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        int exitCode = process.waitFor();
-        if (exitCode != 0) {
-            throw new RuntimeException("Failed to execute script. Exit code: " + exitCode);
-        }
-
-        System.out.println("초기 데이터가 Redis에 삽입되었습니다.");
-        return true;
-    }
 
     @Test
     public void testSomething() throws InterruptedException {
+        Thread.sleep(10000000);
         // Your test code here
         WebClient webClient = WebClient.builder()
             .baseUrl("http://localhost:8092")
             .build();
 
         IssueRequestDto issueRequestDto = new IssueRequestDto();
-        issueRequestDto.setUserId("1000000");
-        issueRequestDto.setCouponId(123L);
+        issueRequestDto.setUserId("testUser");
+        issueRequestDto.setCouponId(1000000L);
 
         Mono<ResponseEntity<ResponseDto>> response = webClient.post()
             .uri("/api/issue")
