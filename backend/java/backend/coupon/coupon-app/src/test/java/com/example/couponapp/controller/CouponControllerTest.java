@@ -14,7 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @WebFluxTest(CouponController.class)
 public class CouponControllerTest {
@@ -29,7 +29,7 @@ public class CouponControllerTest {
     private KafkaProducerService kafkaProducerService;
 
     @Test
-    public void testIssueEndpoint() {
+    public void givenEveryThingWorks_returnSuccess() {
         // Given
         IssueRequestDto requestDto = new IssueRequestDto();
         requestDto.setUserId("testUser");
@@ -38,7 +38,9 @@ public class CouponControllerTest {
         when(verificationService.checkLocalCache(any())).thenReturn(Mono.just(true));
         when(verificationService.checkPeriodAndTime(any())).thenReturn(Mono.just(true));
         when(verificationService.checkCouponInventory(any())).thenReturn(Mono.just(true));
-        when(verificationService.checkDuplicateIssue(any())).thenReturn(Mono.just(true));
+        when(verificationService.checkDuplicateIssue(any())).thenReturn(Mono.just(false));
+        when(verificationService.issueCouponToUser(any())).thenReturn(Mono.just(true));
+        doNothing().when(kafkaProducerService).sendCouponIssueRequest(any());
 
         // When & Then
         webTestClient.post()
@@ -52,16 +54,29 @@ public class CouponControllerTest {
                 assert responseDto.getStatus() == Status.SUCCESSFUL;
                 assert responseDto.getMessage().equals("Coupon issued successfully");
             });
+
+        // Verify that the required methods were called
+        verify(verificationService).checkLocalCache(any());
+        verify(verificationService).checkPeriodAndTime(any());
+        verify(verificationService).checkCouponInventory(any());
+        verify(verificationService).checkDuplicateIssue(any());
+        verify(verificationService).issueCouponToUser(any());
+        verify(kafkaProducerService).sendCouponIssueRequest(any());
     }
 
     @Test
-    public void testIssueEndpointWithInvalidLocalCache() {
+    public void givenDuplicatedIssueTrue_returnFails() {
         // Given
         IssueRequestDto requestDto = new IssueRequestDto();
         requestDto.setUserId("testUser");
         requestDto.setCouponId(123L);
 
-        when(verificationService.checkLocalCache(any())).thenReturn(Mono.just(false));
+        when(verificationService.checkLocalCache(any())).thenReturn(Mono.just(true));
+        when(verificationService.checkPeriodAndTime(any())).thenReturn(Mono.just(true));
+        when(verificationService.checkCouponInventory(any())).thenReturn(Mono.just(true));
+        when(verificationService.checkDuplicateIssue(any())).thenReturn(Mono.just(true));
+        when(verificationService.issueCouponToUser(any())).thenReturn(Mono.just(true));
+        doNothing().when(kafkaProducerService).sendCouponIssueRequest(any());
 
         // When & Then
         webTestClient.post()
@@ -73,7 +88,11 @@ public class CouponControllerTest {
             .expectBody(ResponseDto.class)
             .value(responseDto -> {
                 assert responseDto.getStatus() == Status.FAILED;
-                assert responseDto.getMessage().equals("Invalid local cache");
+                assert responseDto.getMessage().equals("Duplicate issue");
             });
+
+        verify(verificationService, never()).issueCouponToUser(any());
+        verify(kafkaProducerService, never()).sendCouponIssueRequest(any());
     }
+
 }

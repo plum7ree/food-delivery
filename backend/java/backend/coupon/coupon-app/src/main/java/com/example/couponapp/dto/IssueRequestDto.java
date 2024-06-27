@@ -7,4 +7,5 @@ public class IssueRequestDto {
     private String userId;
     private Long couponId;
 
+
 }

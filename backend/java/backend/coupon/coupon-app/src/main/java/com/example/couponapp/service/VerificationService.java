@@ -128,6 +128,7 @@ public class VerificationService {
         var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
         var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
         var couponLockKey = COUPON_LOCK_KEY.apply(couponId);
+        var userIssueKey = USER_COUPON_ISSUE_KEY.apply(userId, couponId);
 
         RLockReactive lock = redissonReactiveClient.getLock(couponLockKey);
         return lock.tryLock(10, TimeUnit.SECONDS)  // 1초 동안 락 획득 시도
@@ -141,8 +142,8 @@ public class VerificationService {
                             UnsignedLong maxCount = UnsignedLong.valueOf(row.get("maxCount"));
                             if (currentIssuedCount.compareTo(maxCount) < 0) {
                                 // issuedCount 증가
-                                return redissonReactiveClient.getBucket(couponCountKey)
-                                    .set(currentIssuedCount.plus(UnsignedLong.ONE).toString())
+                                return redissonReactiveClient.getBucket(couponCountKey).set(currentIssuedCount.plus(UnsignedLong.ONE).toString())
+                                    .then(redissonReactiveClient.<String>getBucket(userIssueKey).set("true"))
                                     .thenReturn(true);
                             } else {
                                 return Mono.just(false);
@@ -152,6 +153,10 @@ public class VerificationService {
                     return Mono.just(false); // 락 획득 실패 시 처리
                 }
             })
+            .doOnError(e -> {
+                log.error(e.getMessage());
+            })
+            .onErrorReturn(false)
             .doFinally(signalType -> lock.unlock());
     }
 

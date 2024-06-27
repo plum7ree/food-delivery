@@ -4,7 +4,9 @@ package com.example.couponapp.config;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.api.RedissonReactiveClient;
+import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.JsonJacksonCodec;
+import org.redisson.codec.CompositeCodec;
 import org.redisson.config.Config;
 import org.redisson.spring.data.connection.RedissonConnectionFactory;
 
@@ -23,7 +25,8 @@ public class RedissonConfig {
     public RedissonClient redissonClient() {
         Config config = new Config();
         config.useSingleServer().setAddress(RedisAddress);
-        config.setCodec(new JsonJacksonCodec());
+        StringCodec stringCodec = StringCodec.INSTANCE;
+        config.setCodec(stringCodec);
         return Redisson.create(config);
     }
 

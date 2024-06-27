@@ -29,34 +29,43 @@ public class CouponController {
         log.info("got request: {}", issueRequestDto);
         return verificationService.checkLocalCache(issueRequestDto)
             .flatMap(isValid -> {
-                if (!Boolean.TRUE.equals(isValid)) {
-                    return Mono.just(ResponseEntity.badRequest().body(new ResponseDto(Status.FAILED, "Invalid local cache")));
+                if (Boolean.TRUE.equals(isValid)) {
+                    return verificationService.checkPeriodAndTime(issueRequestDto);
+                } else {
+                    return Mono.error(new IllegalArgumentException("Invalid local cache"));
                 }
-                return verificationService.checkPeriodAndTime(issueRequestDto);
             })
             .flatMap(isValid -> {
-                if (!Boolean.TRUE.equals(isValid)) {
-                    return Mono.just(ResponseEntity.badRequest().body(new ResponseDto(Status.FAILED, "Invalid period or time")));
+                if (Boolean.TRUE.equals(isValid)) {
+                    return verificationService.checkCouponInventory(issueRequestDto);
+                } else {
+                    return Mono.error(new IllegalArgumentException("Invalid period or time"));
                 }
-                return verificationService.checkCouponInventory(issueRequestDto);
             })
             .flatMap(isValid -> {
-                if (!Boolean.TRUE.equals(isValid)) {
-                    return Mono.just(ResponseEntity.badRequest().body(new ResponseDto(Status.FAILED, "Insufficient inventory")));
+                if (Boolean.TRUE.equals(isValid)) {
+                    return verificationService.checkDuplicateIssue(issueRequestDto);
+                } else {
+                    return Mono.error(new IllegalArgumentException("Insufficient inventory"));
                 }
-                return verificationService.checkDuplicateIssue(issueRequestDto);
             })
             .flatMap(isDuplicate -> {
-                if (Boolean.TRUE.equals(isDuplicate)) {
-                    return Mono.just(ResponseEntity.badRequest().body(new ResponseDto(Status.FAILED, "Duplicate issue")));
+                if (Boolean.FALSE.equals(isDuplicate)) {
+                    return verificationService.issueCouponToUser(issueRequestDto);
+                } else {
+                    return Mono.error(new IllegalArgumentException("Duplicate issue"));
+                }
+            })
+            .flatMap(isIssueSuccessful -> {
+                if (Boolean.FALSE.equals(isIssueSuccessful)) {
+                    return Mono.error(new IllegalArgumentException("Coupon issued error"));
                 }
                 kafkaProducerService.sendCouponIssueRequest(issueRequestDto);
-
                 return Mono.just(ResponseEntity.ok(new ResponseDto(Status.SUCCESSFUL, "Coupon issued successfully")));
             })
             .onErrorResume(e -> {
-                // 에러 발생 시 에러 응답 반환
-                return Mono.just(ResponseEntity.status(500).body(new ResponseDto(Status.FAILED, "Internal server error: " + e.getMessage())));
+                String errorMessage = e instanceof IllegalArgumentException ? e.getMessage() : "Internal server error: " + e.getMessage();
+                return Mono.just(ResponseEntity.badRequest().body(new ResponseDto(Status.FAILED, errorMessage)));
             });
     }
 }

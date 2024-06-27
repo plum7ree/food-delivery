@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.example.couponapp.service.VerificationService.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class VerificationServiceTest {
@@ -31,7 +32,10 @@ class VerificationServiceTest {
     private RMapReactive<String, String> rMapMock;
 
     @Mock
-    private RBucketReactive<String> rBucketMock;
+    private RBucketReactive<String> rIssueCountBucketMock;
+
+    @Mock
+    private RBucketReactive<String> rUserIssuedBucketMock;
 
     @Mock
     private RLockReactive rLockMock;
@@ -111,8 +115,8 @@ class VerificationServiceTest {
         requestDto.setUserId("1000000");
         requestDto.setCouponId(couponId);
 
-        when(rBucketMock.get()).thenReturn(Mono.just("0"));
-        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.just("0"));
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rIssueCountBucketMock);
 
         when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
             Set.of(
@@ -142,8 +146,8 @@ class VerificationServiceTest {
         requestDto.setUserId("1000000");
         requestDto.setCouponId(couponId);
 
-        when(rBucketMock.get()).thenReturn(Mono.just("100"));
-        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.just("100"));
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rIssueCountBucketMock);
 
         when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
             Set.of(
@@ -164,7 +168,7 @@ class VerificationServiceTest {
     }
 
     @Test
-    void givenCheckDuplicateIssue_ShouldReturnTrue_WhenUserHasNotIssuedCoupon() {
+    void givenCheckDuplicateIssue_ShouldReturnFalse_WhenUserHasNotIssuedCoupon() {
         var couponId = 1000000L;
         var userId = "testUser";
         var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
@@ -176,8 +180,8 @@ class VerificationServiceTest {
         issueRequestDto.setCouponId(couponId);
 
 
-        when(rBucketMock.get()).thenReturn(Mono.empty());
-        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rBucketMock);
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rIssueCountBucketMock);
 
 
         // Act
@@ -192,7 +196,7 @@ class VerificationServiceTest {
     }
 
     @Test
-    void givenCheckDuplicateIssue_ShouldReturnFalse_WhenUserAlreadyHasIssuedCoupon() {
+    void givenCheckDuplicateIssue_ShouldReturnTrue_WhenUserAlreadyHasIssuedCoupon() {
         var couponId = 1000000L;
         var userId = "testUser";
         var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
@@ -204,8 +208,8 @@ class VerificationServiceTest {
         issueRequestDto.setCouponId(couponId);
 
 
-        when(rBucketMock.get()).thenReturn(Mono.just("true"));
-        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rBucketMock);
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.just("true"));
+        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rIssueCountBucketMock);
 
 
         // Act
@@ -220,7 +224,7 @@ class VerificationServiceTest {
     }
 
     @Test
-    void givenIssueCouponToUserReturn_shouldReturnTrue_whenIssuedCountLTMaxCount() {
+    void shouldIssueCouponToUserReturnTrue_whenIssuedCountLTMaxCount() {
         var couponId = 1000000L;
         var userId = "testUser";
         var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
@@ -236,7 +240,7 @@ class VerificationServiceTest {
 
         when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
             Set.of(
-                new AbstractMap.SimpleEntry<>("startDate", "2998-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("startDate", "2000-01-01T00:00:00"),
                 new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
                 new AbstractMap.SimpleEntry<>("maxCount", "100")
             )
@@ -246,15 +250,67 @@ class VerificationServiceTest {
         when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
         when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
 
-        when(rBucketMock.get()).thenReturn(Mono.just("0"));
-        when(rBucketMock.set("1")).thenReturn(Mono.empty());
-        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.just("0"));
+        when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rIssueCountBucketMock);
+
+        when(rUserIssuedBucketMock.set("true")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rUserIssuedBucketMock);
+
 
         verificationService.checkLocalCache(issueRequestDto).block();
         Mono<Boolean> result = verificationService.issueCouponToUser(issueRequestDto);
         StepVerifier.create(result)
             .expectNext(true)
             .verifyComplete();
+
+    }
+
+
+    @Test
+    void shouldUpdateIssueCountAndUserIssued_whenIssuedCountLTMaxCount() {
+        var couponId = 1000000L;
+        var userId = "testUser";
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var userCouponIssueKey = USER_COUPON_ISSUE_KEY.apply(userId, couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+        var couponLockKey = COUPON_LOCK_KEY.apply(couponId);
+
+        // Arrange
+        IssueRequestDto issueRequestDto = new IssueRequestDto();
+        issueRequestDto.setUserId(userId);
+        issueRequestDto.setCouponId(couponId);
+
+
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2000-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
+
+        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
+        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.just("0"));
+        when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rIssueCountBucketMock);
+
+        when(rUserIssuedBucketMock.set("true")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rUserIssuedBucketMock);
+
+
+        verificationService.checkLocalCache(issueRequestDto).block();
+        Mono<Boolean> result = verificationService.issueCouponToUser(issueRequestDto);
+        StepVerifier.create(result)
+            .expectNext(true)
+            .verifyComplete();
+
+        verify(rIssueCountBucketMock).set("1");
+        verify(rUserIssuedBucketMock).set("true");
+
     }
 
     @Test
@@ -284,9 +340,9 @@ class VerificationServiceTest {
         when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
         when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
 
-        when(rBucketMock.get()).thenReturn(Mono.just("100"));
-        when(rBucketMock.set("1")).thenReturn(Mono.empty());
-        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.just("100"));
+        when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rIssueCountBucketMock);
 
         verificationService.checkLocalCache(issueRequestDto).block();
         Mono<Boolean> result = verificationService.issueCouponToUser(issueRequestDto);
@@ -322,9 +378,9 @@ class VerificationServiceTest {
         when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(false));
         when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
 
-        when(rBucketMock.get()).thenReturn(Mono.just("0"));
-        when(rBucketMock.set("1")).thenReturn(Mono.empty());
-        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+        when(rIssueCountBucketMock.get()).thenReturn(Mono.just("0"));
+        when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rIssueCountBucketMock);
 
         verificationService.checkLocalCache(issueRequestDto).block();
         Mono<Boolean> result = verificationService.issueCouponToUser(issueRequestDto);

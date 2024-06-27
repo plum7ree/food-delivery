@@ -10,7 +10,11 @@ import org.redisson.api.RMapReactive;
 import org.redisson.api.RedissonReactiveClient;
 import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.JsonJacksonCodec;
-import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
@@ -19,12 +23,19 @@ import java.util.concurrent.TimeUnit;
 import static com.example.couponapp.service.VerificationService.COUPON_INFO_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
+@ContextConfiguration(classes = {RedissonConfig.class, RedisInitializer.class})
+@TestPropertySource(properties = {"spring.data.redis-server=redis://localhost:6379"})
 public class RedisInitializerTest {
 
     private static final String DOCKER_COMPOSE_FILE_PATH = ClassLoader.getSystemResource("docker-compose-test.yml").getPath();
     private static DockerComposeStarter dockerComposeStarter;
-    private static RedissonReactiveClient redissonReactiveClient;
-    private static RedisInitializer redisInitializer;
+
+    @Autowired
+    private RedissonReactiveClient redissonReactiveClient;
+
+    @Autowired
+    private RedisInitializer redisInitializer;
 
     @BeforeAll
     public static void globalSetup() throws Exception {
@@ -32,13 +43,6 @@ public class RedisInitializerTest {
         dockerComposeStarter = new DockerComposeStarter(DOCKER_COMPOSE_FILE_PATH);
         dockerComposeStarter.startServiceAndWaitForLog("coupon-redis", ".*Ready to accept connections.*", 5, TimeUnit.MINUTES);
 
-        // RedisInitializer 인스턴스 생성
-
-        Config config = new Config();
-        config.useSingleServer().setAddress("redis://localhost:6379");
-        config.setCodec(StringCodec.INSTANCE); // Codec 설정 필수!
-        redissonReactiveClient = Redisson.create(config).reactive();
-        redisInitializer = new RedisInitializer(redissonReactiveClient);
     }
 
     @AfterAll
@@ -46,15 +50,12 @@ public class RedisInitializerTest {
         if (dockerComposeStarter != null) {
             dockerComposeStarter.stopAllServices();
         }
-        if (redissonReactiveClient != null) {
-            redissonReactiveClient.shutdown();
-        }
     }
 
     @BeforeEach
     public void setup() throws Exception {
         // Run the initRedis function
-        redisInitializer.initRedis().run();
+//        redisInitializer.initRedis().run();
     }
 
     @Test
