@@ -30,8 +30,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
-    volumes:
-      - "./volumes/kafka/broker-1:/var/lib/kafka/data"
+#    volumes:
+#      - "./volumes/kafka/broker-1:/var/lib/kafka/data"
     networks:
       - ${GLOBAL_NETWORK:-kafka}
   kafka-broker-2:
@@ -47,8 +47,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
-    volumes:
-      - "./volumes/kafka/broker-2:/var/lib/kafka/data"
+#    volumes:
+#      - "./volumes/kafka/broker-2:/var/lib/kafka/data"
     networks:
       - ${GLOBAL_NETWORK:-kafka}
   kafka-broker-3:
@@ -64,8 +64,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
-    volumes:
-      - "./volumes/kafka/broker-3:/var/lib/kafka/data"
+#    volumes:
+#      - "./volumes/kafka/broker-3:/var/lib/kafka/data"
     networks:
       - ${GLOBAL_NETWORK:-kafka}
   # debezium connector

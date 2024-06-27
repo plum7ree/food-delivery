@@ -1,25 +1,23 @@
 package com.example.couponapp.service;
 
 import com.example.couponapp.dto.IssueRequestDto;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.redisson.api.RBucketReactive;
+import org.redisson.api.RLockReactive;
 import org.redisson.api.RMapReactive;
 import org.redisson.api.RedissonReactiveClient;
-import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import java.util.HashMap;
+import java.util.AbstractMap;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import static com.example.couponapp.service.VerificationService.COUPON_COUNT_KEY;
-import static com.example.couponapp.service.VerificationService.COUPON_INFO_KEY;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static com.example.couponapp.service.VerificationService.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 class VerificationServiceTest {
@@ -30,29 +28,19 @@ class VerificationServiceTest {
     private RedissonReactiveClient redissonReactiveClient;
 
     @Mock
-    private RMapReactive<String, String> couponStaticInfoMap;
+    private RMapReactive<String, String> rMapMock;
 
     @Mock
-    private RBucketReactive<String> couponIssueCountBucket;
+    private RBucketReactive<String> rBucketMock;
+
+    @Mock
+    private RLockReactive rLockMock;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
         verificationService = new VerificationService(redissonReactiveClient);
-
-        when(redissonReactiveClient.<String, String>getMap(anyString())).thenReturn(couponStaticInfoMap);
-        when(redissonReactiveClient.<String>getBucket(anyString())).thenReturn(couponIssueCountBucket);
-
-        var couponId = 1000000L;
-        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
-        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
-
-        Table<String, String, String> localCache = HashBasedTable.create();
-        localCache.put(couponInfoKey, "startDate", "1900-01-01T00:00:00");
-        localCache.put(couponInfoKey, "endDate", "2100-12-31T23:59:59");
-
-        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCache);
 
     }
 
@@ -67,9 +55,22 @@ class VerificationServiceTest {
         requestDto.setUserId("1000000");
         requestDto.setCouponId(couponId);
 
-        boolean result = verificationService.checkPeriodAndTime(requestDto).block();
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2000-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        assertTrue(result);
+        boolean localCacheCheck = verificationService.checkLocalCache(requestDto).block();
+        assertTrue(localCacheCheck);
+
+        var periodCheck = verificationService.checkPeriodAndTime(requestDto);
+        StepVerifier.create(periodCheck)
+            .expectNext(true)
+            .verifyComplete();
     }
 
     @Test
@@ -82,15 +83,22 @@ class VerificationServiceTest {
         requestDto.setUserId("1000000");
         requestDto.setCouponId(couponId);
 
-        Table<String, String, String> localCache = HashBasedTable.create();
-        localCache.put(couponInfoKey, "startDate", "2925-01-01T00:00:00");
-        localCache.put(couponInfoKey, "endDate", "2925-12-31T23:59:59");
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2998-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCache);
+        boolean localCacheCheck = verificationService.checkLocalCache(requestDto).block();
+        assertTrue(localCacheCheck);
 
-        boolean result = verificationService.checkPeriodAndTime(requestDto).block();
-
-        assertFalse(result);
+        var periodCheck = verificationService.checkPeriodAndTime(requestDto);
+        StepVerifier.create(periodCheck)
+            .expectNext(false)
+            .verifyComplete();
     }
 
     @Test
@@ -103,18 +111,25 @@ class VerificationServiceTest {
         requestDto.setUserId("1000000");
         requestDto.setCouponId(couponId);
 
-        Table<String, String, String> localCouponStaticInfoCache = HashBasedTable.create();
-        HashMap<String, String> localCouponIssueCountCache = new HashMap<>();
+        when(rBucketMock.get()).thenReturn(Mono.just("0"));
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
 
-        localCouponStaticInfoCache.put(couponInfoKey, "maxCount", "10");
-        when(couponIssueCountBucket.get()).thenReturn(Mono.just("9"));
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2000-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCouponStaticInfoCache);
+        boolean localCacheCheck = verificationService.checkLocalCache(requestDto).block();
+        assertTrue(localCacheCheck);
 
-
-        boolean result = verificationService.checkCouponInventory(requestDto).block();
-
-        assertTrue(result);
+        var result = verificationService.checkCouponInventory(requestDto);
+        StepVerifier.create(result)
+            .expectNext(true)
+            .verifyComplete();
     }
 
     @Test
@@ -127,17 +142,194 @@ class VerificationServiceTest {
         requestDto.setUserId("1000000");
         requestDto.setCouponId(couponId);
 
-        Table<String, String, String> localCouponStaticInfoCache = HashBasedTable.create();
-        HashMap<String, String> localCouponIssueCountCache = new HashMap<>();
+        when(rBucketMock.get()).thenReturn(Mono.just("100"));
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
 
-        localCouponStaticInfoCache.put(couponInfoKey, "maxCount", "10");
-        when(couponIssueCountBucket.get()).thenReturn(Mono.just("10"));
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2000-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        ReflectionTestUtils.setField(verificationService, "localCouponStaticInfoCache", localCouponStaticInfoCache);
+        boolean localCacheCheck = verificationService.checkLocalCache(requestDto).block();
+        assertTrue(localCacheCheck);
+
+        var result = verificationService.checkCouponInventory(requestDto);
+        StepVerifier.create(result)
+            .expectNext(false)
+            .verifyComplete();
+    }
+
+    @Test
+    void givenCheckDuplicateIssue_ShouldReturnTrue_WhenUserHasNotIssuedCoupon() {
+        var couponId = 1000000L;
+        var userId = "testUser";
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var userCouponIssueKey = USER_COUPON_ISSUE_KEY.apply(userId, couponId);
+
+        // Arrange
+        IssueRequestDto issueRequestDto = new IssueRequestDto();
+        issueRequestDto.setUserId(userId);
+        issueRequestDto.setCouponId(couponId);
 
 
-        boolean result = verificationService.checkCouponInventory(requestDto).block();
+        when(rBucketMock.get()).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rBucketMock);
 
-        assertFalse(result);
+
+        // Act
+        Mono<Boolean> result = verificationService.checkDuplicateIssue(issueRequestDto);
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
+
+        // Assert
+        StepVerifier.create(result)
+            .expectNext(false)
+            .verifyComplete();
+
+    }
+
+    @Test
+    void givenCheckDuplicateIssue_ShouldReturnFalse_WhenUserAlreadyHasIssuedCoupon() {
+        var couponId = 1000000L;
+        var userId = "testUser";
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var userCouponIssueKey = USER_COUPON_ISSUE_KEY.apply(userId, couponId);
+
+        // Arrange
+        IssueRequestDto issueRequestDto = new IssueRequestDto();
+        issueRequestDto.setUserId(userId);
+        issueRequestDto.setCouponId(couponId);
+
+
+        when(rBucketMock.get()).thenReturn(Mono.just("true"));
+        when(redissonReactiveClient.<String>getBucket(userCouponIssueKey)).thenReturn(rBucketMock);
+
+
+        // Act
+        Mono<Boolean> result = verificationService.checkDuplicateIssue(issueRequestDto);
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
+
+        // Assert
+        StepVerifier.create(result)
+            .expectNext(true)
+            .verifyComplete();
+
+    }
+
+    @Test
+    void givenIssueCouponToUserReturn_shouldReturnTrue_whenIssuedCountLTMaxCount() {
+        var couponId = 1000000L;
+        var userId = "testUser";
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var userCouponIssueKey = USER_COUPON_ISSUE_KEY.apply(userId, couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+        var couponLockKey = COUPON_LOCK_KEY.apply(couponId);
+
+        // Arrange
+        IssueRequestDto issueRequestDto = new IssueRequestDto();
+        issueRequestDto.setUserId(userId);
+        issueRequestDto.setCouponId(couponId);
+
+
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2998-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
+
+        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
+        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+
+        when(rBucketMock.get()).thenReturn(Mono.just("0"));
+        when(rBucketMock.set("1")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+
+        verificationService.checkLocalCache(issueRequestDto).block();
+        Mono<Boolean> result = verificationService.issueCouponToUser(issueRequestDto);
+        StepVerifier.create(result)
+            .expectNext(true)
+            .verifyComplete();
+    }
+
+    @Test
+    public void givenIssueCouponToUserReturn_shouldReturnTrue_whenIssuedCountEQMaxCount() {
+        var couponId = 1000000L;
+        var userId = "testUser";
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var userCouponIssueKey = USER_COUPON_ISSUE_KEY.apply(userId, couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+        var couponLockKey = COUPON_LOCK_KEY.apply(couponId);
+
+        // Arrange
+        IssueRequestDto issueRequestDto = new IssueRequestDto();
+        issueRequestDto.setUserId(userId);
+        issueRequestDto.setCouponId(couponId);
+
+
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2998-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
+
+        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
+        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+
+        when(rBucketMock.get()).thenReturn(Mono.just("100"));
+        when(rBucketMock.set("1")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+
+        verificationService.checkLocalCache(issueRequestDto).block();
+        Mono<Boolean> result = verificationService.issueCouponToUser(issueRequestDto);
+        StepVerifier.create(result)
+            .expectNext(false)
+            .verifyComplete();
+    }
+
+    @Test
+    void givenIssueCouponToUserReturn_shouldReturnTrue_whenLockFailed() {
+        var couponId = 1000000L;
+        var userId = "testUser";
+        var couponInfoKey = COUPON_INFO_KEY.apply(couponId);
+        var userCouponIssueKey = USER_COUPON_ISSUE_KEY.apply(userId, couponId);
+        var couponCountKey = COUPON_COUNT_KEY.apply(couponId);
+        var couponLockKey = COUPON_LOCK_KEY.apply(couponId);
+
+        // Arrange
+        IssueRequestDto issueRequestDto = new IssueRequestDto();
+        issueRequestDto.setUserId(userId);
+        issueRequestDto.setCouponId(couponId);
+
+
+        when(rMapMock.readAllEntrySet()).thenReturn(Mono.just(
+            Set.of(
+                new AbstractMap.SimpleEntry<>("startDate", "2998-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("endDate", "2999-01-01T00:00:00"),
+                new AbstractMap.SimpleEntry<>("maxCount", "100")
+            )
+        ));
+        when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
+
+        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(false));
+        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+
+        when(rBucketMock.get()).thenReturn(Mono.just("0"));
+        when(rBucketMock.set("1")).thenReturn(Mono.empty());
+        when(redissonReactiveClient.<String>getBucket(couponCountKey)).thenReturn(rBucketMock);
+
+        verificationService.checkLocalCache(issueRequestDto).block();
+        Mono<Boolean> result = verificationService.issueCouponToUser(issueRequestDto);
+        StepVerifier.create(result)
+            .expectNext(false)
+            .verifyComplete();
     }
 }
