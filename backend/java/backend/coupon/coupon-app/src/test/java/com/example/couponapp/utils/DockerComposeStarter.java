@@ -34,6 +34,34 @@ public class DockerComposeStarter {
         }
     }
 
+    public void startAllServices() throws Exception {
+        ProcessBuilder processBuilder = new ProcessBuilder(
+            "docker-compose",
+            "-f", composeFile.getAbsolutePath(),
+            "up"
+        );
+
+        Process process = processBuilder.start();
+
+        Pattern pattern = Pattern.compile(".*"); // 모든 로그 출력
+        CompletableFuture<Boolean> stdoutFuture = readLogsAsync(process.getInputStream(), "STDOUT", pattern);
+        CompletableFuture<Boolean> stderrFuture = readLogsAsync(process.getErrorStream(), "STDERR", pattern);
+
+        CompletableFuture<Boolean> logFound = CompletableFuture.anyOf(stdoutFuture, stderrFuture)
+            .thenApply(result -> (Boolean) result);
+
+        try {
+            boolean found = logFound.get(5, TimeUnit.MINUTES);
+            if (!found) {
+                throw new RuntimeException("Timeout waiting for all services to start");
+            }
+            System.out.println("All services started successfully.");
+        } catch (Exception e) {
+            process.destroyForcibly();
+            throw e;
+        }
+    }
+
     public void startServiceAndWaitForLog(String serviceName, String logPattern, long timeout, TimeUnit unit) throws Exception {
         ProcessBuilder processBuilder = new ProcessBuilder(
             "docker-compose",
