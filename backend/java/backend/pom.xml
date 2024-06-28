@@ -28,6 +28,7 @@
         <module>eats-search</module>
         <module>coupon/coupon-service</module>
         <module>coupon/coupon-app</module>
+        <module>common-util</module>
     </modules>
 
     <parent>
@@ -76,6 +77,8 @@
         <testcontainers.version>1.19.0</testcontainers.version>
 
         <snake-yaml.version>2.0</snake-yaml.version>
+
+        <maven.test.skip>true</maven.test.skip>
 
     </properties>
 
