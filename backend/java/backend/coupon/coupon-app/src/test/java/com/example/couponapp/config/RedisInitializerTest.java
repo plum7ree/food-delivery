@@ -1,6 +1,6 @@
 package com.example.couponapp.config;
 
-import com.example.couponapp.utils.DockerComposeStarter;
+import com.example.commonutil.DockerComposeStarter;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

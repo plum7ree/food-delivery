@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("local")
 @AutoConfigureWebTestClient(timeout = "360000") //3600sec for debug
-public class IntegrationTestCustomDockerComposeStarter {
+public class IntegrationTestCustomDockerComposeStarterWithCouponServiceKafkaListener {
     private static final String DOCKER_COMPOSE_FILE_PATH = ClassLoader.getSystemResource("docker-compose-test.yml").getPath();
 
     private static DockerComposeStarter dockerComposeStarter;
@@ -52,6 +52,7 @@ public class IntegrationTestCustomDockerComposeStarter {
 
         // Start PostgreSQL
         try {
+            dockerComposeStarter.startServiceAndWaitForLog("coupon-db", ".*ready to accept connections.*", 5, TimeUnit.MINUTES);
             // Start Redis
             dockerComposeStarter.startServiceAndWaitForLog("coupon-redis", ".*Ready to accept connections.*", 5, TimeUnit.MINUTES);
 
@@ -65,6 +66,8 @@ public class IntegrationTestCustomDockerComposeStarter {
             dockerComposeStarter.startServiceAndWaitForLog("schema-registry", ".*Cluster ID.*", 5, TimeUnit.MINUTES);
 
             Thread.sleep(5000); // 충분히 켜지길 기다려야함... TODO 시그널 방식으로 어떻게 바꿀까?
+
+            dockerComposeStarter.startServiceAndWaitForLog("coupon-service", ".*Started CouponService.*", 5, TimeUnit.MINUTES);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

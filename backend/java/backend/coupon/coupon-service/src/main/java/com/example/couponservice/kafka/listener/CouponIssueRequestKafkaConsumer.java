@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import java.time.Duration;
 import java.util.*;
 
@@ -37,11 +38,15 @@ public class CouponIssueRequestKafkaConsumer {
     @Value("${topic-names.coupon-issue-request-topic-name}")
     private String topicName;
 
-    @Autowired
-    @Qualifier("commonKafkaConsumerConfigs") //WARNING. qualifier 는 map 으로 되어있으면, bean name 을 한번 key 로 등록시켜버림.
-    private final Map<String, Object> commonConsumerConfigs;
+    @Resource(name = "commonKafkaConsumerConfigs")
+    // bean 이 map 인 경우는 @Resource 를 사용해야한다. 안그러면 map of map 리 리턴되어서 이름으로 다시 찾아야함.
+    private Map<String, Object> commonConsumerConfigs;
 
-    public CouponIssueRequestKafkaConsumer(CouponRepository couponRepository, CouponIssueRepository couponIssueRepository, Map<String, Object> commonConsumerConfigs) {
+    @Autowired
+    public CouponIssueRequestKafkaConsumer(
+        CouponRepository couponRepository,
+        CouponIssueRepository couponIssueRepository,
+        Map<String, Object> commonConsumerConfigs) {
         this.couponRepository = couponRepository;
         this.couponIssueRepository = couponIssueRepository;
         this.commonConsumerConfigs = commonConsumerConfigs;
@@ -49,7 +54,7 @@ public class CouponIssueRequestKafkaConsumer {
 
     @PostConstruct
     public void init() {
-        Map<String, Object> props = (HashMap<String, Object>) commonConsumerConfigs.get("commonKafkaConsumerConfigs");
+        Map<String, Object> props = commonConsumerConfigs;
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         consumer = new KafkaConsumer<>(props);
         consumer.subscribe(Collections.singletonList(topicName));

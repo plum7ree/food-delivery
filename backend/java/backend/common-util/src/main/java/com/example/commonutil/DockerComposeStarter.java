@@ -1,4 +1,4 @@
-package com.example.couponapp.utils;
+package com.example.commonutil;
 
 import java.io.BufferedReader;
 import java.io.File;

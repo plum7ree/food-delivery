@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -467,11 +468,9 @@ public class ManualKafkaAndPostgresTestContainerApplicationTest {
     @RequiredArgsConstructor
     static class TestConfig {
 
-        @Autowired
-        @Qualifier("commonKafkaConsumerConfigs") //WARNING. qualifier 는 map 으로 되어있으면, bean name 을 한번 key 로 등록시켜버림.
+        @Resource(name = "commonKafkaConsumerConfigs") //WARNING. qualifier 는 map 으로 되어있으면, bean name 을 한번 key 로 등록시켜버림.
         private final Map<String, Object> commonConsumerConfigs;
 
-        @Autowired
         private final KafkaConsumerConfigData kafkaConsumerConfigData;
 
         @Value("${kafka-consumer-group-id.payment-consumer-group-id}")
@@ -479,7 +478,7 @@ public class ManualKafkaAndPostgresTestContainerApplicationTest {
 
         @Bean(name = "testKafkaListenerContainerFactory")
         public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory() {
-            Map<String, Object> props = (HashMap<String, Object>) commonConsumerConfigs.get("commonKafkaConsumerConfigs");
+            Map<String, Object> props = commonConsumerConfigs;
             props.keySet().forEach(log::info);
             props.put(ConsumerConfig.GROUP_ID_CONFIG, paymentConsumerGroupId);
             var consumerFactory = new DefaultKafkaConsumerFactory<>(props);
