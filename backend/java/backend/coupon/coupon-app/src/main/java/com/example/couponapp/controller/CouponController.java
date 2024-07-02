@@ -7,6 +7,7 @@ import com.example.couponapp.service.KafkaProducerService;
 import com.example.couponapp.service.VerificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -60,8 +61,16 @@ public class CouponController {
                 if (Boolean.FALSE.equals(isIssueSuccessful)) {
                     return Mono.error(new IllegalArgumentException("Coupon issued error"));
                 }
-                kafkaProducerService.sendCouponIssueRequest(issueRequestDto);
-                return Mono.just(ResponseEntity.ok(new ResponseDto(Status.SUCCESSFUL, "Coupon issued successfully")));
+                return kafkaProducerService.sendCouponIssueRequest(issueRequestDto);
+            })
+            .map(status -> {
+                if (status) {
+                    // Webflux 가 Mono 로 감쌈.
+                    return ResponseEntity.ok(new ResponseDto(Status.SUCCESSFUL, "Coupon issued successfully"));
+                } else {
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new ResponseDto(Status.FAILED, "Failed to process coupon issue"));
+                }
             })
             .onErrorResume(e -> {
                 String errorMessage = e instanceof IllegalArgumentException ? e.getMessage() : "Internal server error: " + e.getMessage();

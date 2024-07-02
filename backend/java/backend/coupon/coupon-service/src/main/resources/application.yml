@@ -26,6 +26,7 @@ spring:
     init:
       platform: postgres
       schema-locations: classpath:sql/postgresql/init-schema.sql
+      data-locations: classpath:sql/postgresql/init-data.sql
       mode: always
 
 retry-config:

@@ -22,20 +22,19 @@ public class KafkaAdminClient {
     private final AdminClient adminClient;
 
     public void createTopics() {
-//        CreateTopicsResult createTopicsResult;
-//        try {
-//            List<String> topicList = kafkaConfigData.getTopicNamesToCreate();
-//            List<NewTopic> newTopicList = topicList.stream().map(topic -> new NewTopic(
-//                    topic.trim(),
-//                    kafkaConfigData.getNumOfPartitions(),
-//                    // ReplicationFactor
-//                    kafkaConfigData.getReplicationFactor() // 토픽별 이부분 확인 해보자. INVALID_REPLICATION_FACTOR 에러뜨니깐
-//            )).toList(); // vs .collect(Collectors.toList())
-//            adminClient.createTopics(newTopicList);
-//
-//        } catch (Throwable t) {
-//            throw new KafkaException("Error on creating topics: ", t);
-//        }
+        CreateTopicsResult createTopicsResult;
+        try {
+            List<String> topicList = kafkaConfigData.getTopicNamesToCreate();
+            List<NewTopic> newTopicList = topicList.stream().map(topic -> new NewTopic(
+                topic.trim(),
+                kafkaConfigData.getNumOfPartitions(),
+                kafkaConfigData.getReplicationFactor()
+            )).toList();
+            adminClient.createTopics(newTopicList);
+
+        } catch (Throwable t) {
+            throw new KafkaException("Error on creating topics: ", t);
+        }
     }
 
 

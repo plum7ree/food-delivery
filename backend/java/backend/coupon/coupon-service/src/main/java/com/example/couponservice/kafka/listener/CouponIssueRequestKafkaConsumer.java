@@ -127,6 +127,9 @@ public class CouponIssueRequestKafkaConsumer {
             var coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new Exception("Coupon not found"));
             // 비즈니스 로직 수행
+            var issuedCount = coupon.getIssuedQuantity();
+            coupon.setIssuedQuantity(issuedCount + 1);
+            couponRepository.save(coupon);
         }
     }
 

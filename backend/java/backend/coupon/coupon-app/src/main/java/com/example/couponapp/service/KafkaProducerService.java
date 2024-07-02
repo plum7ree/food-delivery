@@ -6,6 +6,7 @@ import com.example.kafkaproducer.KafkaProducer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 
@@ -15,7 +16,7 @@ public class KafkaProducerService {
 
     private final KafkaProducer<String, CouponIssueRequestAvroModel> kafkaProducer;
 
-    public void sendCouponIssueRequest(IssueRequestDto issueRequestDto) {
+    public Mono<Boolean> sendCouponIssueRequest(IssueRequestDto issueRequestDto) {
         CouponIssueRequestAvroModel message = CouponIssueRequestAvroModel.newBuilder()
             .setIssueId(System.currentTimeMillis())  // 예제용 ID 생성
             .setCallerId("some-uuid-caller-id")  // 실제 데이터로 대체
@@ -24,8 +25,17 @@ public class KafkaProducerService {
             .setCreatedAt(Instant.ofEpochSecond(Instant.now().toEpochMilli()))
             .build();
 
-        kafkaProducer.send("coupon-issue-topic", "key", message);
+        return Mono.create(sink ->
+            kafkaProducer.sendAndRunCallbackOnAck("coupon-issue-topic", "key", message,
+                (metadata, exception) -> {
+                    if (exception == null) {
+                        sink.success(true);
+                    } else {
+                        sink.success(false);
+                    }
+                }
+            )
+        );
     }
-
 
 }

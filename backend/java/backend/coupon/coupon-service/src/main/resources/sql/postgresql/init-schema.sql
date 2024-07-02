@@ -32,6 +32,7 @@ create table "coupon".coupon_issue
     updated_at                    timestamp   not null default current_timestamp,
     check_related_issued_quantity boolean              default false
 );
+CREATE INDEX idx_coupon_issue_member_id ON "coupon".coupon_issue (member_id);
 
 -- Column comments
 COMMENT

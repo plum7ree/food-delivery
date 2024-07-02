@@ -2,12 +2,20 @@ package com.example.kafkaproducer;
 
 import com.example.kafka.admin.client.KafkaAdminClient;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
+import org.springframework.util.concurrent.ListenableFuture;
+import org.springframework.util.concurrent.ListenableFutureCallback;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 
 /**
  * To use this in a service A,
@@ -30,6 +38,39 @@ public class KafkaProducer<K, V> {
         kafkaTemplate.send(topicName, key, message);
     }
 
+    public void send(String topicName, K key, V message,
+                     BiConsumer<SendResult<K, V>, Throwable> callback) {
+        CompletableFuture<SendResult<K, V>> future = kafkaTemplate.send(topicName, key, message);
+        future.whenComplete(callback);
+    }
+
+
+    /**
+     * 메시지를 보내고 ack를 받았을 때 콜백을 실행하는 함수
+     *
+     * @param topicName Kafka 토픽 이름
+     * @param key       메시지 키
+     * @param message   메시지 내용
+     * @param callback  ack 수신 후 실행될 콜백 함수
+     *                  TODO OOM 방지 backpressure 기능 추가.
+     */
+    public void sendAndRunCallbackOnAck(String topicName, K key, V message,
+                                        BiConsumer<RecordMetadata, Exception> callback) {
+        ProducerRecord<K, V> record = new ProducerRecord<>(topicName, key, message);
+
+        CompletableFuture<SendResult<K, V>> future = kafkaTemplate.send(record);
+
+        future.whenComplete((result, exception) -> {
+            if (exception == null) {
+                // 성공적으로 ack를 받았을 때
+                RecordMetadata metadata = result.getRecordMetadata();
+                callback.accept(metadata, null);
+            } else {
+                // 에러 발생 시
+                callback.accept(null, new Exception("Failed to send message", exception));
+            }
+        });
+    }
     @EventListener
     public void OnAppStarted(ApplicationStartedEvent event) {
         log.info("Kafka Producer createTopics!");

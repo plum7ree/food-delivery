@@ -80,6 +80,8 @@
 
         <maven.test.skip>true</maven.test.skip>
 
+        <mock-server.version>5.11.2</mock-server.version>
+
     </properties>
 
     <repositories>
@@ -397,6 +399,18 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>toxiproxy</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mock-server</groupId>
+                <artifactId>mockserver-netty</artifactId>
+                <version>${mock-server.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.kafka</groupId>
                 <artifactId>spring-kafka-test</artifactId>
                 <version>${spring-kafka-test.version}</version>
@@ -435,6 +449,8 @@
                 <version>${project.version}</version>
             </dependency>
         </dependencies>
+
+
     </dependencyManagement>
 
 
