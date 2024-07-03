@@ -112,6 +112,15 @@ services:
     networks:
       - test-network
 
+  tcpdump:
+    image: nicolaka/netshoot
+    network_mode: "service:kafka-broker-1"
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+    command: [ "sh", "-c", "while true; do sleep 1000; done" ]
+
 networks:
   test-network:
     driver: bridge
