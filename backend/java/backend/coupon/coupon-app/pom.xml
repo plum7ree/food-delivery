@@ -6,11 +6,9 @@
         <artifactId>backend</artifactId>
         <groupId>com.example</groupId>
         <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>coupon-app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>coupon-app</name>
-    <description>coupon-app</description>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -145,6 +143,11 @@
             <artifactId>pcap4j-packetfactory-static</artifactId>
             <version>1.8.2</version>
         </dependency>
+        <dependency>
+            <groupId>io.gatling.highcharts</groupId>
+            <artifactId>gatling-charts-highcharts</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -173,7 +176,6 @@
                 </configuration>
 
             </plugin>
-
 
         </plugins>
     </build>

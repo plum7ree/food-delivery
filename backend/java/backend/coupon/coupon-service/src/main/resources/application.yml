@@ -39,9 +39,9 @@ retry-config:
 spring.kafka.listener.ack-mode: manual
 
 kafka-config:
-  bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
+  bootstrap-servers: kafka-broker-1:9092, kafka-broker-2:9092, kafka-broker-3:9092
   schema-registry-url-key: schema.registry.url
-  schema-registry-url: http://localhost:8081
+  schema-registry-url: http://schema-registry:8081
   topic-names-to-create:
     - coupon-issue-request
   num-of-partitions: 3

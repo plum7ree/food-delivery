@@ -82,6 +82,9 @@
 
         <mock-server.version>5.11.2</mock-server.version>
 
+        <gatling-maven-plugin.version>4.2.7</gatling-maven-plugin.version>
+        <gatling.version>3.8.4</gatling.version>
+
     </properties>
 
     <repositories>
@@ -417,6 +420,13 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>io.gatling.highcharts</groupId>
+                <artifactId>gatling-charts-highcharts</artifactId>
+                <version>${gatling.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snake-yaml.version}</version>
@@ -471,6 +481,11 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>io.gatling</groupId>
+                    <artifactId>gatling-maven-plugin</artifactId>
+                    <version>${gatling-maven-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

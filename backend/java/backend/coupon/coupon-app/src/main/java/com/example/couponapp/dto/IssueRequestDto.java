@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IssueRequestDto {
+    //TODO userId field should be removed. this value should be from spring security usercontext
     private String userId;
     private Long couponId;
 

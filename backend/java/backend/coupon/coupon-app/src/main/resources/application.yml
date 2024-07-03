@@ -26,7 +26,7 @@ retry-config:
 
 
 kafka-config:
-  bootstrap-servers: kafka-broker-1:19092
+  bootstrap-servers: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://schema-registry:8081
   topic-names-to-create:

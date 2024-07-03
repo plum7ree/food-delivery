@@ -97,7 +97,6 @@ public class VerificationService {
                 return Mono.justOrEmpty(localCouponStaticInfoCache.row(couponInfoKey))
                     .flatMap(row -> {
                         UnsignedLong maxCount = UnsignedLong.valueOf(row.get("maxCount"));
-                        // 분산 락 생성
                         if (issuedCount.compareTo(maxCount) < 0) {
                             return Mono.just(true);
                         }

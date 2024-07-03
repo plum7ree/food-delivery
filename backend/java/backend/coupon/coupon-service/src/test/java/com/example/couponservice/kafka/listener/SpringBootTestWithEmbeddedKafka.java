@@ -92,14 +92,14 @@ class SpringBootTestWithEmbeddedKafka {
         // Given
         var message = new CouponIssueRequestAvroModel();
         message.setCallerId(UUID.randomUUID().toString());
-        message.setCouponId(1L);
-        message.setIssueId(1L);
-        message.setAmount(1000);
+        message.setCouponId(1000000L);
+        message.setIssueId(1000000L);
+        message.setAmount(1L);
         message.setCreatedAt(Instant.from(ZonedDateTime.now()));
 
         // 첫 번째 메시지 처리 시 예외 발생
-        doThrow(new RuntimeException("Mocked Exception")).when(couponRepository).findById(1L);
-        doThrow(new RuntimeException("Mocked Exception")).when(couponIssueRepository).findById(1L);
+        doThrow(new RuntimeException("Mocked Exception")).when(couponRepository).findById(1000000L);
+        doThrow(new RuntimeException("Mocked Exception")).when(couponIssueRepository).findById(1000000L);
 
         // Send the first message to the topic
         kafkaTemplate.send(topicName, "partition-key", message).get();
@@ -121,17 +121,19 @@ class SpringBootTestWithEmbeddedKafka {
         // Given
         var message = new CouponIssueRequestAvroModel();
         message.setCallerId(UUID.randomUUID().toString());
-        message.setCouponId(1L);
-        message.setIssueId(1L);
-        message.setAmount(1000);
+        message.setCouponId(1000000L);
+        message.setIssueId(1000000L);
+        message.setAmount(1L);
         message.setCreatedAt(Instant.from(ZonedDateTime.now()));
 
         // 첫 번째 메시지 처리 시 예외 발생
 //        doThrow(new RuntimeException("Mocked Exception")).when(couponRepository).findById(1L);
 //        doThrow(new RuntimeException("Mocked Exception")).when(couponIssueRepository).findById(1L);
 //        // 두 번째 메시지 처리 시 예외 발생하지 않음
-        doReturn(Optional.of(new Coupon())).when(couponRepository).findById(1L);
-        doReturn(Optional.of(new CouponIssue())).when(couponIssueRepository).findById(1L);
+        var coupon = Coupon.builder().id(1000000L).issuedQuantity(1L).build();
+        var couponIssue = CouponIssue.builder().id(1000000L).build();
+        doReturn(Optional.of(coupon)).when(couponRepository).findById(1000000L);
+        doReturn(Optional.of(couponIssue)).when(couponIssueRepository).findById(1000000L);
 
         // Send the first message to the topic
         kafkaTemplate.send(topicName, "partition-key", message).get();
@@ -154,18 +156,18 @@ class SpringBootTestWithEmbeddedKafka {
         var message = new CouponIssueRequestAvroModel();
         message.setCallerId(UUID.randomUUID().toString());
         message.setCouponId(1000000L);
-        message.setIssueId(1L);
-        message.setAmount(1000);
+        message.setIssueId(1000000L);
+        message.setAmount(1L);
         message.setCreatedAt(Instant.from(ZonedDateTime.now()));
 
         Coupon mockCoupon = new Coupon();
-        mockCoupon.setId(1L);
+        mockCoupon.setId(1000000L);
         mockCoupon.setIssuedQuantity(0L);
         mockCoupon.setMaxQuantity(100L);
 
         // Mock repository responses
-        when(couponRepository.findById(1L)).thenReturn(Optional.of(mockCoupon));
-        when(couponIssueRepository.findById(1L)).thenReturn(Optional.empty());
+        when(couponRepository.findById(1000000L)).thenReturn(Optional.of(mockCoupon));
+        when(couponIssueRepository.findById(1000000L)).thenReturn(Optional.empty());
 
         // Send the message to the topic
         kafkaTemplate.send(topicName, "partition-key", message).get();

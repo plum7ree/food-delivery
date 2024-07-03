@@ -1,5 +1,6 @@
 package com.example.couponservice.kafka.listener;
 
+import com.example.couponservice.entity.CouponIssue;
 import com.example.couponservice.repository.CouponIssueRepository;
 import com.example.couponservice.repository.CouponRepository;
 import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
@@ -101,7 +102,7 @@ public class CouponIssueRequestKafkaConsumer {
         CommitChain commitChain = new CommitChain();
         commitChain
             .addCommand(new CommitCouponCommand(couponRepository, couponId))
-            .addCommand(new CommitCouponIssueCommand(couponIssueRepository, issueId));
+            .addCommand(new CommitCouponIssueCommand(couponIssueRepository, issueId, couponId));
 
         try {
             commitChain.execute();
@@ -125,7 +126,7 @@ public class CouponIssueRequestKafkaConsumer {
         @Override
         public void execute() throws Exception {
             var coupon = couponRepository.findById(couponId)
-                .orElseThrow(() -> new Exception("Coupon not found"));
+                .orElseThrow(() -> new Exception(String.format("Coupon %d not found", couponId)));
             // 비즈니스 로직 수행
             var issuedCount = coupon.getIssuedQuantity();
             coupon.setIssuedQuantity(issuedCount + 1);
@@ -138,12 +139,18 @@ public class CouponIssueRequestKafkaConsumer {
 
         private final CouponIssueRepository couponIssueRepository;
         private final Long issueId;
+        private final Long couponId;
 
         @Override
         public void execute() throws Exception {
-            var couponIssue = couponIssueRepository.findById(issueId)
-                .orElseThrow(() -> new Exception("Coupon Issue not found"));
+            CouponIssue couponIssue = CouponIssue.builder()
+                .id(issueId)
+                .couponId(couponId)
+                .build();
+
+
             // 비즈니스 로직 수행
+            couponIssueRepository.save(couponIssue);
         }
     }
 
