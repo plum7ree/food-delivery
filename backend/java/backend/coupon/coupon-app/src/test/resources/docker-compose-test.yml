@@ -74,6 +74,7 @@ services:
     networks:
       - test-network
 
+  # 주의: volume 설정하면 에러날 수 있음. 삭제하고 다시 실행해야하기 때문에 아예 포함 시키지 않음.
   kafka-broker-1:
     image: confluentinc/cp-kafka:7.3.0
     hostname: kafka-broker-1

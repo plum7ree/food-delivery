@@ -27,12 +27,12 @@ public class CouponController {
 
     @PostMapping("/issue")
     public Mono<ResponseEntity<ResponseDto>> issue(@RequestBody IssueRequestDto issueRequestDto) {
-        log.info("got request: {}", issueRequestDto);
         return verificationService.checkLocalCache(issueRequestDto)
             .flatMap(isValid -> {
                 if (Boolean.TRUE.equals(isValid)) {
                     return verificationService.checkPeriodAndTime(issueRequestDto);
                 } else {
+                    log.error("Invalid local cache: {}", issueRequestDto);
                     return Mono.error(new IllegalArgumentException("Invalid local cache"));
                 }
             })
@@ -40,6 +40,7 @@ public class CouponController {
                 if (Boolean.TRUE.equals(isValid)) {
                     return verificationService.checkCouponInventory(issueRequestDto);
                 } else {
+                    log.error("Invalid period or time: {}", issueRequestDto);
                     return Mono.error(new IllegalArgumentException("Invalid period or time"));
                 }
             })
@@ -47,6 +48,7 @@ public class CouponController {
                 if (Boolean.TRUE.equals(isValid)) {
                     return verificationService.checkDuplicateIssue(issueRequestDto);
                 } else {
+                    log.error("Insufficient coupon inventory: {}", issueRequestDto);
                     return Mono.error(new IllegalArgumentException("Insufficient inventory"));
                 }
             })
@@ -54,26 +56,30 @@ public class CouponController {
                 if (Boolean.FALSE.equals(isDuplicate)) {
                     return verificationService.issueCouponToUser(issueRequestDto);
                 } else {
+                    log.error("Duplicate coupon issue detected: {}", issueRequestDto);
                     return Mono.error(new IllegalArgumentException("Duplicate issue"));
                 }
             })
             .flatMap(isIssueSuccessful -> {
-                if (Boolean.FALSE.equals(isIssueSuccessful)) {
+                if (Boolean.TRUE.equals(isIssueSuccessful)) {
+                    return kafkaProducerService.sendCouponIssueRequest(issueRequestDto);
+                } else {
+                    log.error("Failed to issue coupon: {}", issueRequestDto);
                     return Mono.error(new IllegalArgumentException("Coupon issued error"));
                 }
-                return kafkaProducerService.sendCouponIssueRequest(issueRequestDto);
             })
             .map(status -> {
                 if (status) {
-                    // Webflux 가 Mono 로 감쌈.
                     return ResponseEntity.ok(new ResponseDto(Status.SUCCESSFUL, "Coupon issued successfully"));
                 } else {
+                    log.error("Failed to send coupon issue request to Kafka: {}", issueRequestDto);
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body(new ResponseDto(Status.FAILED, "Failed to process coupon issue"));
                 }
             })
             .onErrorResume(e -> {
                 String errorMessage = e instanceof IllegalArgumentException ? e.getMessage() : "Internal server error: " + e.getMessage();
+                log.error("Error processing coupon issue request: {}", errorMessage);
                 return Mono.just(ResponseEntity.badRequest().body(new ResponseDto(Status.FAILED, errorMessage)));
             });
     }

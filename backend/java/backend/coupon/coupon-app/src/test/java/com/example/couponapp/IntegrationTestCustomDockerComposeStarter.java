@@ -6,6 +6,9 @@ import com.example.couponapp.config.RedisInitializer;
 import com.example.couponapp.dto.IssueRequestDto;
 import com.example.couponapp.dto.ResponseDto;
 import com.example.couponapp.dto.Status;
+import io.gatling.javaapi.core.ScenarioBuilder;
+import io.gatling.javaapi.core.Simulation;
+import io.gatling.javaapi.http.HttpProtocolBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +24,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static io.gatling.javaapi.core.CoreDsl.*;
+import static io.gatling.javaapi.http.HttpDsl.http;
+import static io.gatling.javaapi.http.HttpDsl.status;
 
 //@WebFluxTest(CouponController.class)
 //@AutoConfigureWebTestClient
@@ -192,5 +202,95 @@ public class IntegrationTestCustomDockerComposeStarter {
             });
 
     }
+
+    @Test
+    public void singleClientAllRequests() throws InterruptedException {
+        int NUM_REQUESTS = 100; // Number of requests to send
+        ConcurrentLinkedQueue<Map<String, Object>> couponIssueFeeder = new ConcurrentLinkedQueue<>(
+            IntStream.range(0, NUM_REQUESTS)
+                .mapToObj(i -> {
+                    Map<String, Object> record = new HashMap<>();
+                    record.put("couponId", "1000000");
+                    record.put("userId", "123e4567-e89b-12d3-a456-" + String.format("%012d", i));
+                    return record;
+                })
+                .collect(Collectors.toList())
+        );
+
+        for (Map<String, Object> record : couponIssueFeeder) {
+            IssueRequestDto issueRequestDto = new IssueRequestDto();
+            issueRequestDto.setUserId((String) record.get("userId"));
+            issueRequestDto.setCouponId(Long.parseLong((String) record.get("couponId")));
+
+            webTestClient.post()
+                .uri("/api/issue")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(issueRequestDto)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ResponseDto.class)
+                .value(responseDto -> {
+                    assert responseDto.getStatus() == Status.SUCCESSFUL;
+                    assert responseDto.getMessage().equals("Coupon issued successfully");
+                });
+        }
+
+        // Redis verification code here, if needed
+    }
+
+    @Test
+    public void multiThreadedClientsAllRequests() throws InterruptedException, ExecutionException {
+        int NUM_REQUESTS = 100; // Number of requests to send
+        int NUM_THREADS = 10; // Number of concurrent threads
+        ExecutorService executorService = Executors.newFixedThreadPool(NUM_THREADS);
+
+        ConcurrentLinkedQueue<Map<String, Object>> couponIssueFeeder = new ConcurrentLinkedQueue<>(
+            IntStream.range(0, NUM_REQUESTS)
+                .mapToObj(i -> {
+                    Map<String, Object> record = new HashMap<>();
+                    record.put("couponId", "1000000");
+                    record.put("userId", "123e4567-e89b-12d3-a456-" + String.format("%012d", i));
+                    return record;
+                })
+                .collect(Collectors.toList())
+        );
+
+        List<Future<Void>> futures = new ArrayList<>();
+        for (int i = 0; i < NUM_THREADS; i++) {
+            futures.add(executorService.submit(() -> {
+                while (!couponIssueFeeder.isEmpty()) {
+                    Map<String, Object> record = couponIssueFeeder.poll();
+                    if (record != null) {
+                        IssueRequestDto issueRequestDto = new IssueRequestDto();
+                        issueRequestDto.setUserId((String) record.get("userId"));
+                        issueRequestDto.setCouponId(Long.parseLong((String) record.get("couponId")));
+
+                        webTestClient.post()
+                            .uri("/api/issue")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .bodyValue(issueRequestDto)
+                            .exchange()
+                            .expectStatus().isOk()
+                            .expectBody(ResponseDto.class)
+                            .value(responseDto -> {
+                                assert responseDto.getStatus() == Status.SUCCESSFUL;
+                                assert responseDto.getMessage().equals("Coupon issued successfully");
+                            });
+                    }
+                }
+                return null;
+            }));
+        }
+
+        for (Future<Void> future : futures) {
+            future.get(); // Wait for all threads to complete
+        }
+
+        executorService.shutdown();
+        executorService.awaitTermination(1, TimeUnit.MINUTES);
+
+        // Redis verification code here, if needed
+    }
+
 
 }

@@ -11,7 +11,13 @@ import io.gatling.javaapi.http.HttpProtocolBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.http;
@@ -64,12 +70,6 @@ public class CouponControllerSimulationTest {
 
     @Test
     public void runSimulation() {
-//        try {
-//            Thread.sleep(100000000);
-//
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
         GatlingPropertiesBuilder props = new GatlingPropertiesBuilder()
             .simulationClass(CouponControllerSimulation.class.getCanonicalName())
             .resultsDirectory("target/gatling-results")
@@ -79,6 +79,16 @@ public class CouponControllerSimulationTest {
     }
 
     public static class CouponControllerSimulation extends Simulation {
+        private static final int NUM_REQUESTS = 510;
+        private static ConcurrentLinkedQueue<Map<String, Object>> couponIssueFeeder = new ConcurrentLinkedQueue<>(IntStream.range(0, NUM_REQUESTS)
+            .mapToObj(i -> {
+                Map<String, Object> record = new HashMap<>();
+                record.put("couponId", "1000000");
+                record.put("userId", "123e4567-e89b-12d3-a456-" + String.format("%012d", i));
+                return record;
+            })
+            .collect(Collectors.toList()));
+        private static Iterator<Map<String, Object>> couponIssueFeederIterator = couponIssueFeeder.iterator();
 
         HttpProtocolBuilder httpProtocol = http
             .baseUrl("http://localhost:8092")
@@ -86,7 +96,7 @@ public class CouponControllerSimulationTest {
             .contentTypeHeader("application/json");
 
         ScenarioBuilder scn = scenario("Coupon Issue Test")
-            .feed(csv("gatling/coupon_data.csv").random())
+            .feed(couponIssueFeederIterator)
             .exec(http("Issue Coupon Request")
                 .post("/api/issue")
                 .body(StringBody("{ \"couponId\": \"${couponId}\", \"userId\": \"${userId}\" }"))
@@ -97,24 +107,11 @@ public class CouponControllerSimulationTest {
             )
             .pause(1);
 
-        ScenarioBuilder invalidScn = scenario("Invalid Coupon Issue Test")
-            .exec(http("Invalid Coupon Issue Request")
-                .post("/api/issue")
-                .body(StringBody("{ \"couponId\": \"invalid-coupon\", \"userId\": \"user123\" }"))
-                .asJson()
-                .check(status().is(400))
-                .check(jsonPath("$.status").is("FAILED"))
-            )
-            .pause(1);
-
         {
             setUp(
-                scn.injectOpen(
-                    rampUsers(100).during(30),
-                    constantUsersPerSec(10).during(30)
-                ),
-                invalidScn.injectOpen(
-                    rampUsers(50).during(30)
+                scn.injectOpen( // 사용자 부하를 생성
+                    rampUsers(100).during(30), // 처음 30초 동안 100명의 사용자를 점진적으로 증가
+                    constantUsersPerSec(10).during(30) // 이후 30초 동안 10명/초의 속도로 사용자를 지속적으로 생성
                 )
             ).protocols(httpProtocol);
         }

@@ -1,7 +1,8 @@
 server:
   port: 8092
 
-
+logging:
+  config: classpath:logback-spring.xml
 
 spring:
   application:
@@ -34,6 +35,7 @@ kafka-config:
   num-of-partitions: 3
   replication-factor: 3
 
+
 kafka-producer-config:
   key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
   value-serializer-class: io.confluent.kafka.serializers.KafkaAvroSerializer
@@ -44,3 +46,4 @@ kafka-producer-config:
   linger-ms: 5
   request-timeout-ms: 60000
   retry-count: 5
+  enable-idempotence: true

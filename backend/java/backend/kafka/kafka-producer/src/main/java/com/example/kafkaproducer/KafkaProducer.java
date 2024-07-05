@@ -4,6 +4,8 @@ import com.example.kafka.admin.client.KafkaAdminClient;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.errors.RetriableException;
+import org.apache.kafka.common.errors.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -58,15 +60,21 @@ public class KafkaProducer<K, V> {
                                         BiConsumer<RecordMetadata, Exception> callback) {
         ProducerRecord<K, V> record = new ProducerRecord<>(topicName, key, message);
 
+        log.info("sending message");
         CompletableFuture<SendResult<K, V>> future = kafkaTemplate.send(record);
 
         future.whenComplete((result, exception) -> {
             if (exception == null) {
                 // 성공적으로 ack를 받았을 때
                 RecordMetadata metadata = result.getRecordMetadata();
+                log.info("got ack");
                 callback.accept(metadata, null);
             } else {
                 // 에러 발생 시
+                if (exception instanceof TimeoutException) {
+                    callback.accept(null, new Exception("Timeout exception!", exception));
+                    return;
+                }
                 callback.accept(null, new Exception("Failed to send message", exception));
             }
         });

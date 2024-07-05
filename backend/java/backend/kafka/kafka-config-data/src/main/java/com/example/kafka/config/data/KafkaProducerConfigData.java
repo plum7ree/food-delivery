@@ -1,6 +1,7 @@
 package com.example.kafka.config.data;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,4 +18,6 @@ public class KafkaProducerConfigData {
     private Integer lingerMs;
     private Integer requestTimeoutMs;
     private Integer retryCount;
+    @Value("${enable-idempotence:true}")
+    private Boolean enableIdempotence;
 }

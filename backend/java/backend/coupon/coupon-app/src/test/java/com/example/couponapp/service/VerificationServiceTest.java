@@ -247,8 +247,8 @@ class VerificationServiceTest {
         ));
         when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
-        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+        when(rLockMock.tryLock(WAIT_TIME, LEASE_TIME, TIME_UNIT)).thenReturn(Mono.just(true));
+        when(redissonReactiveClient.<String>getFairLock(couponLockKey)).thenReturn(rLockMock);
 
         when(rIssueCountBucketMock.get()).thenReturn(Mono.just("0"));
         when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
@@ -291,8 +291,8 @@ class VerificationServiceTest {
         ));
         when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
-        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+        when(rLockMock.tryLock(WAIT_TIME, LEASE_TIME, TIME_UNIT)).thenReturn(Mono.just(true));
+        when(redissonReactiveClient.<String>getFairLock(couponLockKey)).thenReturn(rLockMock);
 
         when(rIssueCountBucketMock.get()).thenReturn(Mono.just("0"));
         when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
@@ -337,8 +337,8 @@ class VerificationServiceTest {
         ));
         when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(true));
-        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+        when(rLockMock.tryLock(WAIT_TIME, LEASE_TIME, TIME_UNIT)).thenReturn(Mono.just(true));
+        when(redissonReactiveClient.<String>getFairLock(couponLockKey)).thenReturn(rLockMock);
 
         when(rIssueCountBucketMock.get()).thenReturn(Mono.just("100"));
         when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
@@ -375,8 +375,8 @@ class VerificationServiceTest {
         ));
         when(redissonReactiveClient.<String, String>getMap(couponInfoKey)).thenReturn(rMapMock);
 
-        when(rLockMock.tryLock(10, TimeUnit.SECONDS)).thenReturn(Mono.just(false));
-        when(redissonReactiveClient.<String>getLock(couponLockKey)).thenReturn(rLockMock);
+        when(rLockMock.tryLock(WAIT_TIME, LEASE_TIME, TIME_UNIT)).thenReturn(Mono.just(false));
+        when(redissonReactiveClient.<String>getFairLock(couponLockKey)).thenReturn(rLockMock);
 
         when(rIssueCountBucketMock.get()).thenReturn(Mono.just("0"));
         when(rIssueCountBucketMock.set("1")).thenReturn(Mono.empty());
