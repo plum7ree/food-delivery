@@ -110,8 +110,7 @@ public class CouponControllerSimulationTest {
         {
             setUp(
                 scn.injectOpen( // 사용자 부하를 생성
-                    rampUsers(100).during(30), // 처음 30초 동안 100명의 사용자를 점진적으로 증가
-                    constantUsersPerSec(10).during(30) // 이후 30초 동안 10명/초의 속도로 사용자를 지속적으로 생성
+                    rampUsers(510).during(10)
                 )
             ).protocols(httpProtocol);
         }

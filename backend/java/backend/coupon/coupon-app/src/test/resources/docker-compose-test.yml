@@ -31,6 +31,8 @@ services:
       - "8092:8092"
     networks:
       - test-network
+    volumes:
+      - ./logs/coupon-app:/app/logs # 로그 파일 볼륨 마운트
 
   coupon-service:
     image: lomojiki/uber-msa-coupon-service
