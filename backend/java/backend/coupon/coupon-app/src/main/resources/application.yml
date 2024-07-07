@@ -3,6 +3,8 @@ server:
 
 logging:
   config: classpath:logback-spring.xml
+#  file:
+#    name: /app/logs/application.log # 이거 활성화 시켰을때 왜 local 프로파일만 사용하는 테스트가 이걸 참조할까?
 
 spring:
   application:
@@ -40,7 +42,7 @@ kafka-producer-config:
   key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
   value-serializer-class: io.confluent.kafka.serializers.KafkaAvroSerializer
   compression-type: snappy
-  acks: all
+  acks: 1
   batch-size: 16384
   batch-size-boost-factor: 100
   linger-ms: 5

@@ -25,8 +25,8 @@ import java.util.function.Function;
 @Slf4j
 public class VerificationService {
 
-    public final static Long WAIT_TIME = 1000L;
-    public final static Long LEASE_TIME = 2000L;
+    public final static Long WAIT_TIME = 500L;
+    public final static Long LEASE_TIME = 500L;
     public final static TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
     // coupon:%s:issue:info
@@ -173,7 +173,7 @@ public class VerificationService {
             .doFinally(signalType -> {
                 lock.isLocked().flatMap(locked -> {
                     if (locked) {
-                        log.info("unlock tid: {}", threadId);
+//                        log.info("unlock tid: {}", threadId);
                         return lock.unlock(threadId);
                     }
                     return Mono.just(null);

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -44,17 +43,23 @@ public class KafkaProducerService {
             .setAmount(1L)
             .setCreatedAt(Instant.ofEpochSecond(Instant.now().toEpochMilli()))
             .build();
-
         return Mono.create(sink ->
-            kafkaProducer.sendAndRunCallbackOnAck("coupon-issue-topic", "key", message,
+            kafkaProducer.sendAndRunCallback("coupon-issue-topic", "key", message,
                 (metadata, exception) -> {
                     if (exception == null) {
                         sink.success(true);
                     } else {
                         log.error("Failed to send message to Kafka, retrying...", exception);
-                        Mono.delay(Duration.ofMillis(RETRY_DELAY_MS))
-                            .then(retryMessagingWithFallback(issueRequestDto, retryCount + 1))
-                            .subscribe(sink::success, sink::error);
+                        //TODO 여기서 delay 를 줘버리면 bottleneck 이 발생하는것 아닌가?
+                        // redis 에서 이미 순서 보장을 다 했기때문에, 나중에 publish 되어도 된다.
+                        // Mono.fromRunnable(() -> retryMessagingWithFallback(issueRequestDto, retryCount + 1)
+                        //         .subscribe(
+                        //             result -> log.info("Retry succeeded: {}", result),
+                        //             error -> log.error("Retry failed", error)
+                        //         ))
+                        //     .subscribeOn(Schedulers.boundedElastic())
+                        //     .subscribe();
+                        sink.success(false);
                     }
                 }
             )

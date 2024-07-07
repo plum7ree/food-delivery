@@ -37,7 +37,7 @@ class KafkaProducerServiceMockTest {
             var callback = invocation.getArgument(3, BiConsumer.class);
             callback.accept(null, null);  // Simulate successful ACK
             return null;
-        }).when(kafkaProducer).sendAndRunCallbackOnAck(anyString(), anyString(), any(), any());
+        }).when(kafkaProducer).sendAndRunCallback(anyString(), anyString(), any(), any());
 
         // Act
         Mono<Boolean> result = kafkaProducerService.sendCouponIssueRequest(issueRequestDto);
@@ -57,7 +57,7 @@ class KafkaProducerServiceMockTest {
             var callback = invocation.getArgument(3, BiConsumer.class);
             callback.accept(null, new Exception("Kafka error"));  // Simulate ACK failure
             return null;
-        }).when(kafkaProducer).sendAndRunCallbackOnAck(anyString(), anyString(), any(), any());
+        }).when(kafkaProducer).sendAndRunCallback(anyString(), anyString(), any(), any());
 
         // Act
         Mono<Boolean> result = kafkaProducerService.sendCouponIssueRequest(issueRequestDto);

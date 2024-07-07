@@ -3,7 +3,7 @@ redis.call("FLUSHALL")
 
 -- 쿠폰 정보 설정
 -- success 테스트
-redis.call("HMSET", "coupon:1000000:issue:info", "startDate", "2000-01-01T00:00:00", "endDate", "2999-01-01T00:00:00", "maxCount", "500")
+redis.call("HMSET", "coupon:1000000:issue:info", "startDate", "2000-01-01T00:00:00", "endDate", "2999-01-01T00:00:00", "maxCount", "10000")
 -- 사용자에게 issue 이미 됬을때 테스트
 redis.call("HMSET", "coupon:2000000:issue:info", "startDate", "2000-01-01T00:00:00", "endDate", "2999-01-01T00:00:00", "maxCount", "500")
 -- count 다 찼을때 테스트

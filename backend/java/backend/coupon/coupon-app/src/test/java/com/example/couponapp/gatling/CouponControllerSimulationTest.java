@@ -69,17 +69,22 @@ public class CouponControllerSimulationTest {
     }
 
     @Test
-    public void runSimulation() {
+    public void runAllTest() {
+
         GatlingPropertiesBuilder props = new GatlingPropertiesBuilder()
             .simulationClass(CouponControllerSimulation.class.getCanonicalName())
             .resultsDirectory("target/gatling-results")
             .resourcesDirectory("src/test/resources");
-
         Gatling.fromMap(props.build());
     }
+    // smokeTest
+    // spikeTest
+    // stress test
+    // endurance test
+    // breakpoint test
 
     public static class CouponControllerSimulation extends Simulation {
-        private static final int NUM_REQUESTS = 510;
+        private static final int NUM_REQUESTS = Integer.MAX_VALUE;
         private static ConcurrentLinkedQueue<Map<String, Object>> couponIssueFeeder = new ConcurrentLinkedQueue<>(IntStream.range(0, NUM_REQUESTS)
             .mapToObj(i -> {
                 Map<String, Object> record = new HashMap<>();
@@ -106,13 +111,55 @@ public class CouponControllerSimulationTest {
                 .check(jsonPath("$.message").is("Coupon issued successfully"))
             )
             .pause(1);
+//        {
+//            setUp(
+//                scn.injectOpen(
+//                    atOnceUsers(1),
+//                    constantUsersPerSec(1).during(60) // 초당 1 명의 사용자를 60 초 동안 유지
+//                )
+//            ).protocols(httpProtocol);
+//        }
 
+        //        {
+//            setUp(
+//                scn2.injectOpen(
+//                    atOnceUsers(10), // 10명의 사용자를 한 번에 생성
+//                    constantUsersPerSec(10).during(60) // 초당 10 명의 사용자를 60 초 동안 유지
+//                )
+//            ).protocols(httpProtocol);
+//        }
+//
         {
             setUp(
-                scn.injectOpen( // 사용자 부하를 생성
-                    rampUsers(510).during(10)
+                scn.injectOpen(
+                    rampUsers(200).during(10), // 10초 동안 200명의 사용자를 점진적으로 증가
+                    constantUsersPerSec(200).during(60) // 이후 60초 동안 초당 200명의 사용자 유지
                 )
             ).protocols(httpProtocol);
         }
+//
+//        {
+//            setUp(
+//                scn.injectOpen(
+//                    rampUsers(1000).during(60) // 60초 동안 1000명의 사용자를 점진적으로 증가
+//                )
+//            ).protocols(httpProtocol);
+//        }
+//
+//        {
+//            setUp(
+//                scn.injectOpen(
+//                    constantUsersPerSec(100).during(3600) // 1시간 동안 초당 100명의 사용자 유지
+//                )
+//            ).protocols(httpProtocol);
+//        }
+//
+//        {
+//            setUp(
+//                scn.injectOpen(
+//                    constantUsersPerSec(100).during(3600) // 1시간 동안 초당 100명의 사용자 유지
+//                )
+//            ).protocols(httpProtocol);
+//        }
     }
 }
