@@ -14,6 +14,13 @@ spring:
         locator:
           enabled: false
           lowerCaseServiceId: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github.client-id: ${GITHUB_CLIENT_ID}
+          github.client-secret: ${GITHUB_CLIENT_SECRET}
+
 #    kubernetes:
 #      discovery:
 #        enabled: true
@@ -45,3 +52,4 @@ logging:
   level:
     com.example.gateway: INFO
     org.springframework.cloud.gateway: TRACE
+
