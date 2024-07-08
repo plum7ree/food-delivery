@@ -18,8 +18,16 @@ spring:
     oauth2:
       client:
         registration:
-          github.client-id: ${GITHUB_CLIENT_ID}
-          github.client-secret: ${GITHUB_CLIENT_SECRET}
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+      resourceserver:
+        jwt:
+          jwk-set-uri: "https://www.googleapis.com/oauth2/v3/cert"
+          issuer-uri: "https://accounts.google.com"
 
 #    kubernetes:
 #      discovery:
