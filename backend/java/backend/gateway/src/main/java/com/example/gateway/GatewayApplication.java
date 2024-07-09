@@ -53,6 +53,9 @@ public class GatewayApplication {
                         .uri("lb:ws://MONITORING"))
                 .route(p -> p.path("/sockjs/**")
                         .uri("lb://MONITORING"))
+            .route(p -> p.path("/**") // rest of the request into this server.
+                .filters(f -> f.addResponseHeader("X-Response-Time", LocalDateTime.now().toString()))
+                .uri("forward:/"))
                 .build();
 
     }

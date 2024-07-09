@@ -22,4 +22,5 @@ const profilePictureSlice = createSlice({
 
 export const {setProfilePictureUrl, setProfilePictureStatus, setProfilePictureError} = profilePictureSlice.actions;
 
-export default profilePictureSlice.reducer;
+export const profilePictureReducer = profilePictureSlice.reducer;
+export default profilePictureSlice;
