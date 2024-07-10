@@ -247,6 +247,7 @@ driver-service: 8078
 eatssearch: 8079
 schema-registry: 8081
 route(python): 8082
+login: 8083
 driver: 8090
 monitoring: 8091
 coupon-app: 8092

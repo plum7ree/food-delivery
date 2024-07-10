@@ -6,6 +6,7 @@
         <artifactId>backend</artifactId>
         <groupId>com.example</groupId>
         <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <artifactId>location-redis</artifactId>
     <properties>

@@ -46,6 +46,8 @@ public class SecurityConfig {
                     "/sockjs/**"
                 ).authenticated()
                 .pathMatchers(
+                    "/login",
+                    "/register",
                     "/contact",
                     "/register"
                 ).permitAll()

@@ -29,6 +29,7 @@
         <module>coupon/coupon-service</module>
         <module>coupon/coupon-app</module>
         <module>common-util</module>
+        <module>login</module>
     </modules>
 
     <parent>

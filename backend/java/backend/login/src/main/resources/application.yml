@@ -1,0 +1,94 @@
+server:
+  port: 8083
+
+aws:
+  s3:
+    bucket-name: ""
+
+spring:
+  application:
+    name: "login"
+  profiles:
+    active: native
+  autoconfigure:
+  #    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
+  config:
+    import: "optional:configserver:http://localhost:8071/" # For default and 'native' profile, config will be fetched from config server
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+  jpa:
+    hibernate.ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        default_schema: user_schema
+        use_sql_comments: true
+        format_sql: true
+  database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=user_schema&binaryTransfer=true&reWriteBatchedInserts=true
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+#  sql:
+#    init:
+#      #TODO: "mode: always + hibernate.ddl-auto: none" ? ???? ????? ????. hibernate.ddl-auto: none ? ??.
+#      mode: always
+#      platform: postgres
+#      schema-locations: classpath:init-schema.sql
+#      data-locations: classpath:init-data.sql
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    heath:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+#logging:
+#  level:
+#    org.springframework.context: DEBUG
+#    com.example: DEBUG
+#    org.hibernate.SQL: TRACE
+
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: TRACE
+#        type: TRACE
