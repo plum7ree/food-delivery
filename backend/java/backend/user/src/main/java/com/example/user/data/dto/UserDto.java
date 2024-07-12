@@ -11,14 +11,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDto {
-    private Long id;
+    private String id;
     private String email;
-
+    private String username;
+    private String profilePicUrl;
     @JsonIgnore
     private String password;
 
     @JsonIgnore
     private String role;
+
+    @JsonIgnore
+    private String oauth2Provider;
+    @JsonIgnore
+    private String oauth2Sub;
 
     // Getters and setters
 

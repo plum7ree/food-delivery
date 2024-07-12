@@ -23,7 +23,6 @@ public class Account {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -34,6 +33,9 @@ public class Account {
     @JsonIgnore
     private String role;
     // Getters and Setters
+
+    private String oauth2Provider;
+    private String oauth2Sub;
 
     // fetch Lazy restaurant + avoid N + 1?
     // or seperate into another table?

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
+
     @Override
     public Collection<GrantedAuthority> convert(Jwt source) {
         log.info(source.getClaims().toString());

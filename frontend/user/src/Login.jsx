@@ -1,7 +1,7 @@
 import React from "react";
 import {GoogleOAuthProvider, GoogleLogin} from "@react-oauth/google";
 import axios from "axios";
-import {login} from './state/authSlice';
+import {login, storeAuth} from './state/authSlice';
 import {useDispatch} from 'react-redux';
 import {useNavigate} from "react-router-dom";
 
@@ -12,13 +12,21 @@ const Login = () => {
       try {
          console.log("login successful")
          console.log(response)
-         const result = await axios.get("http://localhost:8080/user", {
+         dispatch(storeAuth({clientId: response.clientId, credential: response.credential}));
+         const result = await axios.get("http://localhost:8080/user/api/info", {
             headers: {
                Authorization: `Bearer ${response.credential}`,
             },
          });
-         dispatch(login(response));
-         navigate('/');
+         if (result.data.id === "") {
+            // id가 빈 문자열이면 /register로 리다이렉트
+            console.log(result)
+            navigate('/register');
+         } else {
+            // 그렇지 않으면 로그인 처리 후 홈으로 리다이렉트
+            dispatch(login({clientId: response.clientId, credential: response.credential}));
+            navigate('/');
+         }
       } catch (error) {
          console.error("Login failed:", error);
       }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {createHashRouter, createBrowserRouter, Link, RouterProvider, Navigate} from "react-router-dom";
 import "./styles.css";
 import UberLikeApp from "./UberLikeApp";
@@ -18,7 +18,7 @@ import {CheckoutFailPage} from "./eats/checkout/CheckoutFailPage";
 import RestaurantListFromSearch from "./eats/RestaurantListFromSearch";
 import {useSelector} from "react-redux";
 import Login from "./Login";
-import {getAuthToken} from "./eats/utils/auth";
+import Register from "./eats/Register";
 
 const IconContainer = styled(Box)({
    display: "flex",
@@ -47,35 +47,18 @@ const IconWrapper = styled(Box)({
    marginBottom: "10px",
 });
 const PrivateRoute = ({children}) => {
-   const [isAuthenticated, setIsAuthenticated] = useState(false);
-   const [isLoading, setIsLoading] = useState(true);
-
-   useEffect(() => {
-      const checkAuth = async () => {
-         const token = await getAuthToken();
-         setIsAuthenticated(!!token);
-         setIsLoading(false);
-
-         if (!token) {
-            // 인증되지 않은 경우 백엔드 서버로 리다이렉트
-            window.location.href = 'http://localhost:8083';
-         }
-      };
-      checkAuth();
-   }, []);
-
-   if (isLoading) {
-      return <div>Loading...</div>; // 또는 로딩 스피너 컴포넌트
-   }
-
-   return isAuthenticated ? children : null;
+   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+   return isLoggedIn ? children : <Navigate to="/login"/>;
 };
-
 
 const router = createBrowserRouter([
    {
       path: "/login",
       element: <Login/>,
+   },
+      {
+      path: "/register",
+      element: <Register/>,
    },
    {
       path: "/",

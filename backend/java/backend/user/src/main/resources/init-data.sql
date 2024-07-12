@@ -1,12 +1,15 @@
 -- Insert example data for users
-INSERT INTO account(id, username, password, email, role)
-VALUES ('13f0c8f0-eec0-4169-ad9f-e8bb408a5325', 'username1', 'password1', 'user1@example.com', 'ROLE_USER');
+INSERT INTO account(id, username, password, email, profile_pic_url, role, oauth2provider, oauth2sub)
+VALUES ('13f0c8f0-eec0-4169-ad9f-e8bb408a5325', 'username1', 'password1', 'user1@example.com', '', 'ROLE_USER',
+        'GOOGLE', '10000000000');
 
-INSERT INTO account(id, username, password, email, role)
-VALUES ('dafd9593-0027-42f6-981a-629216784217', 'username2', 'password2', 'user2@example.com', 'ROLE_ADMIN');
+INSERT INTO account(id, username, password, email, profile_pic_url, role, oauth2provider, oauth2sub)
+VALUES ('dafd9593-0027-42f6-981a-629216784217', 'username2', 'password2', 'user2@example.com', '', 'ROLE_ADMIN',
+        'GOOGLE', '10000000000');
 
-INSERT INTO account(id, username, password, email, role)
-VALUES ('10000000-0000-0000-0000-000000000000', 'username3', 'password2', 'user3@example.com', 'ROLE_ADMIN');
+INSERT INTO account(id, username, password, email, profile_pic_url, role, oauth2provider, oauth2sub)
+VALUES ('10000000-0000-0000-0000-000000000000', 'username3', 'password2', 'user3@example.com', '', 'ROLE_ADMIN',
+        'GOOGLE', '10000000000');
 
 
 -- Insert example data for BURGER restaurants

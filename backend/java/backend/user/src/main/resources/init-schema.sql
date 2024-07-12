@@ -10,9 +10,12 @@ CREATE TABLE user_schema.account
 (
     id       UUID PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
+    password        VARCHAR(255),
     email    VARCHAR(255) NOT NULL UNIQUE,
-    role     VARCHAR(255) NOT NULL
+    profile_pic_url character varying,
+    role            VARCHAR(255) NOT NULL,
+    oauth2provider  VARCHAR(255),
+    oauth2sub       VARCHAR(255)
 );
 
 -- restaurants type enum
