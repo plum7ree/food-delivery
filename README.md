@@ -77,19 +77,39 @@ data 수집
 - selenium web crawling
 
 쿠폰 발행
+- webflux
+  - [CouponController.java](backend/java/backend/coupon/coupon-app/src/main/java/com/example/couponapp/controller/CouponController.java)
+  - [VerficationService.java](backend/java/backend/coupon/coupon-app/src/main/java/com/example/couponapp/service/VerificationService.java)
+- reliable kafka, idempotence producer(`acks=1`, `enable-idempotence: true`)
+  - [application.yml](backend/java/backend/coupon/coupon-app/src/main/resources/application.yml)
+- rollback consumer (`enable-auto-commit: false`, manual kafka consumer's `commitSync`)
+  - [application.yml](backend/java/backend/coupon/coupon-service/src/main/resources/application.yml)
+  - [CouponIssueRequestKafkaConsumer](backend/java/backend/coupon/coupon-service/src/main/java/com/example/couponservice/kafka/listener/CouponIssueRequestKafkaConsumer.java)
+- redis 분산락 (`RLockReactive`)
+  - [VerficationService.java](backend/java/backend/coupon/coupon-app/src/main/java/com/example/couponapp/service/VerificationService.java)
 
-- reliable kafka, iphodempt producer
-- redis 분산락
 
 결제 시스템
 
 - outbox pattern, debezium
+  - [debezium docker](docker/kafka/postgres_debezium.yml)
+  - [debezium connector](docker/kafka/start-kafka-cluster.sh)
 - kafka
 
 ### Test
-
+- BDD
 - mocking (service, controller layer)
+  - example: [VerificationServiceTest.java](/backend/java/backend/coupon/coupon-app/src/test/java/com/example/couponapp/service/VerificationServiceTest.java)
 - test container
+  - docker compose util: [DockerComposeStarter.java](backend/java/backend/common-util/src/main/java/com/example/commonutil/DockerComposeStarter.java)
+    - customized docker compose runner
+    - run like:
+      - ```yaml
+            dockerComposeStarter.startServiceAndWaitForLog("kafka-broker-1", ".*started.*", 5, TimeUnit.MINUTES);
+            dockerComposeStarter.startServiceAndWaitForLog("kafka-broker-2", ".*started.*", 5, TimeUnit.MINUTES);
+            dockerComposeStarter.startServiceAndWaitForLog("kafka-broker-3", ".*started.*", 5, TimeUnit.MINUTES);
+          ```
+    - example: [CouponControllerSimulationTest.java](backend/java/backend/coupon/coupon-app/src/test/java/com/example/couponapp/gatling/CouponControllerSimulationTest.java)
 
 ### Infra
 
