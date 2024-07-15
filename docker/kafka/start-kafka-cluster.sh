@@ -73,7 +73,7 @@ curl --location --request POST 'localhost:8083/connectors' \
       "database.user": "postgres",
       "database.password": "admin",
       "database.dbname" : "postgres",
-      "database.server.name": "PostgreSQL-15",sc
+      "database.server.name": "PostgreSQL-15",
       "table.include.list": "payment-request",
       "topic.prefix": "",
       "tombstones.on.delete" : "false",
