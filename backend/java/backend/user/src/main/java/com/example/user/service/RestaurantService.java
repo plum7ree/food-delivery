@@ -118,7 +118,6 @@ public class RestaurantService {
 
         return id;
     }
-
     @Transactional
     public Optional<List<MenuDto>> findMenuByRestaurantId(String restaurantId) {
         return menuRepository.findByRestaurantId(restaurantId);

@@ -68,107 +68,39 @@
 
 - - -    
 
-- 레스토랑 등록, 검색, 주문
-- unit, integration 테스트
-- Selenium 구글 이미지 서치 크롤링 -> elastic search, postgresql 에 마이그레이션
+음식 검색
+
+- elastic search
+
+data 수집
+
+- selenium web crawling
+
+쿠폰 발행
+
+- reliable kafka, iphodempt producer
+- redis 분산락
+
+결제 시스템
+
+- outbox pattern, debezium
+- kafka
+
+### Test
+
+- mocking (service, controller layer)
+- test container
 
 ### Infra
 
+- oauth2, resource server
+- gateway filtering
+- config server
+- Eureka service discovery
 - Kubernetes, helm chart 로 마이크로 서비스 운영 및 배포
 
 <p><br></p>   
 
-### Taxi Call Service
-
-<p>
-<b>Overview</b>   
-</p>
-<img src="../../readme/overview.png" alt="drawing" width="600"/>
-<p><br></p>
-
-<p>
-<b>Driver Location Streaming</b>
-</p>
-<p>1. Data Flow</p>
-<img src="../../readme/driver-arch.png" alt="drawing" width="600"/>
-
-
-<p><br></p>
-
-2. Routing Algorithm
-
-- Contraction Hierarchy (CH)
-- Open Source: Graphhopper
-
-<img src="../../readme/ch.png" alt="drawing" width="300" />
-
-[Image Source](https://www.researchgate.net/figure/Illustrating-a-Contraction-Hierarchies-query_fig2_275279894)
-
-<p><br></p>
-
-<p>
-<b> Domain Driven Design, Payment SAGA pattern </b> 
-</p>
-<img src="../../readme/call-service-saga.png" alt="drawing" width="600"/>
-
-TODO
-
-1. Outbox pattern with Debezium, Optimistic lock
-2. Distributed Lock with 쿠폰 발급 시스템
-3. Rollback entire call request on too late response from driver or payment
-4. handle the duplicated different call request from a user
-
----  
-
-### Test Containers
-
-<b>important</b>   
-spring-test v6.1.2
-spring-boot-testcontainers
-
-```yaml
-            <spring-boot.version>3.1.3</spring-boot.version>
-            <spring-test.version>6.1.2</spring-test.version>
-            <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-dependencies</artifactId>
-            <version>${spring-boot.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-            </dependency>
-            <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring-test.version}</version>
-            </dependency>
-            <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-testcontainers</artifactId>
-            <version>${spring-boot.version}</version>
-            <scope>test</scope>
-            </dependency>
-```
-
-ref: https://github.com/testcontainers/testcontainers-java-spring-boot-quickstart/blob/main/build.gradle
-
-
----  
-
-### Simulation Test
-
-- Multiple number of drivers
-- Generated at Random Location
-- code: [DriverSimulatorTest.java](driver/src/test/java/com/example/driver/DriverSimulatorTest.java)
-
-### Realtime Monitoring View
-
-![Monitoring Drivers Web](../../readme/driver_simulation.gif)
-
-- [simple websocket frontend](backend/monitoring/src/main/resources/templates/index.html)
-- currently STOMP based
-- Todo: RabbitMQ
-
----
 
 ### kube node environment setting
 

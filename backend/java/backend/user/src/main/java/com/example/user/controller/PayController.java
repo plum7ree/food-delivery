@@ -41,7 +41,7 @@ public class PayController {
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
-        ;
+
         JSONObject obj = new JSONObject();
         obj.put("orderId", orderId);
         obj.put("amount", amount);
