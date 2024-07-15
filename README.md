@@ -25,13 +25,13 @@
     </tr>
     <tr>
         <td style="text-align: center;">    
-          <img src="../../readme/category2checkout.gif" alt="Category and Checkout" style="width:250px; height:350px" >
+          <img src="readme/category2checkout.gif" alt="Category and Checkout" style="width:250px; height:350px" >
         </td>
         <td style="text-align: center;">    
-          <img src="../../readme/search.gif" alt="Restaurant Search" style="width:250px; height:350px">
+          <img src="readme/search.gif" alt="Restaurant Search" style="width:250px; height:350px">
         </td>
         <td style="text-align: center;">  
-          <img src="../../readme/checkoutconfirm.gif" alt="Checkout Confirm" style="width:250px; height:350px">
+          <img src="readme/checkoutconfirm.gif" alt="Checkout Confirm" style="width:250px; height:350px">
         </td>
     </tr>
 </table>
@@ -43,10 +43,10 @@
     </tr>
     <tr>
         <td style="text-align: center;">    
-          <img src="../../readme/my_page.png" alt="Checkout Confirm" style="width:250px; height:350px">
+          <img src="readme/my_page.png" alt="Checkout Confirm" style="width:250px; height:350px">
         </td>
         <td style="text-align: center;">    
-            <img src="../../readme/restaurant_registration.png" alt="Checkout Confirm" style="width:250px; height:350px">
+            <img src="readme/restaurant_registration.png" alt="Checkout Confirm" style="width:250px; height:350px">
         </td>
         <td style="text-align: center;">    
         </td>
