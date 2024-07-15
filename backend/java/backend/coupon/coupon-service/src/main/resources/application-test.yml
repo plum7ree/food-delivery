@@ -1,0 +1,68 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: coupon-service
+
+  jpa:
+    database: h2
+    database-platform: org.hibernate.dialect.H2Dialect
+    generate-ddl: true
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      platform: postgres
+      schema-locations: classpath:sql/h2/init-schema.sql
+      mode: always
+  h2:
+    console:
+      enabled: true
+
+retry-config:
+  initial-interval-ms: 1000
+  max-interval-ms: 10000
+  multiplier: 2.0
+  maxAttempts: 3
+  sleep-time-ms: 2000
+
+
+
+kafka-config:
+  bootstrap-servers: localhost:49092 # EmbeddedKafka so @DynamicPropertySource
+  schema-registry-url-key: schema.registry.url
+  schema-registry-url: mock://test-uri
+  topic-names-to-create:
+    - coupon-issue-request
+  num-of-partitions: 3
+  replication-factor: 3
+
+
+kafka-consumer-config:
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+  auto-offset-reset: earliest
+  specific-avro-reader-key: specific.avro.reader
+  specific-avro-reader: true
+  batch-listener: true
+  auto-startup: false
+  concurrency-level: 3
+  session-timeout-ms: 10000
+  heartbeat-interval-ms: 3000
+  max-poll-interval-ms: 300000
+  max-poll-records: 500
+  max-partition-fetch-bytes-default: 1048576
+  max-partition-fetch-bytes-boost-factor: 1
+  poll-timeout-ms: 150
+  enable-auto-commit: false # important!
+  ack-mode: MANUAL # https://docs.spring.io/spring-kafka/reference/kafka/receiving-messages/message-listener-container.html#committing-offsets
+
+topic-names:
+  coupon-issue-request-topic-name: coupon-issue-request
+
+kafka-consumer-group-id:
+  coupon-issue-request-consumer-group-id: coupon-issue-request-topic-consumer-group-id
+
+kafka-listener-id: coupon-issue-request-listener

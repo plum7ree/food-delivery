@@ -1,0 +1,77 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: coupon-service
+
+  jpa:
+    hibernate.ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+
+  datasource:
+    # currentSchema: call
+    # binaryTransfer
+    # reWriteBatchedInserts: batch optimization
+    #TODO CQRS possible with replica DB? access conflict with user micro service?
+    url: jdbc:postgresql://coupon-db:5432/postgres?currentSchema=coupon&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      platform: postgres
+      schema-locations: classpath:sql/postgresql/init-schema.sql
+      data-locations: classpath:sql/postgresql/init-data.sql
+      mode: always
+
+retry-config:
+  initial-interval-ms: 1000
+  max-interval-ms: 10000
+  multiplier: 2.0
+  maxAttempts: 3
+  sleep-time-ms: 2000
+
+spring.kafka.listener.ack-mode: manual
+
+kafka-config:
+  bootstrap-servers: kafka-broker-1:9092, kafka-broker-2:9092, kafka-broker-3:9092
+  schema-registry-url-key: schema.registry.url
+  schema-registry-url: http://schema-registry:8081
+  topic-names-to-create:
+    - coupon-issue-request
+  num-of-partitions: 3
+  replication-factor: 3
+
+
+kafka-consumer-config:
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+  auto-offset-reset: earliest
+  specific-avro-reader-key: specific.avro.reader
+  specific-avro-reader: true
+  batch-listener: true
+  auto-startup: false
+  concurrency-level: 3
+  session-timeout-ms: 10000
+  heartbeat-interval-ms: 3000
+  max-poll-interval-ms: 300000
+  max-poll-records: 500
+  max-partition-fetch-bytes-default: 1048576
+  max-partition-fetch-bytes-boost-factor: 1
+  poll-timeout-ms: 150
+  enable-auto-commit: false # important!
+
+topic-names:
+  coupon-issue-request-topic-name: coupon-issue-request
+
+kafka-consumer-group-id:
+  coupon-issue-request-consumer-group-id: coupon-issue-request-topic-consumer-group-id
+
+kafka-listener-id: coupon-issue-request-listener
+
+

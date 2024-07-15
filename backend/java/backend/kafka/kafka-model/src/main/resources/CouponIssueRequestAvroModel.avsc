@@ -1,0 +1,43 @@
+{
+  "namespace": "com.example.kafka.avro.model",
+  "type": "record",
+  "name": "CouponIssueRequestAvroModel",
+  "fields": [
+    {
+      "name": "issueId",
+      "type": {
+        "type": "long",
+        "logicalType": "long"
+      }
+    },
+    {
+      "name": "callerId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "couponId",
+      "type": {
+        "type": "long",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "amount",
+      "type": {
+        "type": "long",
+        "logicalType": "long",
+        "default": 1
+      }
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

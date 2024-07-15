@@ -58,9 +58,19 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import {Link, useNavigate} from 'react-router-dom';
 import {ArrowBack, ChatBubble, Home, Restaurant} from "@mui/icons-material";
 import {SiAppwrite} from "react-icons/si";
+import {logout} from "../state/authSlice";
+import {useDispatch} from "react-redux";
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+
 
 const MyPage = () => {
    const navigate = useNavigate();
+   const dispatch = useDispatch();
+
+   const handleLogout = () => {
+      dispatch(logout());
+      navigate('/login');
+   };
    return (
       <Container maxWidth="sm">
          <Grid container item justifyContent="space-between">
@@ -137,6 +147,15 @@ const MyPage = () => {
                <Grid item container alignItems="center" mb={1} mt={1}>
                   <GroupAddIcon/>
                   <Typography variant="body1" ml={1}>친구 초대</Typography>
+               </Grid>
+               <Grid item container alignItems="center" mb={1} mt={1}>
+                  <ExitToAppIcon/>
+                  <Button
+                     onClick={handleLogout}
+                     style={{textDecoration: 'none', color: 'inherit'}}
+                  >
+                     <Typography variant="body1" ml={1}>로그아웃</Typography>
+                  </Button>
                </Grid>
             </Grid>
          </Grid>

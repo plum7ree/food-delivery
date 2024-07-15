@@ -106,4 +106,5 @@ export const { addMenu,
   removeMenu,
   updateQuantity } = selectedMenuSlice.actions;
 
-export default selectedMenuSlice.reducer;
+export const selectedMenuReducer = selectedMenuSlice.reducer;
+export default selectedMenuSlice;

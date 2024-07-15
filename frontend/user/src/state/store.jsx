@@ -1,10 +1,13 @@
-import {configureStore} from "@reduxjs/toolkit";
-import profilePictureReducer from "./profilePictureSlice";
-import selectedMenuReducer from "./checkout/selectedMenuSlice";
+import { combineSlices, configureStore } from '@reduxjs/toolkit';
+import profilePictureSlice, {profilePictureReducer} from "./profilePictureSlice";
+import selectedMenuSlice, {selectedMenuReducer} from "./checkout/selectedMenuSlice";
+import authSlice, {authReducer} from "./authSlice";
+
 
 export default configureStore({
    reducer: {
       profilePicture: profilePictureReducer,
-      selectedMenu: selectedMenuReducer
+      selectedMenu: selectedMenuReducer,
+      auth: authReducer
    },
 });

@@ -1,0 +1,51 @@
+server:
+  port: 8092
+
+logging:
+  config: classpath:logback-spring.xml
+#  file:
+#    name: /app/logs/application.log # 이거 활성화 시켰을때 왜 local 프로파일만 사용하는 테스트가 이걸 참조할까?
+
+spring:
+  application:
+    name: coupon-app
+  data:
+    redis-server: redis://coupon-redis:6379
+    jpa:
+      repositories:
+        enabled: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+
+retry-config:
+  initial-interval-ms: 1000
+  max-interval-ms: 10000
+  multiplier: 2.0
+  maxAttempts: 3
+  sleep-time-ms: 2000
+
+
+kafka-config:
+  bootstrap-servers: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+  schema-registry-url-key: schema.registry.url
+  schema-registry-url: http://schema-registry:8081
+  topic-names-to-create:
+    - coupon-issue-request
+  num-of-partitions: 3
+  replication-factor: 3
+
+
+kafka-producer-config:
+  key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
+  value-serializer-class: io.confluent.kafka.serializers.KafkaAvroSerializer
+  compression-type: snappy
+  acks: 1
+  batch-size: 16384
+  batch-size-boost-factor: 100
+  linger-ms: 5
+  request-timeout-ms: 60000
+  retry-count: 5
+  enable-idempotence: true

@@ -1,0 +1,50 @@
+server:
+  port: 8075
+
+spring:
+  application:
+    name: "route"
+  profiles:
+    active: native
+  config:
+    import: "optional:configserver:http://localhost:8071/" # For default and 'native' profile, config will be fetched from config server
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+
+# spring-boot-starter-actuator
+# application monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # health, info, ...
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    heath:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
