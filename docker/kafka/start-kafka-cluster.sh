@@ -57,6 +57,31 @@ done
 
 echo "Creating debezium connectors"
 
+
+## example
+#curl --location --request POST 'localhost:8083/connectors' \
+#--header 'Content-Type: application/json' \
+#--data-raw '{
+#  "name": "order-payment-connector",
+#  "config": {
+#      "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+#      "tasks.max": "1",
+#      "database.hostname": "host.docker.internal",
+#      "database.port": "5432",
+#      "database.user": "postgres",
+#      "database.password": "admin",
+#      "database.dbname" : "postgres",
+#      "database.server.name": "PostgreSQL-15",
+#      "table.include.list": "order.payment_outbox",
+#      "topic.prefix": "debezium",
+#      "tombstones.on.delete" : "false",
+#      "slot.name" : "order_payment_outbox_slot",
+#      "plugin.name": "pgoutput",
+#      "auto.create.topics.enable": false,
+#      "auto.register.schemas": false
+#      }
+# }'
+
 # host 환경: pc. kafka_global-network 네트워크에 postgres, debezium_connector 도커가 실행중일때,
 # host 에서 요청시 database.hostname, port -> localhost, 5433 이고
 # debezium_connector -> postgres 로 요청할때는 database.hostname 은 container 이름인 postgres, port 는 내부에서 켜지는 5432 이다.
@@ -75,7 +100,7 @@ curl --location --request POST 'localhost:8083/connectors' \
       "database.dbname" : "postgres",
       "database.server.name": "PostgreSQL-15",
       "table.include.list": "payment-request",
-      "topic.prefix": "",
+      "topic.prefix": "debezium",
       "tombstones.on.delete" : "false",
       "slot.name" : "order_payment_outbox_slot",
       "plugin.name": "pgoutput",
@@ -98,7 +123,7 @@ curl --location --request POST 'localhost:8083/connectors' \
       "database.dbname" : "postgres",
       "database.server.name": "PostgreSQL-15",
       "table.include.list": "restaurant-approval-request",
-      "topic.prefix": "",
+      "topic.prefix": "debezium",
       "tombstones.on.delete" : "false",
       "slot.name" : "order_restaurant_approval_outbox_slot",
       "plugin.name": "pgoutput",
@@ -121,7 +146,7 @@ curl --location --request POST 'localhost:8083/connectors' \
       "database.dbname" : "postgres",
       "database.server.name": "PostgreSQL-15",
       "table.include.list": "payment-response",
-      "topic.prefix": "",
+      "topic.prefix": "debezium",
       "tombstones.on.delete" : "false",
       "slot.name" : "payment_order_outbox_slot",
       "plugin.name": "pgoutput",
@@ -144,7 +169,7 @@ curl --location --request POST 'localhost:8083/connectors' \
       "database.dbname" : "postgres",
       "database.server.name": "PostgreSQL-15",
       "table.include.list": "restaurant-approval-response",
-      "topic.prefix": "",
+      "topic.prefix": "debezium",
       "tombstones.on.delete" : "false",
       "slot.name" : "restaurant_order_outbox_slot",
       "plugin.name": "pgoutput",
