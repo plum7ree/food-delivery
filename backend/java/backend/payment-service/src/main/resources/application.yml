@@ -19,16 +19,16 @@ retry-config:
   sleep-time-ms: 2000
 
 topic-names:
-  payment-request-topic-name: payment-request-topic
-  payment-response-topic-name: payment-response-topic
+  payment-request-topic-name: debezium.payment-request-topic
+  payment-response-topic-name: debezium.payment-response-topic
 
 kafka-config:
   bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://localhost:8081
   topic-names-to-create:
-    - payment-response-topic
-    - payment-request-topic
+    - debezium.payment-response-topic
+    - debezium.payment-request-topic
   num-of-partitions: 3
   replication-factor: 3
 
@@ -46,7 +46,7 @@ kafka-producer-config:
 kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-  consumer-group-id: payment-topic-consumer-group-id
+  consumer-group-id: debezium.payment-topic-consumer-group-id
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true

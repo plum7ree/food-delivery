@@ -53,10 +53,9 @@ public class LoginController {
 
         return accountService.getUser(email)
             .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.ok().body(UserDto.builder().id("").build()));
+            .orElse(ResponseEntity.badRequest().body(null));
 
     }
-
 
     @GetMapping("/test")
     public ResponseEntity<String> test(@RequestHeader HttpHeaders headers) {

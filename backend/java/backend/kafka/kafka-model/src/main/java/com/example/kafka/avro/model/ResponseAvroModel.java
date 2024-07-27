@@ -14,21 +14,25 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class ResponseAvroModel extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -2811512240270736484L;
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ResponseAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"paymentId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callerId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"calleeId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"status\",\"type\":{\"type\":\"enum\",\"name\":\"Status\",\"symbols\":[\"PENDING\",\"COMPLETED\",\"CANCELLED\",\"FAILED\",\"APPROVED\",\"REJECTED\"]}},{\"name\":\"failureMessages\",\"type\":\"string\"}]}");
+    private static final long serialVersionUID = -5403843991489033270L;
+
+
+    public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"ResponseAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"paymentId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callerId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"calleeId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"orderStatus\",\"type\":{\"type\":\"enum\",\"name\":\"OrderStatus\",\"symbols\":[\"PENDING\",\"CALLER_CANCELLED\",\"PAYMENT_COMPLETED\",\"PAYMENT_CANCELLED\",\"CALLEE_APPROVED\",\"CALLEE_REJECTED\"]}},{\"name\":\"failureMessages\",\"type\":\"string\"}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
-  private static SpecificData MODEL$ = new SpecificData();
-static {
+    private static final SpecificData MODEL$ = new SpecificData();
+
+    static {
+        MODEL$.addLogicalTypeConversion(new org.apache.avro.Conversions.UUIDConversion());
     MODEL$.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimestampMillisConversion());
     MODEL$.addLogicalTypeConversion(new org.apache.avro.Conversions.DecimalConversion());
   }
 
   private static final BinaryMessageEncoder<ResponseAvroModel> ENCODER =
-      new BinaryMessageEncoder<ResponseAvroModel>(MODEL$, SCHEMA$);
+      new BinaryMessageEncoder<>(MODEL$, SCHEMA$);
 
   private static final BinaryMessageDecoder<ResponseAvroModel> DECODER =
-      new BinaryMessageDecoder<ResponseAvroModel>(MODEL$, SCHEMA$);
+      new BinaryMessageDecoder<>(MODEL$, SCHEMA$);
 
   /**
    * Return the BinaryMessageEncoder instance used by this class.
@@ -52,7 +56,7 @@ static {
    * @return a BinaryMessageDecoder instance for this class backed by the given SchemaStore
    */
   public static BinaryMessageDecoder<ResponseAvroModel> createDecoder(SchemaStore resolver) {
-    return new BinaryMessageDecoder<ResponseAvroModel>(MODEL$, SCHEMA$, resolver);
+      return new BinaryMessageDecoder<>(MODEL$, SCHEMA$, resolver);
   }
 
   /**
@@ -75,16 +79,16 @@ static {
     return DECODER.decode(b);
   }
 
-   private java.lang.CharSequence id;
-   private java.lang.CharSequence sagaId;
-   private java.lang.CharSequence paymentId;
-   private java.lang.CharSequence callerId;
-   private java.lang.CharSequence callId;
-   private java.lang.CharSequence calleeId;
-   private java.nio.ByteBuffer price;
-   private java.time.Instant createdAt;
-   private com.example.kafka.avro.model.Status status;
-   private java.lang.CharSequence failureMessages;
+    private java.util.UUID id;
+    private java.util.UUID sagaId;
+    private java.util.UUID paymentId;
+    private java.util.UUID callerId;
+    private java.util.UUID callId;
+    private java.util.UUID calleeId;
+    private java.nio.ByteBuffer price;
+    private java.time.Instant createdAt;
+    private com.example.kafka.avro.model.OrderStatus orderStatus;
+    private java.lang.CharSequence failureMessages;
 
   /**
    * Default constructor.  Note that this does not initialize fields
@@ -103,10 +107,10 @@ static {
    * @param calleeId The new value for calleeId
    * @param price The new value for price
    * @param createdAt The new value for createdAt
-   * @param status The new value for status
+   * @param orderStatus The new value for orderStatus
    * @param failureMessages The new value for failureMessages
    */
-  public ResponseAvroModel(java.lang.CharSequence id, java.lang.CharSequence sagaId, java.lang.CharSequence paymentId, java.lang.CharSequence callerId, java.lang.CharSequence callId, java.lang.CharSequence calleeId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.Status status, java.lang.CharSequence failureMessages) {
+  public ResponseAvroModel(java.util.UUID id, java.util.UUID sagaId, java.util.UUID paymentId, java.util.UUID callerId, java.util.UUID callId, java.util.UUID calleeId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.OrderStatus orderStatus, java.lang.CharSequence failureMessages) {
     this.id = id;
     this.sagaId = sagaId;
     this.paymentId = paymentId;
@@ -115,13 +119,18 @@ static {
     this.calleeId = calleeId;
     this.price = price;
     this.createdAt = createdAt.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
-    this.status = status;
+      this.orderStatus = orderStatus;
     this.failureMessages = failureMessages;
   }
 
+    @Override
   public org.apache.avro.specific.SpecificData getSpecificData() { return MODEL$; }
+
+    @Override
   public org.apache.avro.Schema getSchema() { return SCHEMA$; }
+
   // Used by DatumWriter.  Applications should not call.
+  @Override
   public java.lang.Object get(int field$) {
     switch (field$) {
     case 0: return id;
@@ -132,7 +141,8 @@ static {
     case 5: return calleeId;
     case 6: return price;
     case 7: return createdAt;
-    case 8: return status;
+        case 8:
+            return orderStatus;
     case 9: return failureMessages;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
@@ -140,12 +150,12 @@ static {
 
   private static final org.apache.avro.Conversion<?>[] conversions =
       new org.apache.avro.Conversion<?>[] {
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
+          new org.apache.avro.Conversions.UUIDConversion(),
+          new org.apache.avro.Conversions.UUIDConversion(),
+          new org.apache.avro.Conversions.UUIDConversion(),
+          new org.apache.avro.Conversions.UUIDConversion(),
+          new org.apache.avro.Conversions.UUIDConversion(),
+          new org.apache.avro.Conversions.UUIDConversion(),
       null,
       new org.apache.avro.data.TimeConversions.TimestampMillisConversion(),
       null,
@@ -159,18 +169,33 @@ static {
   }
 
   // Used by DatumReader.  Applications should not call.
+  @Override
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-    case 0: id = (java.lang.CharSequence)value$; break;
-    case 1: sagaId = (java.lang.CharSequence)value$; break;
-    case 2: paymentId = (java.lang.CharSequence)value$; break;
-    case 3: callerId = (java.lang.CharSequence)value$; break;
-    case 4: callId = (java.lang.CharSequence)value$; break;
-    case 5: calleeId = (java.lang.CharSequence)value$; break;
+        case 0:
+            id = (java.util.UUID) value$;
+            break;
+        case 1:
+            sagaId = (java.util.UUID) value$;
+            break;
+        case 2:
+            paymentId = (java.util.UUID) value$;
+            break;
+        case 3:
+            callerId = (java.util.UUID) value$;
+            break;
+        case 4:
+            callId = (java.util.UUID) value$;
+            break;
+        case 5:
+            calleeId = (java.util.UUID) value$;
+            break;
     case 6: price = (java.nio.ByteBuffer)value$; break;
     case 7: createdAt = (java.time.Instant)value$; break;
-    case 8: status = (com.example.kafka.avro.model.Status)value$; break;
+        case 8:
+            orderStatus = (com.example.kafka.avro.model.OrderStatus) value$;
+            break;
     case 9: failureMessages = (java.lang.CharSequence)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
@@ -180,7 +205,7 @@ static {
    * Gets the value of the 'id' field.
    * @return The value of the 'id' field.
    */
-  public java.lang.CharSequence getId() {
+  public java.util.UUID getId() {
     return id;
   }
 
@@ -189,7 +214,7 @@ static {
    * Sets the value of the 'id' field.
    * @param value the value to set.
    */
-  public void setId(java.lang.CharSequence value) {
+  public void setId(java.util.UUID value) {
     this.id = value;
   }
 
@@ -197,7 +222,7 @@ static {
    * Gets the value of the 'sagaId' field.
    * @return The value of the 'sagaId' field.
    */
-  public java.lang.CharSequence getSagaId() {
+  public java.util.UUID getSagaId() {
     return sagaId;
   }
 
@@ -206,7 +231,7 @@ static {
    * Sets the value of the 'sagaId' field.
    * @param value the value to set.
    */
-  public void setSagaId(java.lang.CharSequence value) {
+  public void setSagaId(java.util.UUID value) {
     this.sagaId = value;
   }
 
@@ -214,7 +239,7 @@ static {
    * Gets the value of the 'paymentId' field.
    * @return The value of the 'paymentId' field.
    */
-  public java.lang.CharSequence getPaymentId() {
+  public java.util.UUID getPaymentId() {
     return paymentId;
   }
 
@@ -223,7 +248,7 @@ static {
    * Sets the value of the 'paymentId' field.
    * @param value the value to set.
    */
-  public void setPaymentId(java.lang.CharSequence value) {
+  public void setPaymentId(java.util.UUID value) {
     this.paymentId = value;
   }
 
@@ -231,7 +256,7 @@ static {
    * Gets the value of the 'callerId' field.
    * @return The value of the 'callerId' field.
    */
-  public java.lang.CharSequence getCallerId() {
+  public java.util.UUID getCallerId() {
     return callerId;
   }
 
@@ -240,7 +265,7 @@ static {
    * Sets the value of the 'callerId' field.
    * @param value the value to set.
    */
-  public void setCallerId(java.lang.CharSequence value) {
+  public void setCallerId(java.util.UUID value) {
     this.callerId = value;
   }
 
@@ -248,7 +273,7 @@ static {
    * Gets the value of the 'callId' field.
    * @return The value of the 'callId' field.
    */
-  public java.lang.CharSequence getCallId() {
+  public java.util.UUID getCallId() {
     return callId;
   }
 
@@ -257,7 +282,7 @@ static {
    * Sets the value of the 'callId' field.
    * @param value the value to set.
    */
-  public void setCallId(java.lang.CharSequence value) {
+  public void setCallId(java.util.UUID value) {
     this.callId = value;
   }
 
@@ -265,7 +290,7 @@ static {
    * Gets the value of the 'calleeId' field.
    * @return The value of the 'calleeId' field.
    */
-  public java.lang.CharSequence getCalleeId() {
+  public java.util.UUID getCalleeId() {
     return calleeId;
   }
 
@@ -274,7 +299,7 @@ static {
    * Sets the value of the 'calleeId' field.
    * @param value the value to set.
    */
-  public void setCalleeId(java.lang.CharSequence value) {
+  public void setCalleeId(java.util.UUID value) {
     this.calleeId = value;
   }
 
@@ -313,20 +338,20 @@ static {
   }
 
   /**
-   * Gets the value of the 'status' field.
-   * @return The value of the 'status' field.
+   * Gets the value of the 'orderStatus' field.
+   * @return The value of the 'orderStatus' field.
    */
-  public com.example.kafka.avro.model.Status getStatus() {
-    return status;
+  public com.example.kafka.avro.model.OrderStatus getOrderStatus() {
+      return orderStatus;
   }
 
 
   /**
-   * Sets the value of the 'status' field.
+   * Sets the value of the 'orderStatus' field.
    * @param value the value to set.
    */
-  public void setStatus(com.example.kafka.avro.model.Status value) {
-    this.status = value;
+  public void setOrderStatus(com.example.kafka.avro.model.OrderStatus value) {
+      this.orderStatus = value;
   }
 
   /**
@@ -387,20 +412,20 @@ static {
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<ResponseAvroModel>
     implements org.apache.avro.data.RecordBuilder<ResponseAvroModel> {
 
-    private java.lang.CharSequence id;
-    private java.lang.CharSequence sagaId;
-    private java.lang.CharSequence paymentId;
-    private java.lang.CharSequence callerId;
-    private java.lang.CharSequence callId;
-    private java.lang.CharSequence calleeId;
+      private java.util.UUID id;
+      private java.util.UUID sagaId;
+      private java.util.UUID paymentId;
+      private java.util.UUID callerId;
+      private java.util.UUID callId;
+      private java.util.UUID calleeId;
     private java.nio.ByteBuffer price;
     private java.time.Instant createdAt;
-    private com.example.kafka.avro.model.Status status;
+      private com.example.kafka.avro.model.OrderStatus orderStatus;
     private java.lang.CharSequence failureMessages;
 
     /** Creates a new Builder */
     private Builder() {
-      super(SCHEMA$);
+        super(SCHEMA$, MODEL$);
     }
 
     /**
@@ -441,8 +466,8 @@ static {
         this.createdAt = data().deepCopy(fields()[7].schema(), other.createdAt);
         fieldSetFlags()[7] = other.fieldSetFlags()[7];
       }
-      if (isValidValue(fields()[8], other.status)) {
-        this.status = data().deepCopy(fields()[8].schema(), other.status);
+        if (isValidValue(fields()[8], other.orderStatus)) {
+            this.orderStatus = data().deepCopy(fields()[8].schema(), other.orderStatus);
         fieldSetFlags()[8] = other.fieldSetFlags()[8];
       }
       if (isValidValue(fields()[9], other.failureMessages)) {
@@ -456,7 +481,7 @@ static {
      * @param other The existing instance to copy.
      */
     private Builder(com.example.kafka.avro.model.ResponseAvroModel other) {
-      super(SCHEMA$);
+        super(SCHEMA$, MODEL$);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
         fieldSetFlags()[0] = true;
@@ -489,8 +514,8 @@ static {
         this.createdAt = data().deepCopy(fields()[7].schema(), other.createdAt);
         fieldSetFlags()[7] = true;
       }
-      if (isValidValue(fields()[8], other.status)) {
-        this.status = data().deepCopy(fields()[8].schema(), other.status);
+        if (isValidValue(fields()[8], other.orderStatus)) {
+            this.orderStatus = data().deepCopy(fields()[8].schema(), other.orderStatus);
         fieldSetFlags()[8] = true;
       }
       if (isValidValue(fields()[9], other.failureMessages)) {
@@ -503,7 +528,7 @@ static {
       * Gets the value of the 'id' field.
       * @return The value.
       */
-    public java.lang.CharSequence getId() {
+    public java.util.UUID getId() {
       return id;
     }
 
@@ -513,7 +538,7 @@ static {
       * @param value The value of 'id'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder setId(java.lang.CharSequence value) {
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder setId(java.util.UUID value) {
       validate(fields()[0], value);
       this.id = value;
       fieldSetFlags()[0] = true;
@@ -543,7 +568,7 @@ static {
       * Gets the value of the 'sagaId' field.
       * @return The value.
       */
-    public java.lang.CharSequence getSagaId() {
+    public java.util.UUID getSagaId() {
       return sagaId;
     }
 
@@ -553,7 +578,7 @@ static {
       * @param value The value of 'sagaId'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder setSagaId(java.lang.CharSequence value) {
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder setSagaId(java.util.UUID value) {
       validate(fields()[1], value);
       this.sagaId = value;
       fieldSetFlags()[1] = true;
@@ -583,7 +608,7 @@ static {
       * Gets the value of the 'paymentId' field.
       * @return The value.
       */
-    public java.lang.CharSequence getPaymentId() {
+    public java.util.UUID getPaymentId() {
       return paymentId;
     }
 
@@ -593,7 +618,7 @@ static {
       * @param value The value of 'paymentId'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder setPaymentId(java.lang.CharSequence value) {
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder setPaymentId(java.util.UUID value) {
       validate(fields()[2], value);
       this.paymentId = value;
       fieldSetFlags()[2] = true;
@@ -623,7 +648,7 @@ static {
       * Gets the value of the 'callerId' field.
       * @return The value.
       */
-    public java.lang.CharSequence getCallerId() {
+    public java.util.UUID getCallerId() {
       return callerId;
     }
 
@@ -633,7 +658,7 @@ static {
       * @param value The value of 'callerId'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder setCallerId(java.lang.CharSequence value) {
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder setCallerId(java.util.UUID value) {
       validate(fields()[3], value);
       this.callerId = value;
       fieldSetFlags()[3] = true;
@@ -663,7 +688,7 @@ static {
       * Gets the value of the 'callId' field.
       * @return The value.
       */
-    public java.lang.CharSequence getCallId() {
+    public java.util.UUID getCallId() {
       return callId;
     }
 
@@ -673,7 +698,7 @@ static {
       * @param value The value of 'callId'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder setCallId(java.lang.CharSequence value) {
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder setCallId(java.util.UUID value) {
       validate(fields()[4], value);
       this.callId = value;
       fieldSetFlags()[4] = true;
@@ -703,7 +728,7 @@ static {
       * Gets the value of the 'calleeId' field.
       * @return The value.
       */
-    public java.lang.CharSequence getCalleeId() {
+    public java.util.UUID getCalleeId() {
       return calleeId;
     }
 
@@ -713,7 +738,7 @@ static {
       * @param value The value of 'calleeId'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder setCalleeId(java.lang.CharSequence value) {
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder setCalleeId(java.util.UUID value) {
       validate(fields()[5], value);
       this.calleeId = value;
       fieldSetFlags()[5] = true;
@@ -819,41 +844,41 @@ static {
     }
 
     /**
-      * Gets the value of the 'status' field.
+     * Gets the value of the 'orderStatus' field.
       * @return The value.
       */
-    public com.example.kafka.avro.model.Status getStatus() {
-      return status;
+    public com.example.kafka.avro.model.OrderStatus getOrderStatus() {
+        return orderStatus;
     }
 
 
     /**
-      * Sets the value of the 'status' field.
-      * @param value The value of 'status'.
+     * Sets the value of the 'orderStatus' field.
+     * @param value The value of 'orderStatus'.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder setStatus(com.example.kafka.avro.model.Status value) {
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder setOrderStatus(com.example.kafka.avro.model.OrderStatus value) {
       validate(fields()[8], value);
-      this.status = value;
+        this.orderStatus = value;
       fieldSetFlags()[8] = true;
       return this;
     }
 
     /**
-      * Checks whether the 'status' field has been set.
-      * @return True if the 'status' field has been set, false otherwise.
+     * Checks whether the 'orderStatus' field has been set.
+     * @return True if the 'orderStatus' field has been set, false otherwise.
       */
-    public boolean hasStatus() {
+    public boolean hasOrderStatus() {
       return fieldSetFlags()[8];
     }
 
 
     /**
-      * Clears the value of the 'status' field.
+     * Clears the value of the 'orderStatus' field.
       * @return This builder.
       */
-    public com.example.kafka.avro.model.ResponseAvroModel.Builder clearStatus() {
-      status = null;
+    public com.example.kafka.avro.model.ResponseAvroModel.Builder clearOrderStatus() {
+        orderStatus = null;
       fieldSetFlags()[8] = false;
       return this;
     }
@@ -903,15 +928,15 @@ static {
     public ResponseAvroModel build() {
       try {
         ResponseAvroModel record = new ResponseAvroModel();
-        record.id = fieldSetFlags()[0] ? this.id : (java.lang.CharSequence) defaultValue(fields()[0]);
-        record.sagaId = fieldSetFlags()[1] ? this.sagaId : (java.lang.CharSequence) defaultValue(fields()[1]);
-        record.paymentId = fieldSetFlags()[2] ? this.paymentId : (java.lang.CharSequence) defaultValue(fields()[2]);
-        record.callerId = fieldSetFlags()[3] ? this.callerId : (java.lang.CharSequence) defaultValue(fields()[3]);
-        record.callId = fieldSetFlags()[4] ? this.callId : (java.lang.CharSequence) defaultValue(fields()[4]);
-        record.calleeId = fieldSetFlags()[5] ? this.calleeId : (java.lang.CharSequence) defaultValue(fields()[5]);
+          record.id = fieldSetFlags()[0] ? this.id : (java.util.UUID) defaultValue(fields()[0]);
+          record.sagaId = fieldSetFlags()[1] ? this.sagaId : (java.util.UUID) defaultValue(fields()[1]);
+          record.paymentId = fieldSetFlags()[2] ? this.paymentId : (java.util.UUID) defaultValue(fields()[2]);
+          record.callerId = fieldSetFlags()[3] ? this.callerId : (java.util.UUID) defaultValue(fields()[3]);
+          record.callId = fieldSetFlags()[4] ? this.callId : (java.util.UUID) defaultValue(fields()[4]);
+          record.calleeId = fieldSetFlags()[5] ? this.calleeId : (java.util.UUID) defaultValue(fields()[5]);
         record.price = fieldSetFlags()[6] ? this.price : (java.nio.ByteBuffer) defaultValue(fields()[6]);
         record.createdAt = fieldSetFlags()[7] ? this.createdAt : (java.time.Instant) defaultValue(fields()[7]);
-        record.status = fieldSetFlags()[8] ? this.status : (com.example.kafka.avro.model.Status) defaultValue(fields()[8]);
+          record.orderStatus = fieldSetFlags()[8] ? this.orderStatus : (com.example.kafka.avro.model.OrderStatus) defaultValue(fields()[8]);
         record.failureMessages = fieldSetFlags()[9] ? this.failureMessages : (java.lang.CharSequence) defaultValue(fields()[9]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {

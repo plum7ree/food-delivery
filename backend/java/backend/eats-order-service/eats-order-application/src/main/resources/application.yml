@@ -1,38 +1,33 @@
 server:
   port: 8074
 
+
 spring:
   application:
     name: eats-order-application
 
-  #  autoconfigure:
-  #    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
-
-
   jpa:
     hibernate.ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
   database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   datasource:
-    # currentSchema: call
-    # binaryTransfer
-    # reWriteBatchedInserts: batch optimization
-    #TODO CQRS possible with replica DB? access conflict with user micro service?
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://localhost:5434/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       platform: postgres
-      schema-locations: classpath:sql/orders/init-schema.sql
-      data-locations: classpath:sql/orders/init-data.sql
+      schema-locations: classpath:orders/init-schema.sql
+      data-locations: classpath:orders/init-data.sql
       mode: always
-
+  h2:
+    console:
+      enabled: true
 
 retry-config:
   initial-interval-ms: 1000
@@ -84,10 +79,10 @@ kafka-config:
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://localhost:8081
   topic-names-to-create:
-    - payment-request
-    - payment-response
-    - restaurant-approval-request
-    - restaurant-approval-response
+    - debezium.payment-request
+    - debezium.payment-response
+    - debezium.restaurant-approval-request
+    - debezium.restaurant-approval-response
   num-of-partitions: 3
   replication-factor: 3
 
@@ -120,5 +115,18 @@ kafka-consumer-config:
   poll-timeout-ms: 150
   enable-auto-commit: true
 kafka-consumer-group-id:
-  payment-consumer-group-id: payment-topic-consumer-group-id
-  driver-approval-consumer-group-id: driver-approval-topic-consumer-group-id
+  payment-consumer-group-id: debezium.payment-topic-consumer-group-id
+  restaurant-approval-response-consumer-group-id: debezium.driver-approval-topic-consumer-group-id
+
+
+user:
+  service:
+    url: "http://localhost:8077/api/info" # TODO http://user:8077 ?
+  restaurant-info:
+    url: "http://localhost:8077/api/restaurant"
+
+this-service:
+  outbox-scheduler-fixed-rate-ms: 1000
+  outbox-scheduler-initial-delay-ms: 1000
+
+

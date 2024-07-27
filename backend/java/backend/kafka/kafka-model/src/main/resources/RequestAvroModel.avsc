@@ -25,7 +25,14 @@
       }
     },
     {
-      "name": "callId",
+      "name": "orderId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "paymentId",
       "type": {
         "type": "string",
         "logicalType": "uuid"
@@ -55,19 +62,90 @@
       }
     },
     {
-      "name": "status",
+      "name": "orderStatus",
       "type": {
         "type": "enum",
-        "name": "Status",
+        "name": "OrderStatus",
         "symbols": [
           "PENDING",
-          "COMPLETED",
-          "CANCELLED",
-          "FAILED",
-          "APPROVED",
-          "REJECTED"
+          "CALLER_CANCELLED",
+          "PAYMENT_COMPLETED",
+          "PAYMENT_CANCELLED",
+          "CALLEE_APPROVED",
+          "CALLEE_REJECTED"
         ]
       }
+    },
+    {
+      "name": "trackingId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "address",
+      "type": {
+        "type": "record",
+        "name": "Address",
+        "fields": [
+          {
+            "name": "street",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "type": "string"
+          },
+          {
+            "name": "postalCode",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "items",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "OrderItem",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "type": "string",
+                "logicalType": "uuid"
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "int"
+            },
+            {
+              "name": "price",
+              "type": {
+                "type": "bytes",
+                "logicalType": "decimal",
+                "precision": 10,
+                "scale": 2
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "failureMessages",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "string"
+        }
+      ],
+      "default": null
     }
   ]
 }

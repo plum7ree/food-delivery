@@ -29,6 +29,8 @@
         <module>coupon/coupon-service</module>
         <module>coupon/coupon-app</module>
         <module>common-util</module>
+        <module>test-data-generation</module>
+        <module>restaurant-approval-service</module>
     </modules>
 
     <parent>

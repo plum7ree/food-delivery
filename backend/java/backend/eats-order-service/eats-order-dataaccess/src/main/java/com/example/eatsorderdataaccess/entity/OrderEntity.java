@@ -8,6 +8,7 @@ import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.Type;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -35,6 +36,11 @@ public class OrderEntity {
     private OrderStatus orderStatus;
     private String failureMessages;
 
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private OrderAddressEntity address;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItemEntity> items;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

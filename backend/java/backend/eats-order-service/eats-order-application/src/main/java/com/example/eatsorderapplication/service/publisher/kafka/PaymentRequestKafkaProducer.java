@@ -1,9 +1,9 @@
 package com.example.eatsorderapplication.service.publisher.kafka;
 
+import com.example.commondata.domain.event.publisher.DomainEventPublisher;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.event.CallPaidEvent;
-import com.example.eatsorderdomain.data.mapper.DataMapper;
-import com.example.commondata.domain.event.publisher.DomainEventPublisher;
+import com.example.eatsorderdomain.data.mapper.DtoDataMapper;
 import com.example.kafka.avro.model.DriverApprovalRequestAvroModel;
 import com.example.kafkaproducer.KafkaProducer;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +23,12 @@ public class PaymentRequestKafkaProducer implements DomainEventPublisher<CallPai
     public void publish(CallPaidEvent domainEvent) {
         String callId = domainEvent.getOrderDomainObject().getId().getValue().toString();
 
-        var RequestAvroModel = DataMapper
-                .callPaidEventToRequestAvroModel(domainEvent);
+        var RequestAvroModel = DtoDataMapper
+            .callPaidEventToRequestAvroModel(domainEvent);
 
-        kafkaProducer.send(eatsOrderServiceConfigData.getDriverApprovalRequestTopicName(),
-                callId,
-                RequestAvroModel);
+        kafkaProducer.send(eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName(),
+            callId,
+            RequestAvroModel);
 
 
     }

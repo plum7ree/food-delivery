@@ -1,6 +1,6 @@
 package com.example.eatsorderdomain.data.dto;
 
-import com.example.kafka.avro.model.Status;
+import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class ResponseDto {
     private String driverId;
     private BigDecimal price;
     private Instant createdAt;
-    private Status status;
+    private OrderStatus status;
     private String failureMessages;
 
 }

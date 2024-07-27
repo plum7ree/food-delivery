@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 public class EatsOrderServiceConfigData {
     String paymentRequestTopicName;
     String paymentResponseTopicName;
-    String driverApprovalRequestTopicName;
-    String driverApprovalResponseTopicName;
     String restaurantApprovalRequestTopicName;
     String restaurantApprovalResponseTopicName;
 }

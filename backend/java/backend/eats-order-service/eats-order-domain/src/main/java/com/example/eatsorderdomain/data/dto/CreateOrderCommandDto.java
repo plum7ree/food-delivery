@@ -2,12 +2,11 @@ package com.example.eatsorderdomain.data.dto;
 
 
 import com.example.commondata.domain.aggregate.valueobject.Address;
-import com.example.eatsorderdomain.data.aggregate.OrderItem;
+import com.example.eatsorderdomain.data.dto.OrderItemDto;
+import com.example.eatsorderdomain.data.dto.PaymentDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,21 +15,27 @@ import java.util.UUID;
 @Data
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class CreateOrderCommandDto {
     @NotNull
     @JsonProperty
-    private final UUID callerId;
+    private UUID callerId; //TODO remove this.
     @NotNull
     @JsonProperty
-    private final UUID calleeId;
+    private UUID calleeId;
     @NotNull
     @JsonProperty
-    private final BigDecimal price; //TODO how to add info of currency? won, dollars...
+    private BigDecimal price; //TODO how to add info of currency? won, dollars...
     @NotNull
     @JsonProperty
-    private final Address address;
+    private Address address;
+    @NotNull
     @JsonProperty
-    private final RequestDto payment;
+    private PaymentDto payment;
+    @NotNull
     @JsonProperty
-    private final List<OrderItem> items;
+    private List<OrderItemDto> items;
+
+    public void validate() {
+    }
 }

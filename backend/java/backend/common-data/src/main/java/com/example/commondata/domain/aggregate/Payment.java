@@ -1,13 +1,11 @@
 package com.example.commondata.domain.aggregate;
 
-import com.example.commondata.domain.aggregate.valueobject.CallId;
-import com.example.commondata.domain.aggregate.valueobject.Money;
-import com.example.commondata.domain.aggregate.valueobject.PaymentId;
-import com.example.commondata.domain.aggregate.valueobject.CallerId;
-import com.example.kafka.avro.model.Status;
+import com.example.commondata.domain.aggregate.valueobject.*;
 import jakarta.persistence.Transient;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.UUID;
 
 // https://www.baeldung.com/lombok-builder-inheritance
 @Getter
@@ -16,13 +14,12 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Payment extends AggregateRoot<PaymentId> {
-    private CallId callId;
+    private OrderId orderId;
     private CallerId callerId;
-    private CallerId calleeId;
+    private CalleeId calleeId;
     private Money price;
-    private String type;
-    private String orderId;
+    private UUID sagaId;
     @Transient
     private String paymentKey;
-    private Status status;
+    private OrderStatus status;
 }

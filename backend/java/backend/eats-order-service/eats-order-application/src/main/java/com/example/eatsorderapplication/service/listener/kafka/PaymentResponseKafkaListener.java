@@ -3,8 +3,8 @@ package com.example.eatsorderapplication.service.listener.kafka;
 //import com.example.eatsorderapplication.service.CallAndPaymentSaga;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdomain.data.dto.ResponseDto;
+import com.example.kafka.avro.model.OrderStatus;
 import com.example.kafka.avro.model.ResponseAvroModel;
-import com.example.kafka.avro.model.Status;
 import com.example.kafkaconsumer.GeneralKafkaConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class PaymentResponseKafkaListener implements GeneralKafkaConsumer<Respon
 
         messages.forEach(responseAvroModel -> {
             log.info("payment response topic received");
-            if (Status.COMPLETED == responseAvroModel.getStatus()) {
+            if (OrderStatus.PAYMENT_COMPLETED == responseAvroModel.getOrderStatus()) {
                 ResponseDto responseDto = new ResponseDto();
                 BeanUtils.copyProperties(responseAvroModel, responseDto);
 //                var event = callAndPaymentSaga.process(responseDto);

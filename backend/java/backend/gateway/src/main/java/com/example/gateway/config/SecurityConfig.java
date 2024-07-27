@@ -40,6 +40,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SecurityConfig {
 
+    /**
+     * websocket + oauth2:
+     * ref: https://stackoverflow.com/questions/77094697/secure-websocket-connections-with-oauth-in-spring-boot-app
+     * websocket 연결이 이루어 지기전, http/https handshake 을 수행한다.
+     * 따라서, 이부분에서 jwt 을 보내면,
+     * 서버에서 oauth2ResourceServer 함수로 체인 구성하고 있다면
+     * 굳이 인터셉터에서 직접 검증 필요없을듯.
+     *
+     * @param http
+     * @return
+     */
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http

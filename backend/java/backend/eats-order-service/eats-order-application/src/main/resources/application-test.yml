@@ -5,11 +5,21 @@ spring:
   application:
     name: eats-order-application
 
-    autoconfigure:
-      exclude:
-        - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-        - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
-        - com.querydsl.sql.spring.autoconfigure.QuerydslSqlAutoConfiguration
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.hibernate: WARN
+    org.apache: WARN
+    com.example: WARN  # 여기에 여러분의 애플리케이션 패키지명을 넣으세요
+
+    # 특정 로그를 ERROR 레벨로 설정하고 싶다면:
+    org.springframework.security: ERROR
+    org.springframework.web: ERROR
+
+    # Kafka 관련 로그 설정
+    org.apache.kafka: WARN
+    kafka: WARN
 
   jpa:
     hibernate.ddl-auto: none
@@ -20,25 +30,16 @@ spring:
   database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   datasource:
-    # currentSchema: call
-    # binaryTransfer
-    # reWriteBatchedInserts: batch optimization
-    #TODO CQRS possible with replica DB? access conflict with user micro service?
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://localhost:5434/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
-    hikari:
-      data-source-properties:
-        stringtype: unspecified
-
-  sql:
-    init:
-      platform: postgres
-      schema-locations: classpath:sql/orders/init-schema.sql
-      data-locations: classpath:sql/orders/init-data.sql
-      mode: always
-
+#  sql:
+#    init:
+#      platform: postgres
+#      schema-locations: classpath:orders/init-schema.sql
+#      data-locations: classpath:orders/init-data.sql
+#      mode: always
 
 
 retry-config:
@@ -47,6 +48,7 @@ retry-config:
   multiplier: 2.0
   maxAttempts: 3
   sleep-time-ms: 2000
+
 
 #management:
 #  endpoints:
@@ -91,10 +93,10 @@ kafka-config:
   schema-registry-url-key: schema.registry.url
   schema-registry-url: http://localhost:8081
   topic-names-to-create:
-    - payment-response
-    - payment-request
-    - restaurant-approval-request
-    - restaurant-approval-response
+    - debezium.payment-response
+    - debezium.payment-request
+    - debezium.restaurant-approval-request
+    - debezium.restaurant-approval-response
   num-of-partitions: 3
   replication-factor: 3
 
@@ -128,11 +130,14 @@ kafka-consumer-config:
   enable-auto-commit: true
 
 kafka-consumer-group-id:
-  payment-consumer-group-id: payment-topic-consumer-group-id
-  driver-approval-consumer-group-id: driver-approval-topic-consumer-group-id
+  payment-consumer-group-id: debezium.payment-topic-consumer-group-id
+  driver-approval-consumer-group-id: debezium.driver-approval-topic-consumer-group-id
 
-logging:
-  level:
-    org.springframework.jdbc: DEBUG
-    com.querydsl.sql: DEBUG
-    org.hibernate.SQL: debug
+
+user:
+  service:
+    url: "http://localhost:8077/api/info"
+
+this-service:
+  outbox-scheduler-fixed-rate-ms: 1000
+  outbox-scheduler-initial-delay-ms: 1000

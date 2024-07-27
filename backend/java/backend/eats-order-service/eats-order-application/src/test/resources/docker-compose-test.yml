@@ -1,0 +1,159 @@
+version: '3.7'
+
+services:
+  order-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=postgres
+    ports:
+      - "5434:5432"
+    #      - "5432:5432"` # 5433:5432 는 연결이 안된다! 왜지?? 5432:5432, 5434:5432 등 5433 제외 하고, 바꾸니깐 잘됨.
+    restart: always
+    networks:
+      - test-network
+
+
+  user-db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=postgres
+    ports:
+      - "5432:5432"
+    restart: always
+    #    hostname: coupon-db
+    networks:
+      - test-network
+  configserver-app:
+    image: lomojiki/uber-msa-configserver
+    container_name: configserver
+    ports:
+      - "8071:8071"
+    networks:
+      - test-network
+
+  eurekaserver:
+    image: lomojiki/uber-msa-eurekaserver
+    container_name: eurekaserver
+    ports:
+      - "8761:8761"
+    networks:
+      - test-network
+
+  # export
+  # AWS_ACCESS_KEY_ID=
+  # AWS_SECRET_ACCESS_KEY=
+  user-app:
+    image: lomojiki/uber-msa-user
+    container_name: user
+    ports:
+      - "8077:8077"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=ap-northeast-2
+    networks:
+      - test-network
+  #    volumes:
+  #      - ./logs/user:/app/logs # 로그 파일 볼륨 마운트
+
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_INIT_LIMIT: 5
+      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVERS: zookeeper:2888:3888
+      KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
+    networks:
+      - test-network
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.3.0
+    hostname: schema-registry
+    depends_on:
+      - kafka-broker-1
+      - kafka-broker-2
+      - kafka-broker-3
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8081
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka-broker-1:9092,LISTENER_LOCAL://localhost:19092
+      SCHEMA_REGISTRY_DEBUG: 'true'
+    networks:
+      - test-network
+
+  # 주의: volume 설정하면 에러날 수 있음. 삭제하고 다시 실행해야하기 때문에 아예 포함 시키지 않음.
+  kafka-broker-1:
+    image: confluentinc/cp-kafka:7.3.0
+    hostname: kafka-broker-1
+    ports:
+      - "19092:19092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-1:9092,LISTENER_LOCAL://localhost:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_COMPRESSION_TYPE: producer
+    networks:
+      - test-network
+  kafka-broker-2:
+    image: confluentinc/cp-kafka:7.3.0
+    hostname: kafka-broker-2
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-2:9092,LISTENER_LOCAL://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_COMPRESSION_TYPE: producer
+    networks:
+      - test-network
+  kafka-broker-3:
+    image: confluentinc/cp-kafka:7.3.0
+    hostname: kafka-broker-3
+    ports:
+      - "39092:39092"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-broker-3:9092,LISTENER_LOCAL://localhost:39092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,LISTENER_LOCAL:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_COMPRESSION_TYPE: producer
+    networks:
+      - test-network
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "9000:8080"
+    environment:
+      ZK_HOSTS: "zookeeper:2181"
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge

@@ -3,13 +3,14 @@ package com.example.eatsorderapplication.service;
 import com.example.commondata.domain.aggregate.valueobject.*;
 import com.example.eatsorderapplication.data.dto.EatsOrderResponseDto;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
-import com.example.eatsorderdomain.data.aggregate.OrderDomainObject;
+import com.example.eatsorderdataaccess.entity.OrderEntity;
+import com.example.eatsorderdataaccess.entity.RestaurantApprovalOutboxMessageEntity;
+import com.example.eatsorderdataaccess.repository.OrderRepository;
+import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
+import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
 import com.example.eatsorderdomain.data.event.CallCreatedEvent;
-import com.example.eatsorderdomain.data.mapper.DataMapper;
-import com.example.kafka.avro.model.PaymentRequestAvroModel;
 import com.example.kafka.avro.model.RequestAvroModel;
-import com.example.kafka.avro.model.Status;
 import com.example.kafkaproducer.KafkaProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,6 +47,17 @@ class EatsOrderCommandServiceTestDO {
 
     @Captor
     private ArgumentCaptor<RequestAvroModel> messageCaptor;
+    @Mock
+    private OrderRepository orderRepository;
+
+    @Mock
+    private RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository;
+
+    @Captor
+    private ArgumentCaptor<OrderEntity> orderEntityCaptor;
+
+    @Captor
+    private ArgumentCaptor<RestaurantApprovalOutboxMessageEntity> restaurantApprovalRequestEntityCaptor;
 
     @BeforeEach
     void setUp() {
@@ -61,17 +74,17 @@ class EatsOrderCommandServiceTestDO {
         var postalCode = "12345";
         var city = "City";
         Address address = Address.builder()
-                .street(street)
-                .postalCode(postalCode)
-                .city(city)
-                .build();
+            .street(street)
+            .postalCode(postalCode)
+            .city(city)
+            .build();
         var createEatsOrderCommandDto = CreateOrderCommandDto.builder()
-                .address(address)
+            .address(address)
             .calleeId(driverId)
-                .price(price)
+            .price(price)
             .callerId(userId)
-                .payment(null)
-                .build();
+            .payment(null)
+            .build();
 
 
         var callId = new OrderId(UUID.randomUUID());
@@ -81,15 +94,15 @@ class EatsOrderCommandServiceTestDO {
         var money = new Money(price);
 
 
-        OrderDomainObject callAfterCreateOrderTransactionDO = OrderDomainObject.builder()
-                .id(callId)
-                .calleeId(calleeId)
-                .callerId(callerId)
-                .price(money)
+        Order callAfterCreateOrderTransactionDO = Order.builder()
+            .id(callId)
+            .calleeId(calleeId)
+            .callerId(callerId)
+            .price(money)
             .trackingId(new SimpleId(UUID.randomUUID()))
             .orderStatus(OrderStatus.PENDING)
-                .status(Status.PENDING)
-                .build();
+            .orderStatus(OrderStatus.PENDING)
+            .build();
 
         CallCreatedEvent callCreatedEvent = new CallCreatedEvent(callAfterCreateOrderTransactionDO, nowMock);
 
@@ -97,22 +110,27 @@ class EatsOrderCommandServiceTestDO {
         zonedDateTimeMockedStatic.when(() -> ZonedDateTime.now(any(ZoneId.class))).thenReturn(nowMock);
         when(eatsOrderServiceConfigData.getRestaurantApprovalRequestTopicName()).thenReturn("test-topic");
         // When
-        EatsOrderResponseDto responseDto = eatsOrderCommandService.createAndPublishOrder(createEatsOrderCommandDto);
+        EatsOrderResponseDto responseDto = eatsOrderCommandService.createAndSaveOrder(createEatsOrderCommandDto);
 
         // Then
-        verify(kafkaProducer).send(topicNameCaptor.capture(), keyCaptor.capture(), messageCaptor.capture());
 
-        assertEquals("test-topic", topicNameCaptor.getValue());
-        assertEquals(callerId.getValue().toString(), messageCaptor.getValue().getCallerId());
-        assertEquals(calleeId.getValue().toString(), messageCaptor.getValue().getCalleeId());
-        assertEquals(DataMapper.decimalConversion.toBytes(money.getAmount(),
-                        PaymentRequestAvroModel.getClassSchema().getField("price").schema(),
-                        PaymentRequestAvroModel.getClassSchema().getField("price").schema().getLogicalType()), messageCaptor.getValue().getPrice());
-        assertEquals("", messageCaptor.getValue().getSagaId());
-//        assertEquals(nowMock.toInstant(), messageCaptor.getValue().getCreatedAt());
+        // Verify OrderRepository save call
+        verify(orderRepository).save(orderEntityCaptor.capture());
+        OrderEntity savedOrderEntity = orderEntityCaptor.getValue();
+        assertNotNull(savedOrderEntity);
+        assertEquals(userId, savedOrderEntity.getCustomerId());
+        assertEquals(driverId, savedOrderEntity.getRestaurantId());
+        assertEquals(price, savedOrderEntity.getPrice());
+        assertEquals(OrderStatus.PENDING, savedOrderEntity.getOrderStatus());
 
-        assertEquals(callId.getValue().toString(), messageCaptor.getValue().getId());
-        assertEquals(messageCaptor.getValue().getStatus(), Status.PENDING);
-        assertEquals(callCreatedEvent.getOrderDomainObject().getId().getValue().toString(), keyCaptor.getValue());
+        // Verify RestaurantApprovalRequestOutboxRepository save call
+        verify(restaurantApprovalRequestOutboxRepository).save(restaurantApprovalRequestEntityCaptor.capture());
+        RestaurantApprovalOutboxMessageEntity savedRestaurantApprovalRequestEntity = restaurantApprovalRequestEntityCaptor.getValue();
+        assertNotNull(savedRestaurantApprovalRequestEntity);
+        assertEquals(OrderStatus.PENDING, savedRestaurantApprovalRequestEntity.getOrderStatus());
+        assertEquals(OutboxStatus.STARTED, savedRestaurantApprovalRequestEntity.getOutboxStatus());
+        assertEquals(SagaStatus.STARTED, savedRestaurantApprovalRequestEntity.getSagaStatus());
+        assertEquals("APPROVAL", savedRestaurantApprovalRequestEntity.getSagaType());
+
     }
 }
