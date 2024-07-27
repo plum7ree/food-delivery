@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {createHashRouter, createBrowserRouter, Link, RouterProvider, Navigate} from "react-router-dom";
 import "./styles.css";
 import UberLikeApp from "./UberLikeApp";
@@ -16,7 +16,7 @@ import CheckoutPage from "./eats/CheckoutPage";
 import {CheckoutSuccessPage} from "./eats/checkout/CheckoutSuccessPage";
 import {CheckoutFailPage} from "./eats/checkout/CheckoutFailPage";
 import RestaurantListFromSearch from "./eats/RestaurantListFromSearch";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import Login from "./Login";
 import Register from "./eats/Register";
 
@@ -56,7 +56,7 @@ const router = createBrowserRouter([
       path: "/login",
       element: <Login/>,
    },
-      {
+   {
       path: "/register",
       element: <Register/>,
    },
@@ -143,6 +143,15 @@ const router = createBrowserRouter([
 
 
 export default function App() {
+   const dispatch = useDispatch();
+   useEffect(() => {
+      dispatch({type: 'notifications/connect'});
+
+      return () => {
+         dispatch({type: 'notifications/disconnect'});
+      };
+   }, [dispatch]);
+
    return (
       <RouterProvider router={router}/>
    );
