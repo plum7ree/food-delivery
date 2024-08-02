@@ -312,6 +312,7 @@ def generate_restaurant(name, type, pictureUrl, menus, userId=str(uuid.uuid4()))
 
 def generate_menu(name, pictureUrl, options):
     return {
+        "id": str(uuid.uuid4()),
         "name": name,
         "description": "A classic hamburger with lettuce, tomato, onion, and spread on a freshly baked bun",
         "price": 3500,

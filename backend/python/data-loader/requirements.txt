@@ -10,3 +10,4 @@ fake_useragent
 lxml
 psycopg2=2-2.9.9
 json_stream
+Faker~=26.1.0
