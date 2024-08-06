@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceAuthenticationFilter implements GatewayFilter {
 
+    // JwtDecoder.fromIssuerUri 는 굳이 필요없는듯?
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         return ReactiveSecurityContextHolder.getContext()

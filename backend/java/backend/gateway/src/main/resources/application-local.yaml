@@ -8,15 +8,13 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: http://eurekaserver:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/
 
 spring:
   application:
     name: "gateway"
   config:
-    import: "optional:configserver:http://configserver:8071/"
-  profiles:
-    active: "default"
+    import: "optional:configserver:http://localhost:8071/"
   cloud:
     gateway:
       httpclient:
@@ -29,7 +27,6 @@ spring:
       global-filter:
         websocket-routing:
           enabled: true
-
   security:
     oauth2:
       resourceserver:
@@ -47,8 +44,6 @@ lb-uri-config:
   # official doc: https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway/global-filters.html#websocket-routing-filter
   web-socket-ws-server-uri: "lb:ws://websocketserver:8094/ws" #
   web-socket-sockjs-server-uri: "lb://websocketserver:8094/sockjs" # ws:// 없다. TODO websocket 으로 승격되면?
-
-
 
 #    kubernetes:
 #      discovery:
