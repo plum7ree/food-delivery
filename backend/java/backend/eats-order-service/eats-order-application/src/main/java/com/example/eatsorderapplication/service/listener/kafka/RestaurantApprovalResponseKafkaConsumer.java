@@ -11,7 +11,9 @@ import com.example.eatsorderdataaccess.repository.PaymentOutboxRepository;
 import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
 import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.eatsorderdomain.data.mapper.DtoDataMapper;
+import com.example.kafka.avro.model.NotificationAvroModel;
 import com.example.kafka.avro.model.RequestAvroModel;
+import com.example.kafkaproducer.KafkaProducer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -57,6 +59,8 @@ public class RestaurantApprovalResponseKafkaConsumer {
     private final EatsOrderSaga eatsOrderSaga;
 
     private final PaymentOutboxRepository paymentOutboxRepository;
+
+    private final KafkaProducer<String, NotificationAvroModel> kafkaProducer;
 
     @PostConstruct
     public void init() {
@@ -133,13 +137,17 @@ public class RestaurantApprovalResponseKafkaConsumer {
         }
 
         // validate(order);
-        {
-            var entity = RepositoryEntityDataMapper.orderToOrderApproval(order, RestaurantApprovalStatus.APPROVED);
-            orderApprovalRepository.save(entity);
-        }
+
+        var entity = RepositoryEntityDataMapper.orderToOrderApproval(order, RestaurantApprovalStatus.APPROVED);
+        orderApprovalRepository.save(entity);
+
 
         updateOutboxRepositories(order, sagaId);
 
+        NotificationAvroModel message = NotificationAvroModel.newBuilder()
+            .setUserId(order.getCallerId().getValue())
+            .setMessage("restaurant approved!").build();
+        kafkaProducer.send("notification", "", message);
 
     }
 

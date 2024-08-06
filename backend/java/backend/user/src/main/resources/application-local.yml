@@ -5,6 +5,10 @@ aws:
   s3:
     bucket-name: ""
 
+app:
+  init:
+    sql-data: true
+
 spring:
   application:
     name: "user"
@@ -33,13 +37,16 @@ spring:
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
-  sql:
-    init:
-      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
-      mode: always
-      platform: postgres
-      schema-locations: classpath:users/init-schema.sql
-      data-locations: classpath:users/init-data.sql
+  #  sql:
+  #    init:
+  #      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
+  #      mode: always
+  #      platform: postgres
+  #      schema-locations: classpath:users/init-schema.sql
+  #      data-locations: classpath:users/init-data.sql
+  data:
+    redis-server: redis://localhost:6379
+
 
 retry-config:
   initial-interval-ms: 1000
@@ -88,4 +95,6 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
 
-
+eats-order-service:
+  create-order:
+    uri: http://localhost:8074/createorder

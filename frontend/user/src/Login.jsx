@@ -4,31 +4,32 @@ import axios from "axios";
 import {login, storeAuth} from './state/authSlice';
 import {useDispatch} from 'react-redux';
 import {useNavigate} from "react-router-dom";
+import {SERVER_URL} from "./state/const";
+import axiosInstance from "./state/axiosInstance";
 
 const Login = () => {
    const dispatch = useDispatch();
    const navigate = useNavigate();
    const handleLoginSuccess = async (response) => {
       try {
-         console.log("login successful")
+         console.log("oauth2 login successful")
          console.log(response)
          dispatch(storeAuth({clientId: response.clientId, credential: response.credential}));
-         const result = await axios.get("http://localhost:8080/user/api/info", {
+         const result = await axiosInstance.get(SERVER_URL + "/user/api/info", {
             headers: {
                Authorization: `Bearer ${response.credential}`,
             },
          });
-         if (result.data.id === "") {
-            // id가 빈 문자열이면 /register로 리다이렉트
-            console.log(result)
-            navigate('/register');
-         } else {
-            // 그렇지 않으면 로그인 처리 후 홈으로 리다이렉트
-            dispatch(login({clientId: response.clientId, credential: response.credential}));
-            navigate('/');
-         }
+         // 에러 발생 없으면 로그인 처리 후 홈으로 리다이렉트
+         dispatch(login({clientId: response.clientId, credential: response.credential}));
+         navigate('/');
+
       } catch (error) {
-         console.error("Login failed:", error);
+         console.error("After Oauth2 request to user service failed. 가입이 필요해서, registration 페이지로 전환.:", error);
+         if (error.response.status === 400) {
+            // id가 빈 문자열이면 /register로 리다이렉트
+            navigate('/register');
+         }
       }
    };
 

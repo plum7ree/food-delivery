@@ -2,22 +2,21 @@ package com.example.eatsorderapplication.config.tomcat;
 
 // ref: https://github.com/rstoyanchev/spring-websocket-portfolio/blob/main/src/test/java/org/springframework/samples/portfolio/web/support/TomcatWebSocketTestServer.java#L46
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashSet;
-
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.websocket.server.WsContextListener;
-
 import org.springframework.web.SpringServletContainerInitializer;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * A wrapper around an embedded {@link org.apache.catalina.startup.Tomcat} server
@@ -78,7 +77,9 @@ public class TomcatWebSocketTestServer implements WebSocketTestServer {
 
     public void deployWithInitializer(Class<? extends WebApplicationInitializer>... initializers) {
         this.context = this.tomcatServer.addContext("", this.baseDir.getAbsolutePath());
-        Tomcat.addServlet(this.context, "default", "org.apache.catalina.servlets.DefaultServlet");
+
+//        https://github.com/rstoyanchev/spring-websocket-portfolio/blob/main/src/test/java/org/springframework/samples/portfolio/web/support/TomcatWebSocketTestServer.java#L97
+        Tomcat.addServlet(this.context, "default", "org.apache.catalina.servlets.DefaultServlet"); // 이건 뭐지??
         this.context.addApplicationListener(WsContextListener.class.getName());
         this.context.addServletContainerInitializer(new SpringServletContainerInitializer(),
             new HashSet<>(Arrays.asList(initializers)));

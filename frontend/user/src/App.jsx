@@ -47,7 +47,7 @@ const IconWrapper = styled(Box)({
    marginBottom: "10px",
 });
 const PrivateRoute = ({children}) => {
-   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+   const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn ?? false);
    return isLoggedIn ? children : <Navigate to="/login"/>;
 };
 
@@ -144,13 +144,18 @@ const router = createBrowserRouter([
 
 export default function App() {
    const dispatch = useDispatch();
+   const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn ?? false);
+   const credential = useSelector((state) => state.auth?.credential ?? null);
+
    useEffect(() => {
-      dispatch({type: 'notifications/connect'});
+      if (isLoggedIn && credential) {
+         dispatch({type: 'notifications/connect'});
+      }
 
       return () => {
          dispatch({type: 'notifications/disconnect'});
       };
-   }, [dispatch]);
+   }, [isLoggedIn, credential, dispatch]);
 
    return (
       <RouterProvider router={router}/>

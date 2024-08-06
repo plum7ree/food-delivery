@@ -49,9 +49,9 @@ public class LoginController {
     @GetMapping("/info")
     public ResponseEntity<UserDto> getUserInfo(@RequestHeader HttpHeaders headers) throws ParseException {
 
-        var email = Objects.requireNonNull(headers.get("X-Auth-User-Email")).get(0);
+        var sub = Objects.requireNonNull(headers.get("X-Auth-User-Sub")).get(0);
 
-        return accountService.getUser(email)
+        return accountService.getUserByOauth2Subject(sub)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.badRequest().body(null));
 

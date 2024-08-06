@@ -7,7 +7,8 @@ import {v4 as uuidv4} from 'uuid';
 import {SearchRestaurantTestData as mockSearchRestaurant} from "./resources/RestaurantTestData";
 import {Container, maxWidth} from "@mui/system";
 import {selectCartItemCount} from "../state/checkout/selectedMenuSlice";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {initRestaurantIfNeeded} from "../state/checkout/selectedMenuSlice";
 
 const RestaurantPicture = (props) => {
    const {pictureUrl1, type} = props.restaurant;
@@ -101,11 +102,13 @@ const RestaurantActions = ({onCheckout}) => {
    );
 };
 
-const RestaurantMenu = ({menus, onOptionSelect}) => {
+const RestaurantMenu = ({restaurantId, menus, onOptionSelect}) => {
    const navigate = useNavigate();
+   const dispatch = useDispatch();
 
    const goToMenuPage = (menu) => {
       console.log(menu)
+      dispatch(initRestaurantIfNeeded({restaurantId: restaurantId}));
       navigate(`/eats/restaurant/menu`, {
          state: {
             menu,
@@ -116,8 +119,9 @@ const RestaurantMenu = ({menus, onOptionSelect}) => {
    return (
       <Grid container item direction="column" alignItems="center" spacing={3}>
          {menus.map((menu) => (
-            <Grid container key={uuidv4()} item direction="row" justifyContent="space-between" onClick={() => goToMenuPage(menu)}>
-               <Grid item spacing={2}>
+            <Grid container key={uuidv4()} item direction="row" justifyContent="space-between"
+                  onClick={() => goToMenuPage(menu)}>
+               <Grid item >
                   <Grid item>
                      <Typography variant="h5">{menu.name}</Typography>
                   </Grid>
@@ -125,8 +129,8 @@ const RestaurantMenu = ({menus, onOptionSelect}) => {
                      <Typography variant="subtitle1">{menu.price}</Typography>
                   </Grid>
                </Grid>
-               <Grid item >
-                  <img src={menu.pictureUrl} style={{width:'162px', height: '100px'}} />
+               <Grid item>
+                  <img src={menu.pictureUrl} style={{width: '162px', height: '100px'}}/>
                </Grid>
             </Grid>
          ))}
@@ -202,6 +206,7 @@ const RestaurantPage = () => {
                   <Grid container>
                      {restaurantState.menuDtoList && (
                         <RestaurantMenu
+                           restaurantId={restaurantIdState}
                            menus={restaurantState.menuDtoList}
                         />
                      )}

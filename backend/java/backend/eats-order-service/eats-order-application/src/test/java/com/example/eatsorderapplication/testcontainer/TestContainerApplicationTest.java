@@ -106,7 +106,7 @@ public class TestContainerApplicationTest {
     }
 
     /**
-     * /api/eatsorder 로 요청 보내면, sagaStatus PENDING 을 가지고 요청 보내야함
+     * /api/createorder 로 요청 보내면, sagaStatus PENDING 을 가지고 요청 보내야함
      *
      * @throws InterruptedException
      * @throws JsonProcessingException
@@ -138,7 +138,7 @@ public class TestContainerApplicationTest {
             HttpEntity<String> entity = new HttpEntity<>(testData.jsonPayload, testData.headers);
 
             // When
-            ResponseEntity<EatsOrderResponseDto> response = restTemplate.postForEntity(appUrl + "/api/eatsorder", entity, EatsOrderResponseDto.class);
+            ResponseEntity<EatsOrderResponseDto> response = restTemplate.postForEntity(appUrl + "/api/createorder", entity, EatsOrderResponseDto.class);
 
             // Then
             assertEquals(HttpStatus.OK, response.getStatusCode());

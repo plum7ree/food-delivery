@@ -19,7 +19,6 @@
         <module>driver</module>
         <module>route</module>
         <module>location-redis</module>
-        <module>eats-order-service</module>
         <module>eats-order-service/eats-order-domain</module>
         <module>eats-order-service/eats-order-dataaccess</module>
         <module>eats-order-service/eats-order-config-data</module>
@@ -29,8 +28,9 @@
         <module>coupon/coupon-service</module>
         <module>coupon/coupon-app</module>
         <module>common-util</module>
-        <module>test-data-generation</module>
         <module>restaurant-approval-service</module>
+        <module>websocketserver</module>
+        <module>driver-assignment</module>
     </modules>
 
     <parent>

@@ -78,7 +78,6 @@ public class TestDataGenerator {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-        headers.set("X-Auth-User-Email", "user@example.com");
 
         return new TestData(userId, driverId, price, address, jsonPayload, headers);
     }

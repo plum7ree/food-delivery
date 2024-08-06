@@ -5,7 +5,6 @@ import com.example.user.data.entity.Account;
 import com.example.user.data.repository.AccountRepository;
 import com.example.user.mappers.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -17,9 +16,9 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final UserMapper userMapper;
 
-    public Optional<UserDto> getUser(String email) {
+    public Optional<UserDto> getUserByOauth2Subject(String sub) {
         try {
-            return accountRepository.findByEmail(email).map(userMapper::accountEntityToUser
+            return accountRepository.findByOauth2Sub(sub).map(userMapper::accountEntityToUser
             );
         } catch (Exception exception) {
             return Optional.empty();

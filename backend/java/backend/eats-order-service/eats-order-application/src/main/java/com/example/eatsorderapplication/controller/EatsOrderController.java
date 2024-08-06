@@ -36,29 +36,9 @@ public class EatsOrderController {
      * @param createOrderCommandDto
      * @return
      */
-    @PostMapping("/eatsorder")
+    @PostMapping("/createorder")
     public ResponseEntity<EatsOrderResponseDto> createOrder(@RequestHeader HttpHeaders headers, @RequestBody CreateOrderCommandDto createOrderCommandDto) {
         try {
-            // User Athentication
-//            var email = Objects.requireNonNull(headers.get("X-Auth-User-Email")).get(0);
-//
-//            HttpHeaders userServiceHeaders = new HttpHeaders();
-//            userServiceHeaders.set("X-Auth-User-Email", email);
-//            HttpEntity<?> requestEntity = new HttpEntity<>(userServiceHeaders);
-//
-//            ResponseEntity<UserDto> userResponse = restTemplate.exchange(
-//                userServiceUrl,
-//                HttpMethod.GET,
-//                requestEntity,
-//                UserDto.class
-//            );
-//
-//            if(userResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
-//                return ResponseEntity.badRequest().build();
-//            }
-//            UserDto userDto = userResponse.getBody();
-//
-//            createOrderCommandDto.setCallerId(UUID.fromString(userDto.getId()));
 
             var response = eatsOrderCommandService.createAndSaveOrder(createOrderCommandDto);
             return ResponseEntity.ok(response);
@@ -73,25 +53,6 @@ public class EatsOrderController {
     @PostMapping("/cancelorder")
     public ResponseEntity<EatsOrderResponseDto> cancelOrder(@RequestHeader HttpHeaders headers, @RequestBody CreateOrderCommandDto createOrderCommandDto) {
         try {
-            var email = Objects.requireNonNull(headers.get("X-Auth-User-Email")).get(0);
-
-            HttpHeaders userServiceHeaders = new HttpHeaders();
-            userServiceHeaders.set("X-Auth-User-Email", email);
-            HttpEntity<?> requestEntity = new HttpEntity<>(userServiceHeaders);
-
-            ResponseEntity<UserDto> userResponse = restTemplate.exchange(
-                userServiceUrl,
-                HttpMethod.GET,
-                requestEntity,
-                UserDto.class
-            );
-
-            UserDto userDto = userResponse.getBody();
-            if (userDto == null) {
-                userDto = new UserDto(); // 또는 적절한 기본값 설정
-            }
-
-            createOrderCommandDto.setCallerId(UUID.fromString(userDto.getId()));
 
             var response = eatsOrderCommandService.createAndSaveOrder(createOrderCommandDto);
             return ResponseEntity.ok(response);

@@ -15,7 +15,7 @@ spring:
   database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   datasource:
-    url: jdbc:postgresql://localhost:5434/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://order-db:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
@@ -36,37 +36,38 @@ retry-config:
   maxAttempts: 3
   sleep-time-ms: 2000
 
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*" # health, info, ...
-#  health:
-#    readiness-state:
-#      enabled: true
-#    liveness-state:
-#      enabled: true
-#  endpoint:
-#    shutdown:
-#      enabled: true
-#    heath:
-#      probes:
-#        enabled: true
-#  info:
-#    env:
-#      enabled: true
-#  metrics:
-#    tags:
-#      application: ${spring.application.name}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # health, info, ...
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    heath:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
 #
-#eureka:
-#  instance:
-#    preferIpAddress: true
-#  client:
-#    fetchRegistry: true
-#    registerWithEureka: true
-#    serviceUrl:
-#      defaultZone: http://localhost:8761/eureka/
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://eurekaserver:8761/eureka/
+
 
 topic-names:
   payment-request-topic-name: payment-request
@@ -75,9 +76,10 @@ topic-names:
   restaurant-approval-response-topic-name: restaurant-approval-response
 
 kafka-config:
-  bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
+  # 띄어쓰기 ㄴㄴ. localhost:19092 대신 kafka-broker-1:9092 (같은 네트워크라서 그런듯)
+  bootstrap-servers: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
   schema-registry-url-key: schema.registry.url
-  schema-registry-url: http://localhost:8081
+  schema-registry-url: http://schema-registry:8081
   topic-names-to-create:
     - debezium.payment-request
     - debezium.payment-response
@@ -121,9 +123,9 @@ kafka-consumer-group-id:
 
 user:
   service:
-    url: "http://localhost:8077/api/info" # TODO http://user:8077 ?
+    url: "http://user:8077/api/info" # TODO http://user:8077 ?
   restaurant-info:
-    url: "http://localhost:8077/api/restaurant"
+    url: "http://user:8077/api/restaurant"
 
 this-service:
   outbox-scheduler-fixed-rate-ms: 1000

@@ -13,6 +13,7 @@ import {
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import {login} from "../state/authSlice";
 import {useDispatch, useSelector} from "react-redux";
+import {SERVER_URL} from "../state/const";
 
 const Register = () => {
    const credential = useSelector((state) => state.auth.credential);
@@ -32,7 +33,7 @@ const Register = () => {
       e.preventDefault();
       setError('');
       try {
-         const response = await axios.post('http://localhost:8080/user/api/register', formData, {
+         const response = await axios.post(SERVER_URL + '/user/api/register', formData, {
             headers: {
                Authorization: `Bearer ${credential}`,
                'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ const Register = () => {
          });
          if (response.status === 200) {
             console.log('Registration successful');
-            dispatch(login(response));
+            dispatch(login({clientId: response.data.clientId, credential: response.data.credential}));
             navigate('/');
          }
       } catch (error) {

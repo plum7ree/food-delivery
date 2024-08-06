@@ -140,6 +140,10 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-data-23</artifactId>
+        </dependency>
 
 
     </dependencies>
@@ -174,7 +178,8 @@
                                     <!-- compile 해야 설치됨. -->
                                     <directory>${project.parent.basedir}/test-data-generation/users</directory>
                                     <includes>
-                                        <include>init-data.sql</include>
+                                        <include>user_list.json</include>
+                                        <include>web_crawled_restaurant_data.json</include>
                                         <include>init-schema.sql</include>
                                     </includes>
                                 </resource>

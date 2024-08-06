@@ -22,7 +22,7 @@
        function connect() {
           stompClient = new window.StompJs.Client({
              webSocketFactory: function () {
-                return new WebSocket("ws://localhost:8072/websocket");
+                return new WebSocket("ws://localhost:8072/ws");
              }
           });
           stompClient.onConnect = function (frame) {

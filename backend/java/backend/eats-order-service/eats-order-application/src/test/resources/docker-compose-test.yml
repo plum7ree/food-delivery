@@ -1,5 +1,6 @@
 version: '3.7'
 
+#TODO central folder 에 이 파일 옮기기
 services:
   order-db:
     image: postgres:13
@@ -7,7 +8,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=postgres
+    container_name: order-db
     ports:
+      # host 에서 접속시 localhost:5434,
+      # 같은 test-network 안에서는 order-db:5432 로 접속해야함
       - "5434:5432"
     #      - "5432:5432"` # 5433:5432 는 연결이 안된다! 왜지?? 5432:5432, 5434:5432 등 5433 제외 하고, 바꾸니깐 잘됨.
     restart: always
@@ -17,6 +21,7 @@ services:
 
   user-db:
     image: postgres:13
+    container_name: user-db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=admin
@@ -24,14 +29,19 @@ services:
     ports:
       - "5432:5432"
     restart: always
-    #    hostname: coupon-db
+    #    hostname: coupon-db # container_name vs host_name
     networks:
       - test-network
-  configserver-app:
+    depends_on:
+      - eurekaserver
+
+  #TODO config server 가 제대로 동작하는지 테스트 필요한듯. 현재는 모든 설정은 마이크로 서비스에서 관리
+  configserver:
     image: lomojiki/uber-msa-configserver
     container_name: configserver
     ports:
       - "8071:8071"
+    restart: always
     networks:
       - test-network
 
@@ -42,6 +52,9 @@ services:
       - "8761:8761"
     networks:
       - test-network
+    restart: always
+    depends_on:
+      - configserver
 
   # export
   # AWS_ACCESS_KEY_ID=
@@ -49,17 +62,37 @@ services:
   user-app:
     image: lomojiki/uber-msa-user
     container_name: user
-    ports:
-      - "8077:8077"
     environment:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - AWS_REGION=ap-northeast-2
+    ports:
+      - "8077:8077"
     networks:
       - test-network
+    depends_on:
+      - eurekaserver
   #    volumes:
   #      - ./logs/user:/app/logs # 로그 파일 볼륨 마운트
 
+  #TODO eureka server 에 계속 app 이름 config-data 로 들어감. profile 설정을 해서 제대로 된 application.yml 를 줘야하나?
+  eats-order-application:
+    image: lomojiki/uber-msa-eats-order-application
+    container_name: eats-order-application
+    networks:
+      - test-network
+    depends_on:
+      - eurekaserver
+
+  gateway:
+    image: lomojiki/uber-msa-gateway
+    container_name: gateway
+    ports:
+      - "8080:8080"
+    networks:
+      - test-network
+    depends_on:
+      - eurekaserver
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -109,8 +142,11 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
+    depends_on:
+      - zookeeper
     networks:
       - test-network
+
   kafka-broker-2:
     image: confluentinc/cp-kafka:7.3.0
     hostname: kafka-broker-2
@@ -124,6 +160,9 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+    depends_on:
+      - zookeeper
     networks:
       - test-network
   kafka-broker-3:
@@ -139,6 +178,9 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
+      KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
+    depends_on:
+      - zookeeper
     networks:
       - test-network
 
@@ -151,6 +193,16 @@ services:
       ZK_HOSTS: "zookeeper:2181"
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
+    networks:
+      - test-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    #    hostname: coupon-redis # hostname 을 comment 처리 해도, coupon-app 실행하면 coupon-redis 로 url해야 연결됨.
+    command: redis-server --loglevel debug
     networks:
       - test-network
 
