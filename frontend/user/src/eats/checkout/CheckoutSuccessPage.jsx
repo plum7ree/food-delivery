@@ -26,7 +26,7 @@ export function CheckoutSuccessPage() {
          orderId,
          amount
       })
-      assert(credential != null)
+      console.assert(credential != null)
       const response = await axiosInstance.post(`/user/api/pay/confirm`, dto, {
          headers: {
             "content-type": "application/json",

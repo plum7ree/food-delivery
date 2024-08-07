@@ -1,4 +1,5 @@
 import {createSlice} from "@reduxjs/toolkit";
+import {useSelector} from "react-redux";
 
 const selectedMenuSlice = createSlice({
    name: "selectedMenu",
@@ -81,7 +82,7 @@ const selectedMenuSlice = createSlice({
     *  }
     *
     */
-   initialState: {restaurantId:"", menus:[]},
+   initialState: {restaurantId: "", menus: []},
    reducers: {
       initRestaurantIfNeeded: (state, action) => {
          const {restaurantId} = action.payload;
@@ -117,8 +118,9 @@ const selectedMenuSlice = createSlice({
    },
 });
 
-export const selectCartItemCount = (state) => {
-   return state.selectedMenu.menus.length;
+export const selectCartItemCount = (store) => {
+   console.log(store)
+   return store.selectedMenu.menus.length;
 };
 
 /**
@@ -165,5 +167,4 @@ export const {
    updateQuantity
 } = selectedMenuSlice.actions;
 
-export const selectedMenuReducer = selectedMenuSlice.reducer;
-export default selectedMenuSlice;
+export default selectedMenuSlice.reducer;

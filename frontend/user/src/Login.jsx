@@ -26,9 +26,11 @@ const Login = () => {
 
       } catch (error) {
          console.error("After Oauth2 request to user service failed. 가입이 필요해서, registration 페이지로 전환.:", error);
-         if (error.response.status === 400) {
+         if (error.code === "ERR_NETWORK") {
             // id가 빈 문자열이면 /register로 리다이렉트
             navigate('/register');
+         } else if (error.response.code === 503) {
+            console.error("user service not available");
          }
       }
    };
