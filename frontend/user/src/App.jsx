@@ -19,6 +19,7 @@ import RestaurantListFromSearch from "./eats/RestaurantListFromSearch";
 import {useDispatch, useSelector} from "react-redux";
 import Login from "./Login";
 import Register from "./eats/Register";
+import {PersistGate} from "redux-persist/integration/react";
 
 const IconContainer = styled(Box)({
    display: "flex",
@@ -161,4 +162,3 @@ export default function App() {
       <RouterProvider router={router}/>
    );
 }
-
