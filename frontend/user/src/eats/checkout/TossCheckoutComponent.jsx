@@ -58,6 +58,16 @@ export function TossCheckoutComponent() {
       // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
       // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
       const orderId = uuidv4();
+      console.assert(orderId != null);
+      console.assert(restaurantId != null);
+      console.log(mySelectedMenuWithOnlyIdAndQuantity)
+      mySelectedMenuWithOnlyIdAndQuantity.forEach((menu) => {
+         console.assert(menu.menuId != null)
+         console.assert(menu.quantity > 0)
+         menu.selectedOptions.forEach((option) => {
+            console.assert(option.optionId != null);
+         })
+      })
       const dto = constructOrderMenusDto(orderId, restaurantId, mySelectedMenuWithOnlyIdAndQuantity)
 
       //TODO axios interceptor 로 바꾸자.

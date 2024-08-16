@@ -154,6 +154,7 @@ const RestaurantPage = () => {
          const mockRestaurant = restaurant
          console.log(mockRestaurant.menuDtoList)
          setRestaurantState(mockRestaurant);
+         setRestaurantIdState(restaurant.id);
       } else {
          const {restaurant} = location.state;
          setRestaurantIdState(restaurant.id);

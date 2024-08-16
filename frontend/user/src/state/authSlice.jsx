@@ -1,27 +1,79 @@
-import {createSlice} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import localStorage from "redux-persist/es/storage";
 
-// oauth2 info
-// clientId 는 user db 의 clientId 가 아니라 해당 oauth2 authentication server 의 clientId 이다.
+export const asyncGetAuth = createAsyncThunk(
+  'auth/getAuth',
+  async () => {
+    const credential = await localStorage.getItem('access-token');
+    const isLoggedIn = await localStorage.getItem('isLoggedIn');
+    const clientId = await localStorage.getItem('clientId');
+    console.log("getAuth credential: ", credential, " isLoggedIn: ", isLoggedIn)
+    return { credential, isLoggedIn, clientId };
+  }
+);
+
+export const asyncStoreAuth = createAsyncThunk(
+  'auth/storeAuth',
+  async ({ clientId, credential }, thunkAPI) => {
+    await localStorage.setItem('clientId', clientId);
+    await localStorage.setItem('access-token', credential);
+    return { clientId, credential };
+  }
+);
+
+export const asyncLogin = createAsyncThunk(
+  'auth/login',
+  async (_, thunkAPI) => {
+    await localStorage.setItem('isLoggedIn', 'true');
+    return true;
+  }
+);
+
+export const asyncLogout = createAsyncThunk(
+  'auth/logout',
+  async (_, thunkAPI) => {
+    await localStorage.setItem('isLoggedIn', 'false');
+    return false;
+  }
+);
+
 const authSlice = createSlice({
-   name: 'auth',
-   initialState: {
-      isLoggedIn: false,
-      clientId: null,
-      credential: null, //  JWT 토큰
-
-   },
-   reducers: {
-      storeAuth: (state, action) => {
-         state.clientId = action.payload.clientId;
-         state.credential = action.payload.credential;
-      },
-      login: (state, action) => {
-         state.isLoggedIn = true;
-      },
-      logout: (state) => {
-         state.isLoggedIn = false;
-      },
-   },
+  name: 'auth',
+  initialState: {
+    credential: null,
+    isLoggedIn: false,
+    clientId: null,
+    getAuthStatus: 'idle',
+    storeAuthStatus: 'idle',
+    loginStatus: 'idle',
+    logoutStatus: 'idle',
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(asyncGetAuth.pending, (state) => {
+        state.getAuthStatus = 'pending';
+      })
+      .addCase(asyncGetAuth.fulfilled, (state, action) => {
+        state.getAuthStatus = 'fulfilled';
+        state.credential = action.payload.credential;
+        state.isLoggedIn = action.payload.isLoggedIn === 'true';
+        state.clientId = action.payload.clientId;
+      })
+      .addCase(asyncStoreAuth.fulfilled, (state, action) => {
+        state.storeAuthStatus = 'fulfilled';
+        state.clientId = action.payload.clientId;
+        state.credential = action.payload.credential;
+      })
+      .addCase(asyncLogin.fulfilled, (state) => {
+        state.loginStatus = 'fulfilled';
+        state.isLoggedIn = true;
+      })
+      .addCase(asyncLogout.fulfilled, (state) => {
+        state.logoutStatus = 'fulfilled';
+        state.isLoggedIn = false;
+      });
+  }
 });
-export const {storeAuth, login, logout} = authSlice.actions;
+
 export default authSlice.reducer;

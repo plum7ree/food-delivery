@@ -86,6 +86,9 @@ const selectedMenuSlice = createSlice({
    reducers: {
       initRestaurantIfNeeded: (state, action) => {
          const {restaurantId} = action.payload;
+         console.assert(restaurantId !== undefined)
+         console.assert(restaurantId != null)
+         console.assert(restaurantId !== {})
          if (state.restaurantId !== restaurantId) {
             // 현재 restaurantId와 새로운 restaurantId가 다르면 state 초기화
             return {
@@ -99,6 +102,7 @@ const selectedMenuSlice = createSlice({
       addMenu: (state, action) => {
          const {menuItem, selectedOptions} = action.payload;
          state.menus.push({menuItem, selectedOptions, quantity: 1});
+         localStorage.setItem("selectedMenu", JSON.stringify(state.menus));
       },
       removeMenu: (state, action) => {
          const menuItemId = action.payload;
@@ -106,6 +110,7 @@ const selectedMenuSlice = createSlice({
          if (index !== -1) {
             state.splice(index, 1);
          }
+         localStorage.setItem("selectedMenu", JSON.stringify(state.menus));
       },
       updateQuantity: (state, action) => {
          const {menuItemId, quantity} = action.payload;
@@ -113,6 +118,7 @@ const selectedMenuSlice = createSlice({
          if (menuItem) {
             menuItem.quantity = quantity;
          }
+         localStorage.setItem("selectedMenu", JSON.stringify(state.menus));
       },
 
    },
@@ -143,7 +149,12 @@ export const selectedMenuWithOnlyIdAndQuantity = (state) => {
             return {optionId, quantity: quantity};
          })
       );
-
+      console.assert(item.menuItem.id != null)
+      console.assert(item.quantity > 0)
+      selectedOptions.forEach((option) => {
+         console.assert(option.optionId != null);
+         console.assert(option.quantity  > 0);
+      })
       return {
          menuId: item.menuItem.id,
          quantity: item.quantity,

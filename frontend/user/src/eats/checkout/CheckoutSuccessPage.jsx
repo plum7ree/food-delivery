@@ -34,13 +34,15 @@ export function CheckoutSuccessPage() {
          }
       })
       if (response.ok) {
+         console.log('Payment successful');
          setIsConfirmed(true);
+         navigate('/eats');
 
+      } else {
          // 3초 후에 /eats 페이지로 이동
          setTimeout(() => {
             navigate('/eats');
          }, 3000);
-
       }
    }
 

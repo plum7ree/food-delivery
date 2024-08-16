@@ -44,27 +44,42 @@ dependencies:
   axios:
     specifier: 1.6.8
     version: 1.6.8
+  js-cookie:
+    specifier: ^3.0.5
+    version: 3.0.5
   leaflet:
     specifier: 1.9.4
     version: 1.9.4
   nanoid:
     specifier: ^5.0.7
     version: 5.0.7
+  pkce-challenge:
+    specifier: ^4.1.0
+    version: 4.1.0
   react:
     specifier: ^18.0.0
     version: 18.2.0
   react-dom:
     specifier: ^18.0.0
     version: 18.2.0(react@18.2.0)
+  react-google-button:
+    specifier: ^0.8.0
+    version: 0.8.0(react@18.2.0)
   react-icons:
     specifier: ^5.2.0
     version: 5.2.1(react@18.2.0)
+  react-oauth2-code-pkce:
+    specifier: ^1.20.1
+    version: 1.20.1(react@18.2.0)
   react-redux:
     specifier: ^9.1.1
     version: 9.1.1(react@18.2.0)(redux@5.0.1)
   react-router-dom:
     specifier: ^6.22.3
     version: 6.22.3(react-dom@18.2.0)(react@18.2.0)
+  redux-persist:
+    specifier: ^6.0.0
+    version: 6.0.0(react@18.2.0)(redux@5.0.1)
   sockjs-client:
     specifier: ^1.6.1
     version: 1.6.1
@@ -1473,6 +1488,11 @@ packages:
       hasown: 2.0.2
     dev: false
 
+  /js-cookie@3.0.5:
+    resolution: {integrity: sha512-cEiJEAEoIbWfCZYKWhVwFuvPX1gETRYPw6LlaTKoxD3s2AkXzkCjnp6h0V77ozyqj0jakteJ4YqDJT830+lVGw==}
+    engines: {node: '>=14'}
+    dev: false
+
   /js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
     dev: false
@@ -1585,6 +1605,11 @@ packages:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
     dev: false
 
+  /pkce-challenge@4.1.0:
+    resolution: {integrity: sha512-ZBmhE1C9LcPoH9XZSdwiPtbPHZROwAnMy+kIFQVrnMCxY4Cudlz3gBOpzilgc0jOgRaiT3sIWfpMomW2ar2orQ==}
+    engines: {node: '>=16.20.0'}
+    dev: false
+
   /postcss@8.4.39:
     resolution: {integrity: sha512-0vzE+lAiG7hZl1/9I8yzKLx3aR9Xbof3fBHKunvMfOCYAtMhrsnccJY2iTURb9EZd5+pLuiNV9/c/GZJOHsgIw==}
     engines: {node: ^10 || ^12 || >=14}
@@ -1620,6 +1645,15 @@ packages:
       scheduler: 0.23.0
     dev: false
 
+  /react-google-button@0.8.0(react@18.2.0):
+    resolution: {integrity: sha512-0u6mbDcTUmWzgXsld8FJpbrXP+zDsNQVYPIt225aBqwgJ/CdrDiep1PZOpnyntyjsejWG0TtQr6uZB4eIaXlJQ==}
+    peerDependencies:
+      react: '>= 16.8.0'
+    dependencies:
+      prop-types: 15.8.1
+      react: 18.2.0
+    dev: false
+
   /react-icons@5.2.1(react@18.2.0):
     resolution: {integrity: sha512-zdbW5GstTzXaVKvGSyTaBalt7HSfuK5ovrzlpyiWHAFXndXTdd/1hdDHI4xBM1Mn7YriT6aqESucFl9kEXzrdw==}
     peerDependencies:
@@ -1634,6 +1668,14 @@ packages:
 
   /react-is@18.2.0:
     resolution: {integrity: sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==}
+    dev: false
+
+  /react-oauth2-code-pkce@1.20.1(react@18.2.0):
+    resolution: {integrity: sha512-HX/OpIKX6cnvKy80rqEgRfX8N+mXuM+266meoYGOi83I7vqcfPePdr+4Cwtly7DDDeHL9FeB91LV1Nk6BSLZVA==}
+    peerDependencies:
+      react: '>=16.8.0'
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react-redux@9.1.1(react@18.2.0)(redux@5.0.1):
@@ -1704,6 +1746,19 @@ packages:
     engines: {node: '>=0.10.0'}
     dependencies:
       loose-envify: 1.4.0
+    dev: false
+
+  /redux-persist@6.0.0(react@18.2.0)(redux@5.0.1):
+    resolution: {integrity: sha512-71LLMbUq2r02ng2We9S215LtPu3fY0KgaGE0k8WRgl6RkqxtGfl7HUozz1Dftwsb0D/5mZ8dwAaPbtnzfvbEwQ==}
+    peerDependencies:
+      react: '>=16'
+      redux: '>4.0.0'
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      react: 18.2.0
+      redux: 5.0.1
     dev: false
 
   /redux-thunk@3.1.0(redux@5.0.1):

@@ -19,7 +19,10 @@ import RestaurantListFromSearch from "./eats/RestaurantListFromSearch";
 import {useDispatch, useSelector} from "react-redux";
 import Login from "./Login";
 import Register from "./eats/Register";
-import {PersistGate} from "redux-persist/integration/react";
+import {asyncGetAuth} from "./state/authSlice";
+// import {PersistGate} from "redux-persist/integration/react";
+// import PostToken from "./ReceiveGoogleOAuth2Token(googleclientsidenotworking)";
+// import ReceiveGoogleOAuth2TokenGoogleclientsidenotworking from "./ReceiveGoogleOAuth2Token(googleclientsidenotworking)";
 
 const IconContainer = styled(Box)({
    display: "flex",
@@ -48,15 +51,39 @@ const IconWrapper = styled(Box)({
    marginBottom: "10px",
 });
 const PrivateRoute = ({children}) => {
-   const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn ?? false);
+   const dispatch = useDispatch();
+   const getAuthStatus = useSelector((state) => state.auth.getAuthStatus);
+   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+
+   useEffect(() => {
+      if (getAuthStatus === 'idle') {
+         console.log('idle')
+         dispatch(asyncGetAuth());
+      }
+   }, [dispatch, getAuthStatus]);
+
+   if (getAuthStatus === 'pending') {
+      console.log('pending')
+      return <div>Loading...</div>;
+   }
+
+   if (getAuthStatus === 'rejected') {
+      console.log('rejected')
+
+      return <Navigate to="/login"/>;
+   }
+
    return isLoggedIn ? children : <Navigate to="/login"/>;
 };
-
 const router = createBrowserRouter([
    {
       path: "/login",
       element: <Login/>,
    },
+   // {
+   //    path: "/token",
+   //    element: <ReceiveGoogleOAuth2TokenGoogleclientsidenotworking/>,
+   // },
    {
       path: "/register",
       element: <Register/>,
