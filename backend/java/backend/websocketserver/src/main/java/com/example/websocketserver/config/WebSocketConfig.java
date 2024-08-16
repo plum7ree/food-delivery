@@ -1,7 +1,9 @@
 package com.example.websocketserver.config;
 
 
+import com.example.websocketserver.decoder.WebSocketJwtAuthenticationFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -24,6 +26,9 @@ import java.util.Objects;
 @Slf4j
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    @Autowired
+    private WebSocketJwtAuthenticationFilter webSocketJwtAuthenticationFilter;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/queue", "/topic");
@@ -41,26 +46,40 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             .withSockJS();
     }
 
+
+    //TODO setUserId 와 같은 jwt 세션 정보 Redis 에 저장.
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                log.info("InboundChannel: {}", message.getHeaders());
-                //
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    log.info("websocket InboundChannel trying connect!");
-                    //note: oauth2 sub 이 아니라 user db 의 uuid primary key
-                    String authorizationHeader = Objects.requireNonNull(accessor.getNativeHeader("Authorization")).get(0);
-                    String jwtToken = Arrays.stream(authorizationHeader.split(" ")).toList().get(1);
-                    log.info("jwtToken : {}", jwtToken);
-                    // accessor.setUser(() -> userId);
+                    log.info("WebSocket InboundChannel trying to connect!");
+                    try {
+                        String authorizationHeader = Objects.requireNonNull(accessor.getNativeHeader("Authorization")).get(0);
+                        String jwtToken = Arrays.stream(authorizationHeader.split(" ")).toList().get(1);
+                        log.info("JWT Token: {}", jwtToken);
+
+                        String userId = webSocketJwtAuthenticationFilter.validateTokenAndReturnUserId(jwtToken);
+                        if (userId == null) {
+                            log.warn("Invalid JWT token. Connection rejected.");
+                            return null; // Returning null rejects the connection
+                        }
+
+                        // Set the authenticated user
+                        accessor.setUser(() -> userId);
+                        log.info("User authenticated. setUser userId: {} ", userId);
+                    } catch (Exception e) {
+                        log.error("Error during WebSocket authentication", e);
+                        return null; // Reject the connection on any exception
+                    }
                 }
                 return message;
             }
         });
     }
+
 // 성공 했을 시 로그
 // 질문: session 설정 은 어디서?
 //{simpMessageType=CONNECT, stompCommand=CONNECT,
