@@ -113,11 +113,12 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/classes/restaurant</outputDirectory>
+                            <outputDirectory>${project.build.directory}/classes/restaurant-approval</outputDirectory>
                             <resources>
                                 <resource>
                                     <!-- compile 해야 설치됨. -->
-                                    <directory>${project.parent.basedir}/test-data-generation/restaurant</directory>
+                                    <directory>${project.parent.basedir}/test-data-generation/restaurant-approval
+                                    </directory>
                                     <includes>
                                         <!--                                        <include>init-data.sql</include>-->
                                         <include>init-schema.sql</include>

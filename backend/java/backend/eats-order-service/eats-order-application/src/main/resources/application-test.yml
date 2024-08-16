@@ -1,10 +1,6 @@
 server:
   port: 8074
 
-spring:
-  application:
-    name: eats-order-application
-
 logging:
   level:
     root: WARN
@@ -21,6 +17,11 @@ logging:
     org.apache.kafka: WARN
     kafka: WARN
 
+
+spring:
+  application:
+    name: eats-order-application
+
   jpa:
     hibernate.ddl-auto: none
     show-sql: true
@@ -34,12 +35,12 @@ logging:
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
-#  sql:
-#    init:
-#      platform: postgres
-#      schema-locations: classpath:orders/init-schema.sql
-#      data-locations: classpath:orders/init-data.sql
-#      mode: always
+  sql:
+    init:
+      platform: postgres
+      schema-locations: classpath:orders/init-schema.sql
+      data-locations: classpath:orders/init-data.sql
+      mode: always
 
 
 retry-config:

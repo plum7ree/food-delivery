@@ -1,12 +1,12 @@
-package com.example.eatsorderdomain.data.dto;
+package com.example.user.data.dto.order;
 
 
-import com.example.commondata.domain.aggregate.valueobject.Address;
-import com.example.eatsorderdomain.data.dto.OrderItemDto;
-import com.example.eatsorderdomain.data.dto.PaymentDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +28,7 @@ public class CreateOrderCommandDto {
     private BigDecimal price; //TODO how to add info of currency? won, dollars...
     @NotNull
     @JsonProperty
-    private Address address;
+    private AddressDto address;
     @NotNull
     @JsonProperty
     private PaymentDto payment;
@@ -39,6 +39,7 @@ public class CreateOrderCommandDto {
     @NotNull
     @JsonProperty
     private UUID orderId;
+
     public void validate() {
     }
 }

@@ -16,8 +16,8 @@ public interface RestaurantApprovalRequestOutboxRepository extends JpaRepository
 
     @Query(value = "SELECT * FROM restaurant_approval_outbox " +
         "WHERE saga_type = :sagaType " +
-        "AND outbox_status = CAST(:outboxStatus AS outbox_status) " +
-        "AND saga_status = ANY(CAST(:sagaStatuses AS saga_status[]))",
+        "AND outbox_status = :outboxStatus " +
+        "AND saga_status IN :sagaStatuses",
         nativeQuery = true)
     Optional<List<RestaurantApprovalOutboxMessageEntity>> findBySagaTypeAndOutboxStatusAndSagaStatusIn(
         @Param("sagaType") String sagaType,
@@ -26,7 +26,7 @@ public interface RestaurantApprovalRequestOutboxRepository extends JpaRepository
 
 
     @Query(value = "SELECT * FROM restaurant_approval_outbox " +
-        "WHERE saga_type = :sagaType AND outbox_status = CAST(:status AS outbox_status) " +
+        "WHERE saga_type = :sagaType AND outbox_status = :status " +
         "LIMIT 1",
         nativeQuery = true)
     Optional<RestaurantApprovalOutboxMessageEntity> findBySagaTypeAndOutboxStatus(

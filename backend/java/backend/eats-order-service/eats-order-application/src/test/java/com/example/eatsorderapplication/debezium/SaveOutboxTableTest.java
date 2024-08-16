@@ -87,9 +87,9 @@ public class SaveOutboxTableTest {
                 .processedAt(now)
                 .sagaType(type)
                 .payload(payload)
-                .orderStatus(orderStatus)
-                .sagaStatus(sagaStatus)
-                .outboxStatus(outboxStatus)
+                .orderStatus(orderStatus.name())
+                .sagaStatus(sagaStatus.name())
+                .outboxStatus(outboxStatus.name())
                 .version(version)
                 .build();
 

@@ -1,12 +1,10 @@
 server:
-  port: 8076
+  port: 8074
 
 
 spring:
   application:
-    name: restaurant-approval-service
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
+    name: eats-order-application
 
   jpa:
     hibernate.ddl-auto: none
@@ -17,22 +15,20 @@ spring:
   database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=restaurant&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://order-db:5434/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
   sql:
     init:
       platform: postgres
-      schema-locations: classpath:restaurant-approval/init-schema.sql
-      #      data-locations: classpath:restaurant-approval/init-data.sql
+      schema-locations: classpath:orders/init-schema.sql
+      data-locations: classpath:orders/init-data.sql
       mode: always
   h2:
     console:
       enabled: true
 
-
-# for test. These should be moved into configserver
 retry-config:
   initial-interval-ms: 1000
   max-interval-ms: 10000
@@ -40,23 +36,55 @@ retry-config:
   maxAttempts: 3
   sleep-time-ms: 2000
 
-this-service:
-  outbox-scheduler-fixed-rate-ms: 1000
-  outbox-scheduler-initial-delay-ms: 1000
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # health, info, ...
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    heath:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+#
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://eurekaserver:8761/eureka/
+
 
 topic-names:
-  payment-request-topic-name: payment-request # TODO remove
-  payment-response-topic-name: payment-response # TODO remove
+  payment-request-topic-name: payment-request
+  payment-response-topic-name: payment-response
   restaurant-approval-request-topic-name: restaurant-approval-request
   restaurant-approval-response-topic-name: restaurant-approval-response
 
 kafka-config:
-  bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
+  # 띄어쓰기 ㄴㄴ. localhost:19092 대신 kafka-broker-1:9092 (같은 네트워크라서 그런듯)
+  bootstrap-servers: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
   schema-registry-url-key: schema.registry.url
-  schema-registry-url: http://localhost:8081
+  schema-registry-url: http://schema-registry:8081
   topic-names-to-create:
-    - debezium.payment-response
     - debezium.payment-request
+    - debezium.payment-response
+    - debezium.restaurant-approval-request
+    - debezium.restaurant-approval-response
   num-of-partitions: 3
   replication-factor: 3
 
@@ -74,7 +102,6 @@ kafka-producer-config:
 kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-  consumer-group-id: debezium.payment-topic-consumer-group-id
   auto-offset-reset: earliest
   specific-avro-reader-key: specific.avro.reader
   specific-avro-reader: true
@@ -89,13 +116,19 @@ kafka-consumer-config:
   max-partition-fetch-bytes-boost-factor: 1
   poll-timeout-ms: 150
   enable-auto-commit: true
-
 kafka-consumer-group-id:
-  restaurant-approval-request-consumer-group-id: restaurant-approval-request-topic-consumer-group-id
+  payment-consumer-group-id: debezium.payment-topic-consumer-group-id
+  restaurant-approval-response-consumer-group-id: debezium.driver-approval-topic-consumer-group-id
 
 
+user:
+  service:
+    url: "http://user:8077/api/info" # TODO http://user:8077 ?
+  restaurant-info:
+    url: "http://user:8077/api/restaurant"
 
-logging:
-  level:
-    org.springframework.context: DEBUG
-    com.example: DEBUG
+this-service:
+  outbox-scheduler-fixed-rate-ms: 1000
+  outbox-scheduler-initial-delay-ms: 1000
+
+

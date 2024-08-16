@@ -1,5 +1,6 @@
 package com.example.user.controller;
 
+import com.example.user.data.dto.order.*;
 import com.example.user.service.AccountService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,9 +12,7 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,12 +25,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,7 +45,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class PayController {
 
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
     @Value("${eats-order-service.create-order.uri}")
     private String orderServiceUri;
 
@@ -76,6 +75,9 @@ public class PayController {
     public ResponseEntity<JSONObject> prepare(@RequestBody JSONObject orderRequest) {
         log.info("prepare orderRequest: {}", orderRequest);
         // 주문 정보를 Redis에 저장
+        assert orderRequest.get("orderId") != null;
+        assert orderRequest.get("restaurantId") != null;
+        assert orderRequest.get("menus") != null;
         var orderId = orderRequest.get("orderId");
         redisTemplate.opsForValue().set("order:" + orderId, orderRequest.toString());
 
@@ -136,134 +138,146 @@ public class PayController {
 
         InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
 
-        // 결제 성공 및 실패 비즈니스 로직을 구현하세요.
+
         Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-        JSONObject jsonObject = (JSONObject) parser.parse(reader);
+        JSONObject tossResponseJsonObject = (JSONObject) parser.parse(reader);
         responseStream.close();
 
-        // 레디스 에서 order 가져오자.
-        String jsonStr = redisTemplate.opsForValue().get(orderId);
+        /**
+         /prepare 에서 저장했던, order 가져오기.
+         {"orderId":"2d88fd82-143d-444e-aedf-f56da4a78fee",
+         "menus":[
+         {
+         "menuId":"864293bc-cf74-42db-94f3-8c1ffeab9828",
+         "quantity":1,
+         "selectedOptions":[
+         {
+         "optionId":"4acc880e-61ce-4e84-9598-1ba676d721b9",
+         "quantity":1
+         },
+         {
+         "optionId":"4b739d9e-0f30-445c-8b81-a8186b52622d",
+         "quantity":1
+         }]}]
+         ,"restaurantId":{}}
+         **/
+        String jsonStr = redisTemplate.opsForValue().get("order:" + orderId);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(jsonStr);
-        log.info(jsonNode.toString());
 
+        // User 정보 가져옴.
         var sub = Objects.requireNonNull(headers.get("X-Auth-User-Sub")).get(0);
         var accountEntity = accountService.getUserByOauth2Subject(sub);
 
         // 성공시 eats order service 에게 승인 요청해야함.
         String userId = accountEntity.get().getId();
         String restaurantId = jsonNode.get("restaurantId").asText();
-        BigDecimal price = new BigDecimal("100.500000");
 
-        String address = """
-            {
-              "street": "123 Main St",
-              "postalCode": "12345",
-              "city": "City"
-            }
-            """;
+        CreateOrderCommandDto createOrderCommandDto = CreateOrderCommandDto.builder()
+            .callerId(UUID.fromString(userId))
+            .calleeId(UUID.fromString(restaurantId))
+            .price(new BigDecimal(amount))
+            .address(createAddress(jsonNode))
+            .payment(createPaymentDto(paymentKey))
+            .items(createOrderItems(jsonNode))
+            .orderId(UUID.fromString(orderId))
+            .build();
+        HttpHeaders orderRequestHeaders = new HttpHeaders();
+        orderRequestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        String orderItemJson = """
-            {
-                "product": {
-                    "name": "Product Name",
-                    "description": "Description"
-                },
-                "quantity": 1,
-                "price": {
-                    "amount": "50.25"
-                },
-                "subTotal": {
-                    "amount": "50.25"
-                }
-            }
-            """;
+        HttpEntity<CreateOrderCommandDto> orderRequest = new HttpEntity<>(createOrderCommandDto, orderRequestHeaders);
 
-        String jsonPayload = String.format("""
-                {
-                    "callerId": "%s",
-                    "calleeId": "%s",
-                    "price": %f,
-                    "address": %s,
-                    "payment": null,
-                    "items": [%s]
-                }
-                """,
-            userId,
-            restaurantId,
-            price,
-            address,
-            orderItemJson);
-//        HttpEntity<String> entity = new HttpEntity<>(testData.jsonPayload, testData.headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+            orderServiceUri,
+            HttpMethod.POST,
+            orderRequest,
+            String.class
+        );
 
-//        restTemplate.exchange(orderServiceUri);
-
-        return ResponseEntity.status(code).body(jsonObject);
+        return ResponseEntity.status(response.getStatusCode()).body((JSONObject) parser.parse(response.getBody()));
     }
 
-//    @RequestMapping(value = "/test/confirm")
-//    public ResponseEntity<JSONObject> testConfirmPayment(@RequestBody String jsonBody) throws Exception {
-//        HttpEntity<String> entity = new HttpEntity<>(testData.jsonPayload, testData.headers);
-//        UUID userId = UUID.fromString("d290f1ee-6c54-4b01-90e6-d701748f0851");
-//        UUID driverId = UUID.fromString("c240a1ee-6c54-4b01-90e6-d701748f0852");
-//        BigDecimal price = new BigDecimal("100.500000");
-//
-//        String address = """
-//            {
-//              "street": "123 Main St",
-//              "postalCode": "12345",
-//              "city": "City"
-//            }
-//            """;
-//
-//        String orderItemJson = """
-//            {
-//                "product": {
-//                    "name": "Product Name",
-//                    "description": "Description"
-//                },
-//                "quantity": 1,
-//                "price": {
-//                    "amount": "50.25"
-//                },
-//                "subTotal": {
-//                    "amount": "50.25"
-//                }
-//            }
-//            """;
-//
-//        String jsonPayload = String.format("""
-//                {
-//                    "callerId": "%s",
-//                    "calleeId": "%s",
-//                    "price": %f,
-//                    "address": %s,
-//                    "payment": null,
-//                    "items": [%s]
-//                }
-//                """,
-//            userId,
-//            driverId,
-//            price,
-//            address,
-//            orderItemJson);
-//        restTemplate.exchange(orderServiceUri)
-//
-//        ResponseEntity<RestaurantDto> userResponse = restTemplate.exchange(
-//            orderServiceUri,
-//            HttpMethod.POST,
-//            requestEntity,
-//            RestaurantDto.class
-//        );
-//
-//            HttpEntity<String> entity = new HttpEntity<>(testData.jsonPayload, testData.headers);
-//
-//            // When
-//            ResponseEntity<EatsOrderResponseDto> response = restTemplate.postForEntity(appUrl + "/api/createorder", entity, EatsOrderResponseDto.class);
 
-//        if (userResponse.getStatusCode() == HttpStatus.BAD_REQUEST) {
-//            return Optional.empty();
-//        }
-//        return Optional.ofNullable(userResponse.getBody());
-//    }
+    private AddressDto createAddress(JsonNode jsonNode) {
+        // Address 생성 로직 구현
+        return new AddressDto(UUID.randomUUID(), "", "", ""); // 실제 구현에 맞게 수정 필요
+    }
+
+    private PaymentDto createPaymentDto(String paymentKey) {
+        // PaymentDto 생성 로직 구현
+        return new PaymentDto(); // 실제 구현에 맞게 수정 필요
+    }
+
+    private List<OrderItemDto> createOrderItems(JsonNode jsonNode) {
+        List<OrderItemDto> items = new ArrayList<>();
+        JsonNode menusNode = jsonNode.get("menus");
+        for (JsonNode menuNode : menusNode) {
+            UUID menuId = UUID.fromString(menuNode.get("menuId").asText());
+            int quantity = menuNode.get("quantity").asInt();
+
+            List<OptionDto> options = new ArrayList<>();
+            JsonNode optionsNode = menuNode.get("selectedOptions");
+            for (JsonNode optionNode : optionsNode) {
+                OptionDto option = OptionDto.builder()
+                    .id(UUID.fromString(optionNode.get("optionId").asText()))
+                    .cost(BigInteger.valueOf(optionNode.get("quantity").asLong()))
+                    .build();
+                options.add(option);
+            }
+
+            OrderItemDto orderItem = OrderItemDto.builder()
+                .id(menuId)
+                .quantity(quantity)
+                .price(BigDecimal.ZERO) // 서버에서 계산
+                .optionDtoList(options)
+                .build();
+            items.add(orderItem);
+        }
+        return items;
+    }
+
+    private String createOrderItemDtoString(JsonNode jsonNode) {
+        StringBuilder orderItemJsonBuilder = new StringBuilder();
+        JsonNode menusNode = jsonNode.get("menus");
+        for (int i = 0; i < menusNode.size(); i++) {
+            JsonNode menuNode = menusNode.get(i);
+            String menuId = menuNode.get("menuId").asText();
+            int quantity = menuNode.get("quantity").asInt();
+
+            StringBuilder optionsJsonBuilder = new StringBuilder();
+            JsonNode optionsNode = menuNode.get("selectedOptions");
+            for (int j = 0; j < optionsNode.size(); j++) {
+                JsonNode optionNode = optionsNode.get(j);
+                String optionId = optionNode.get("optionId").asText();
+                assert (optionId != null);
+                int optionQuantity = optionNode.get("quantity").asInt();
+                assert (optionQuantity > 0);
+                optionsJsonBuilder.append(String.format("""
+                    {
+                        "id": "%s",
+                        "name": "",
+                        "cost": %d
+                    }""", optionId, optionQuantity));
+
+                if (j < optionsNode.size() - 1) {
+                    optionsJsonBuilder.append(",");
+                }
+            }
+
+            orderItemJsonBuilder.append(String.format("""
+                {
+                    "id": "%s",
+                    "quantity": %d,
+                    "price": 0,
+                    "optionDtoList": [%s]
+                }""", menuId, quantity, optionsJsonBuilder.toString()));
+
+            if (i < menusNode.size() - 1) {
+                orderItemJsonBuilder.append(",");
+            }
+        }
+
+        return orderItemJsonBuilder.toString();
+    }
+
 }

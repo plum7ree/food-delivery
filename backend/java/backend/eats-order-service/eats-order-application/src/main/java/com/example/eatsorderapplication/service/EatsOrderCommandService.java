@@ -44,10 +44,12 @@ public class EatsOrderCommandService {
     public EatsOrderResponseDto createAndSaveOrder(CreateOrderCommandDto createOrderCommandDto) {
         try {
             Order order = DtoDataMapper.orderDtoToOrder(createOrderCommandDto);
+            log.info("EatsOrderCommandService.createAndSaveOrder order : {}", order.toString());
 
             log.info("try to save a call. Id: {}", order.getId().getValue());
             {
                 OrderEntity orderEntity = RepositoryEntityDataMapper.orderToOrderEntity(order);
+                log.info("EatsOrderCommandService.createAndSaveOrder orderEntity : {}", orderEntity.toString());
                 orderRepository.save(orderEntity);
                 orderRepository.save(orderEntity);
 

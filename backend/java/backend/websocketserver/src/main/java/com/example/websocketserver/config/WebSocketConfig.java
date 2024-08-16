@@ -15,6 +15,10 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 @Configuration
 @EnableWebSocketMessageBroker
 @Slf4j
@@ -43,12 +47,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 log.info("InboundChannel: {}", message.getHeaders());
+                //
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     log.info("websocket InboundChannel trying connect!");
                     //note: oauth2 sub 이 아니라 user db 의 uuid primary key
-                    // String userId = accessor.getFirstNativeHeader("X-Auth-User-Id");
-                    // log.info("userId : {}", userId);
+                    String authorizationHeader = Objects.requireNonNull(accessor.getNativeHeader("Authorization")).get(0);
+                    String jwtToken = Arrays.stream(authorizationHeader.split(" ")).toList().get(1);
+                    log.info("jwtToken : {}", jwtToken);
                     // accessor.setUser(() -> userId);
                 }
                 return message;
@@ -56,14 +62,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         });
     }
 // 성공 했을 시 로그
+// 질문: session 설정 은 어디서?
 //{simpMessageType=CONNECT, stompCommand=CONNECT,
 // nativeHeaders={accept-version=[1.2,1.1,1.0], heart-beat=[10000,10000]},
 // simpSessionAttributes={}, simpHeartbeat=[J@2d341aa5, simpSessionId=yez3g10l}
 // websocket InboundChannel trying connect!
+
+// // 여기서 보면 nativeHeaders 에 id=sub-0 으로 되어있다.
 //InboundChannel: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE,
 // nativeHeaders={id=[sub-0], destination=[/user/queue/notifications]},
 // simpSessionAttributes={}, simpHeartbeat=[J@4f546ed1, simpSubscriptionId=sub-0,
 // simpSessionId=yez3g10l, simpDestination=/user/queue/notifications}
+
+
 //InboundChannel: {simpMessageType=SUBSCRIBE, stompCommand=SUBSCRIBE,
 // nativeHeaders={id=[sub-1], destination=[/user/topic/heartbeat]},
 // simpSessionAttributes={}, simpHeartbeat=[J@3164d254, simpSubscriptionId=sub-1,

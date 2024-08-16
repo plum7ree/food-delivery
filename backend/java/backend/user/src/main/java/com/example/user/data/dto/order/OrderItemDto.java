@@ -1,24 +1,27 @@
-package com.example.eatsorderdomain.data.dto;
+package com.example.user.data.dto.order;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class OptionDto {
-    @JsonIgnore
+public class OrderItemDto {
     @NotNull
     private UUID id;
-    private String name;
-    private BigInteger cost;
+    @NotNull
+    private Integer quantity;
+    @NotNull
+    private BigDecimal price;
+
+    private List<OptionDto> optionDtoList;
 
 }

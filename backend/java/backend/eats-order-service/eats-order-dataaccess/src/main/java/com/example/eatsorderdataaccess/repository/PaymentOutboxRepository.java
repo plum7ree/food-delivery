@@ -14,7 +14,7 @@ public interface PaymentOutboxRepository extends JpaRepository<PaymentOutboxMess
 
     @Query(value = "SELECT * FROM payment_outbox " +
         "WHERE saga_id = :sagaId " +
-        "AND saga_status = ANY(CAST(:sagaStatus AS saga_status))",
+        "AND saga_status = :sagaStatus",
         nativeQuery = true)
     Optional<PaymentOutboxMessageEntity> findBySagaIdAndSagaStatus(
         @Param("sagaId") String sagaType,

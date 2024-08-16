@@ -100,4 +100,4 @@ eureka:
 
 eats-order-service:
   create-order:
-    uri: http://eats-order-application:8074/createorder
+    uri: http://eats-order-application:8074/api/createorder

@@ -75,7 +75,7 @@ services:
   #    volumes:
   #      - ./logs/user:/app/logs # 로그 파일 볼륨 마운트
 
-  #TODO eureka server 에 계속 app 이름 config-data 로 들어감. profile 설정을 해서 제대로 된 application.yml 를 줘야하나?
+  #TODO eureka server 에 계속 app 이름 config-data 로 들어감. profile 설정을 해서 제대로 된 application-test.yml 를 줘야하나?
   eats-order-application:
     image: lomojiki/uber-msa-eats-order-application
     container_name: eats-order-application

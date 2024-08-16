@@ -147,9 +147,9 @@ public class RestaurantApprovalRequestOutboxScheduler {
                             metadata.partition(),
                             metadata.offset(),
                             metadata.timestamp());
-                        originalEntity.setOrderStatus(OrderStatus.PENDING);
-                        originalEntity.setOutboxStatus(OutboxStatus.COMPLETED);
-                        originalEntity.setSagaStatus(SagaStatus.PROCESSING);
+                        originalEntity.setOrderStatus(OrderStatus.PENDING.name());
+                        originalEntity.setOutboxStatus(OutboxStatus.COMPLETED.name());
+                        originalEntity.setSagaStatus(SagaStatus.PROCESSING.name());
                         originalEntity.setProcessedAt(ZonedDateTime.now());
                         originalEntity.setCreatedAt(originalEntity.getCreatedAt());
                         originalEntity.setVersion(originalEntity.getVersion());

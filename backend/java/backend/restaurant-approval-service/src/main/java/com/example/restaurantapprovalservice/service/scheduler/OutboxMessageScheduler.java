@@ -138,7 +138,7 @@ public class OutboxMessageScheduler {
                             metadata.partition(),
                             metadata.offset(),
                             metadata.timestamp());
-                        originalEntity.setOutboxStatus(OutboxStatus.COMPLETED);
+                        originalEntity.setOutboxStatus(OutboxStatus.COMPLETED.name());
                         originalEntity.setProcessedAt(ZonedDateTime.now());
                         originalEntity.setCreatedAt(originalEntity.getCreatedAt());
                         originalEntity.setVersion(originalEntity.getVersion());

@@ -1,4 +1,4 @@
-package com.example.eatsorderdomain.data.dto;
+package com.example.user.data.dto.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;

@@ -1,6 +1,12 @@
 server:
   port: 8074
 
+logging:
+  level:
+    org.apache.kafka: ERROR
+    org.springframework.kafka: ERROR
+    kafka: ERROR
+    state.change.logger: ERROR
 
 spring:
   application:
@@ -15,7 +21,7 @@ spring:
   database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://localhost:5434/postgres?currentSchema=order&binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver

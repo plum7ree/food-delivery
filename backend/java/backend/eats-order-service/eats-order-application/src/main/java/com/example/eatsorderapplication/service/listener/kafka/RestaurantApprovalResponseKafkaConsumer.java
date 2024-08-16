@@ -131,7 +131,7 @@ public class RestaurantApprovalResponseKafkaConsumer {
     public void complete(Order order, UUID sagaId) throws JsonProcessingException {
         // 1. check Status.APPROVED already in restaurant approval request database
         if (orderApprovalRepository
-            .findByOrderIdAndStatus(order.getId().getValue(), RestaurantApprovalStatus.APPROVED)
+            .findByOrderIdAndStatus(order.getId().getValue(), RestaurantApprovalStatus.APPROVED.name())
             .isPresent()) {
             return;
         }
@@ -156,7 +156,7 @@ public class RestaurantApprovalResponseKafkaConsumer {
     public void rollback(Order order, UUID sagaId) throws JsonProcessingException {
         // 1. check Status.APPROVED already in restaurant approval request database
         if (orderApprovalRepository
-            .findByOrderIdAndStatus(order.getId().getValue(), RestaurantApprovalStatus.APPROVED)
+            .findByOrderIdAndStatus(order.getId().getValue(), RestaurantApprovalStatus.APPROVED.name())
             .isPresent()) {
             return;
         }
@@ -179,10 +179,10 @@ public class RestaurantApprovalResponseKafkaConsumer {
 
         optionalRestaurantApprovalOutboxMessageEntity.ifPresent(
             restaurantApprovalOutboxMessageEntity -> {
-                SagaStatus currSagaStatus = optionalRestaurantApprovalOutboxMessageEntity.get().getSagaStatus();
+                SagaStatus currSagaStatus = SagaStatus.valueOf(optionalRestaurantApprovalOutboxMessageEntity.get().getSagaStatus());
                 SagaStatus newSagaStatus = eatsOrderSaga.updateSagaStatus(currSagaStatus, order.getOrderStatus());
 
-                restaurantApprovalOutboxMessageEntity.setSagaStatus(newSagaStatus);
+                restaurantApprovalOutboxMessageEntity.setSagaStatus(newSagaStatus.name());
 
                 // update
                 restaurantApprovalRequestOutboxRepository.save(optionalRestaurantApprovalOutboxMessageEntity.get());
@@ -192,7 +192,7 @@ public class RestaurantApprovalResponseKafkaConsumer {
 
                 optionalPaymentOutboxMessageEntity.ifPresent(
                     paymentOutboxMessageEntity -> {
-                        paymentOutboxMessageEntity.setSagaStatus(newSagaStatus);
+                        paymentOutboxMessageEntity.setSagaStatus(newSagaStatus.name());
                         paymentOutboxRepository.save(paymentOutboxMessageEntity);
                     }
                 );

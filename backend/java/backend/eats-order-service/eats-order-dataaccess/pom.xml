@@ -52,6 +52,12 @@
             <version>5.0.0</version>
             <classifier>jakarta</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -62,6 +68,33 @@
                 <configuration>
                     <skip>true</skip>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes/restaurant-approval</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <!-- compile 해야 설치됨. -->
+                                    <directory>${project.parent.basedir}/test-data-generation/restaurant-approval
+                                    </directory>
+                                    <includes>
+                                        <!--                                        <include>init-data.sql</include>-->
+                                        <include>init-schema.sql</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

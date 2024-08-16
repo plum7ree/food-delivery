@@ -39,7 +39,11 @@ public class EatsOrderController {
     @PostMapping("/createorder")
     public ResponseEntity<EatsOrderResponseDto> createOrder(@RequestHeader HttpHeaders headers, @RequestBody CreateOrderCommandDto createOrderCommandDto) {
         try {
-
+            log.info("EatsOrderController.createOrder createOrderCommandDto : {}", createOrderCommandDto.toString());
+            assert (createOrderCommandDto.getOrderId() != null);
+            createOrderCommandDto.getItems().forEach(orderItemDto -> {
+                assert (orderItemDto.getId() != null);
+            });
             var response = eatsOrderCommandService.createAndSaveOrder(createOrderCommandDto);
             return ResponseEntity.ok(response);
 //            return ResponseEntity.ok(null);

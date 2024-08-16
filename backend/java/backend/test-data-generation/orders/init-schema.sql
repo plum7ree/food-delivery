@@ -67,6 +67,7 @@ CREATE TYPE saga_status AS ENUM ('STARTED', 'FAILED', 'SUCCEEDED', 'PROCESSING',
 DROP TYPE IF EXISTS outbox_status;
 CREATE TYPE outbox_status AS ENUM ('STARTED', 'COMPLETED', 'FAILED');
 
+
 DROP TABLE IF EXISTS "order".payment_outbox CASCADE;
 
 CREATE TABLE "order".payment_outbox
@@ -126,4 +127,14 @@ CREATE TABLE "order".customers
     first_name character varying COLLATE pg_catalog."default" NOT NULL,
     last_name  character varying COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT customers_pkey PRIMARY KEY (id)
+);
+
+DROP TABLE IF EXISTS "order".order_approval CASCADE; -- 해당 테이블에 의존하는 모든 객체들도 함께 삭제
+CREATE TABLE "order".order_approval
+(
+    id            uuid              NOT NULL,
+    restaurant_id uuid              NOT NULL,
+    order_id      uuid              NOT NULL,
+    status        character varying NOT NULL,
+    CONSTRAINT order_approval_pkey PRIMARY KEY (id)
 );

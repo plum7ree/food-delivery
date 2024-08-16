@@ -10,7 +10,6 @@ import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutbo
 import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.eatsorderdomain.data.mapper.DtoDataMapper;
 import com.example.kafka.avro.model.RequestAvroModel;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
@@ -121,20 +120,26 @@ public class RestaurantApprovalRequestKafkaConsumer {
     }
 
     @Transactional
-    public void complete(Order order, UUID sagaId) throws JsonProcessingException {
+    public void complete(Order order, UUID sagaId) throws Exception {
         // 1. check Status.APPROVED already in restaurant approval request database
-        if (orderApprovalRepository
-            .findByOrderIdAndStatus(order.getId().getValue(), RestaurantApprovalStatus.APPROVED)
-            .isPresent()) {
-            return;
+        try {
+            if (orderApprovalRepository
+                .findByOrderIdAndStatus(order.getId().getValue(), RestaurantApprovalStatus.APPROVED.name())
+                .isPresent()) {
+                return;
+            }
+        } catch (Exception e) {
+            throw new Exception("error orderApprovalRepository.findByOrderIdAndStatus() : " + e.getMessage());
         }
 
         // validate(order);
-        {
+        try {
             var entity = RepositoryEntityDataMapper.orderToOrderApproval(order, RestaurantApprovalStatus.APPROVED);
             orderApprovalRepository.save(entity);
+        } catch (Exception e) {
+            throw new Exception("error orderApprovalRepository.save(entity): " + e.getMessage());
         }
-        {
+        try {
             order.setOrderStatus(OrderStatus.CALLEE_APPROVED);
             var entity = RepositoryEntityDataMapper.orderToRestaurantApprovalOutboxMessageEntity(
                 order,
@@ -145,6 +150,8 @@ public class RestaurantApprovalRequestKafkaConsumer {
             );
 
             restaurantApprovalRequestOutboxRepository.save(entity);
+        } catch (Exception e) {
+            throw new Exception("error restaurantApprovalRequestOutboxRepository.save(entity): " + e.getMessage());
         }
 
     }

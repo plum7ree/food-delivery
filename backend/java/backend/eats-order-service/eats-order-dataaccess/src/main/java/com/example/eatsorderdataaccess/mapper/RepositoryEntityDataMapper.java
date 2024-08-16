@@ -76,9 +76,9 @@ public class RepositoryEntityDataMapper {
             .processedAt(ZonedDateTime.now(ZoneId.of("UTC")))
             .sagaType(sagaType)
             .payload(objectMapper.writeValueAsString(order))
-            .orderStatus(order.getOrderStatus())
-            .outboxStatus(outboxStatus)
-            .sagaStatus(sagaStatus)
+            .orderStatus(order.getOrderStatus().name())
+            .outboxStatus(outboxStatus.name())
+            .sagaStatus(sagaStatus.name())
             .version(1)
             .build();
     }
@@ -87,7 +87,7 @@ public class RepositoryEntityDataMapper {
         return OrderApprovalEntity.builder()
             .id(UUID.randomUUID())
             .orderId(order.getId().getValue())
-            .status(restaurantApprovalStatus)
+            .status(restaurantApprovalStatus.name())
             .restaurantId(order.getCalleeId().getValue())
             .build();
     }

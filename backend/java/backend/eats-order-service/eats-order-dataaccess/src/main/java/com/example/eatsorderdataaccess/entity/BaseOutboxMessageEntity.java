@@ -1,12 +1,14 @@
 package com.example.eatsorderdataaccess.entity;
 
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
-import com.example.commondata.domain.aggregate.valueobject.OutboxStatus;
-import com.example.commondata.domain.aggregate.valueobject.SagaStatus;
 import jakarta.annotation.Nonnull;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -35,21 +37,22 @@ public abstract class BaseOutboxMessageEntity {
     @Nonnull
     @Column(name = "saga_type")
     private String sagaType;
+
+    //TODO json 와 jsonb 의 차이.
     @Nonnull
     @Column(name = "payload")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Setter
     private String payload;
     @Nonnull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "order_status", columnDefinition = "order_status")
-    private OrderStatus orderStatus;
+    @Column(name = "order_status")
+    private String orderStatus;
     @Nonnull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "outbox_status", columnDefinition = "outbox_status")
-    private OutboxStatus outboxStatus;
+    @Column(name = "outbox_status")
+    private String outboxStatus;
     @Nonnull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "saga_status", columnDefinition = "saga_status")
-    private SagaStatus sagaStatus;
+    @Column(name = "saga_status")
+    private String sagaStatus;
 
     @Version
     private int version;

@@ -97,4 +97,4 @@ eureka:
 
 eats-order-service:
   create-order:
-    uri: http://localhost:8074/createorder
+    uri: http://localhost:8074/api/createorder
