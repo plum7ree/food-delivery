@@ -11,7 +11,7 @@ import {
    CssBaseline
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import {login} from "../state/authSlice";
+import {asyncLogin, asyncStoreAuth} from "../state/authSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {SERVER_URL} from "../state/const";
 
@@ -44,7 +44,8 @@ const Register = () => {
          });
          if (response.status === 200) {
             console.log('Registration successful');
-            dispatch(login({clientId: response.data.clientId, credential: response.data.credential}));
+            await dispatch(asyncStoreAuth({clientId: response.data.clientId, credential: response.data.credential}));
+            await dispatch(asyncLogin({clientId: response.data.clientId, credential: response.data.credential}));
             navigate('/');
          }
       } catch (error) {

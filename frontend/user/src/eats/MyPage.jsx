@@ -58,17 +58,17 @@ import RedeemIcon from '@mui/icons-material/Redeem';
 import {Link, useNavigate} from 'react-router-dom';
 import {ArrowBack, ChatBubble, Home, Restaurant} from "@mui/icons-material";
 import {SiAppwrite} from "react-icons/si";
-import {logout} from "../state/authSlice";
 import {useDispatch} from "react-redux";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import {asyncLogout} from "../state/authSlice";
 
 
 const MyPage = () => {
    const navigate = useNavigate();
    const dispatch = useDispatch();
 
-   const handleLogout = () => {
-      dispatch(logout());
+   const handleLogout = async () => {
+      await dispatch(asyncLogout());
       navigate('/login');
    };
    return (

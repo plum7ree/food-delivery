@@ -2,7 +2,7 @@
 // import from a built version: 'sockjs-client/dist/sockjs' instead of 'sockjs-client'
 // https://github.com/sockjs/sockjs-client/issues/439
 import SockJS from "sockjs-client/dist/sockjs"
-import {Client} from '@stomp/stompjs';
+import {Client, Stomp} from '@stomp/stompjs';
 import {addNotification, setConnectionStatus} from './notificationSlice';
 
 // 로그인 후 jwt 담아서 ws 연결
@@ -40,22 +40,24 @@ const websocketMiddleware = store => {
                // next는 다음 middleware 에게 action 전달
                return next(action);
             }
+            console.info('JWT token exists trying to connect');
 
-
-            // client = new Client({
-            //    webSocketFactory: () => new SockJS(`http://localhost:8080/sockjs?token=${credential}`,
-            //       null,
-            //       {withCredentials: true}),
-            //    onConnect,
-            //    onDisconnect,
-            // });
-
-            // client.activate();
+            // https://tjdans.tistory.com/25
+            // https://ably.com/blog/websocket-authentication
+            // sockjs 는 http 로 handshake 한 다음 ws 로 승격됨.
+            const socket = new SockJS('http://localhost:8080/sockjs');
+            const stompClient = Stomp.over(socket);
+            let headers = {Authorization: `Bearer ${credential}`};
+            stompClient.connect(headers, (frame) => {
+               onConnect();
+            }, (error) => {
+               onDisconnect();
+            })
             break;
 
          case 'notifications/disconnect':
             if (client) {
-               client.deactivate();
+               onDisconnect();
                client = null;
             }
             break;
