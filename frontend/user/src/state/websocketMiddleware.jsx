@@ -4,24 +4,25 @@
 import SockJS from "sockjs-client/dist/sockjs"
 import {Client, Stomp} from '@stomp/stompjs';
 import {addNotification, setConnectionStatus} from './notificationSlice';
+import {toast} from "react-toastify";
 
 // 로그인 후 jwt 담아서 ws 연결
 const websocketMiddleware = store => {
-   let client = null;
+   let stompClient = null;
 
    const onConnect = () => {
       console.info('websocket connected successfully.');
       store.dispatch(setConnectionStatus(true));
-      client.subscribe('/user/queue/notifications', message => {
+      // /user 가 들어가면 사용자별 메시지 라우팅이다.
+      stompClient.subscribe('/user/queue/notifications', message => {
          const newNotification = JSON.parse(message.body);
-         console.info("got message {}", newNotification);
          store.dispatch(addNotification(newNotification));
+         toast.success("Order Approved by Restaurant: " + newNotification.message);
       });
-      client.subscribe('/user/topic/heartbeat', message => {
-         const newNotification = JSON.parse(message.body);
-         console.info("got heartbeat {}", newNotification);
-         store.dispatch(addNotification(newNotification));
-      });
+      // stompClient.subscribe('/topic/heartbeat', message => {
+      //    const newNotification = JSON.parse(message.body);
+      //    store.dispatch(addNotification(newNotification));
+      // });
    };
 
    const onDisconnect = () => {
@@ -32,7 +33,7 @@ const websocketMiddleware = store => {
    return next => action => {
       switch (action.type) {
          case 'notifications/connect':
-            if (client) client.deactivate();
+            if (stompClient) stompClient.deactivate();
             const state = store.getState();
             const credential = state.auth.credential;
             if (!credential) {
@@ -40,13 +41,12 @@ const websocketMiddleware = store => {
                // next는 다음 middleware 에게 action 전달
                return next(action);
             }
-            console.info('JWT token exists trying to connect');
 
             // https://tjdans.tistory.com/25
             // https://ably.com/blog/websocket-authentication
             // sockjs 는 http 로 handshake 한 다음 ws 로 승격됨.
             const socket = new SockJS('http://localhost:8080/sockjs');
-            const stompClient = Stomp.over(socket);
+            stompClient = Stomp.over(socket);
             let headers = {Authorization: `Bearer ${credential}`};
             stompClient.connect(headers, (frame) => {
                onConnect();
@@ -56,9 +56,9 @@ const websocketMiddleware = store => {
             break;
 
          case 'notifications/disconnect':
-            if (client) {
+            if (stompClient) {
                onDisconnect();
-               client = null;
+               stompClient = null;
             }
             break;
 

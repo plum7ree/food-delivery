@@ -1,9 +1,10 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import './style.css'
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {SERVER_URL} from "../../state/const";
 import axiosInstance from "../../state/axiosInstance";
+import {asyncGetAuth} from "../../state/authSlice";
 
 export function CheckoutSuccessPage() {
    const [isConfirmed, setIsConfirmed] = useState(false);
@@ -12,33 +13,55 @@ export function CheckoutSuccessPage() {
    const orderId = searchParams.get('orderId');
    const paymentKey = searchParams.get('paymentKey');
    const amount = searchParams.get('amount');
-   console.log("checkout success page")
+
    const navigate = useNavigate();
-   const credential = useSelector((state) => state.auth?.credential ?? null);
+   const dispatch = useDispatch();
+   const credential = useSelector((state) => state.auth?.credential);
+   const getAuthStatus = useSelector((state) => state.auth?.getAuthStatus);
+
+   const [isButtonEnabled, setButtonEnabled] = useState(false);
+   // step1. getAuth 부르고, 아래의 useEffect 에서 getAuthStatus 관찰.
+   useEffect(() => {
+      dispatch(asyncGetAuth());
+   }, [dispatch]);
+
+   // step2. getAuthStatus 가 fulfilled 이면, credential 로드 된거임.
+   useEffect(() => {
+      if (getAuthStatus === 'fulfilled' && credential) {
+         setButtonEnabled(true)
+      } else {
+         setButtonEnabled(false)
+      }
+   }, [getAuthStatus, credential]);
 
    async function confirmPayment() {
-      // TODO: API를 호출해서 서버에게 paymentKey, orderId, amount를 넘겨주세요.
-      // 서버에선 해당 데이터를 가지고 승인 API를 호출하면 결제가 완료됩니다.
-      // https://docs.tosspayments.com/reference#%EA%B2%B0%EC%A0%9C-%EC%8A%B9%EC%9D%B8
-
       const dto = JSON.stringify({
          paymentKey,
          orderId,
          amount
-      })
-      console.assert(credential != null)
-      const response = await axiosInstance.post(`/user/api/pay/confirm`, dto, {
-         headers: {
-            "content-type": "application/json",
-            Authorization: `Bearer ${credential}`,
-         }
-      })
-      if (response.ok) {
-         console.log('Payment successful');
-         setIsConfirmed(true);
-         navigate('/eats');
+      });
 
-      } else {
+      try {
+         const response = await axiosInstance.post(`/user/api/pay/confirm`, dto, {
+            headers: {
+               "content-type": "application/json",
+               Authorization: `Bearer ${credential}`,
+            }
+         });
+
+         if (response.status === 200) {
+            console.log('Payment successful');
+            setIsConfirmed(true);
+            navigate('/eats');
+         } else {
+            console.error('Payment confirmation failed');
+            // 3초 후에 /eats 페이지로 이동
+            setTimeout(() => {
+               navigate('/eats');
+            }, 3000);
+         }
+      } catch (error) {
+         console.error('Error confirming payment:', error);
          // 3초 후에 /eats 페이지로 이동
          setTimeout(() => {
             navigate('/eats');
@@ -114,7 +137,7 @@ export function CheckoutSuccessPage() {
                   <h4 className="text-center description">결제 승인하고 완료해보세요.</h4>
                </div>
                <div className="w-100">
-                  <button className="btn primary w-100" onClick={confirmPayment}>
+                  <button className="btn primary w-100" onClick={confirmPayment}  disabled={!isButtonEnabled}>
                      결제 승인하기
                   </button>
                </div>

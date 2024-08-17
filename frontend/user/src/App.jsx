@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {createHashRouter, createBrowserRouter, Link, RouterProvider, Navigate} from "react-router-dom";
+import {createBrowserRouter, Link, Navigate, RouterProvider} from "react-router-dom";
 import "./styles.css";
 import UberLikeApp from "./UberLikeApp";
 import EatsMain from "./eats/EatsMain";
@@ -20,9 +20,8 @@ import {useDispatch, useSelector} from "react-redux";
 import Login from "./Login";
 import Register from "./eats/Register";
 import {asyncGetAuth} from "./state/authSlice";
-// import {PersistGate} from "redux-persist/integration/react";
-// import PostToken from "./ReceiveGoogleOAuth2Token(googleclientsidenotworking)";
-// import ReceiveGoogleOAuth2TokenGoogleclientsidenotworking from "./ReceiveGoogleOAuth2Token(googleclientsidenotworking)";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const IconContainer = styled(Box)({
    display: "flex",
@@ -50,17 +49,24 @@ const IconWrapper = styled(Box)({
    fontSize: "7rem",
    marginBottom: "10px",
 });
+
+/**
+ * React-Redux의 useSelector 훅:
+ * useSelector는 Redux 스토어의 상태를 구독합니다. 선택된 상태가 변경될 때마다 컴포넌트를 다시 렌더링합니다.
+ * 상태 변경 감지:
+ * Redux 스토어에서 isLoggedIn 상태가 변경되면, useSelector가 이를 감지합니다.
+ * 컴포넌트 리렌더링:
+ * 상태 변경이 감지되면, React는 PrivateRoute 컴포넌트를 리렌더링합니다.
+ * 조건부 렌더링:
+ * 리렌더링 시 새로운 isLoggedIn 값에 따라 적절한 내용(자식 컴포넌트 또는 리다이렉트)을 렌더링합니다.
+ *
+ * @param children
+ * @returns {*|React.JSX.Element}
+ * @constructor
+ */
 const PrivateRoute = ({children}) => {
-   const dispatch = useDispatch();
    const getAuthStatus = useSelector((state) => state.auth.getAuthStatus);
    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-
-   useEffect(() => {
-      if (getAuthStatus === 'idle') {
-         console.log('idle')
-         dispatch(asyncGetAuth());
-      }
-   }, [dispatch, getAuthStatus]);
 
    if (getAuthStatus === 'pending') {
       console.log('pending')
@@ -174,6 +180,24 @@ export default function App() {
    const dispatch = useDispatch();
    const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn ?? false);
    const credential = useSelector((state) => state.auth?.credential ?? null);
+   const getAuthStatus = useSelector((state) => state.auth.getAuthStatus);
+
+   useEffect(() => {
+      if (getAuthStatus === 'idle') {
+         dispatch(asyncGetAuth());
+      }
+   }, [dispatch, getAuthStatus]);
+
+   useEffect(() => {
+      if (isLoggedIn && credential) {
+         dispatch({type: 'notifications/connect'});
+      }
+
+      return () => {
+         dispatch({type: 'notifications/disconnect'});
+      };
+   }, [isLoggedIn, credential, dispatch]);
+
 
    useEffect(() => {
       if (isLoggedIn && credential) {
@@ -186,6 +210,9 @@ export default function App() {
    }, [isLoggedIn, credential, dispatch]);
 
    return (
-      <RouterProvider router={router}/>
+      <>
+         <RouterProvider router={router}/>
+         <ToastContainer autoClose={2000} stacked />
+      </>
    );
 }
