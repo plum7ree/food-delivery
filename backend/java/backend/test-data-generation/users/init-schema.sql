@@ -75,3 +75,21 @@ CREATE TABLE user_schema.option
     CONSTRAINT options_pkey PRIMARY KEY (id),
     CONSTRAINT fk_option_group_id FOREIGN KEY (option_group_id) REFERENCES user_schema.option_group (id)
 );
+
+-- options
+CREATE TABLE user_schema.reviews
+(
+    id            uuid                                           NOT NULL,
+    user_id       uuid                                           NOT NULL,
+    user_name     character varying COLLATE pg_catalog."default" NOT NULL,
+    restaurant_id uuid                                           NOT NULL,
+    rating        FLOAT                                          NOT NULL,
+    created_at    TIMESTAMP                                      NOT NULL,
+    updated_at    TIMESTAMP                                      NOT NULL,
+    image_url     character varying,
+    comment       VARCHAR(1000)                                  NOT NULL,
+    CONSTRAINT reviews_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_account_id FOREIGN KEY (user_id) REFERENCES user_schema.account (id),
+    CONSTRAINT fk_restaurant_id FOREIGN KEY (restaurant_id) REFERENCES user_schema.restaurant (id)
+
+);

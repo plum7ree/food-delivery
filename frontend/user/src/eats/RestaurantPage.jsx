@@ -9,6 +9,8 @@ import {Container, maxWidth} from "@mui/system";
 import {selectCartItemCount} from "../state/checkout/selectedMenuSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {initRestaurantIfNeeded} from "../state/checkout/selectedMenuSlice";
+import ReviewComponent from "./ReviewComponent";
+import ReviewsTestData from "./resources/ReviewsTestData";
 
 const RestaurantPicture = (props) => {
    const {pictureUrl1, type} = props.restaurant;
@@ -121,7 +123,7 @@ const RestaurantMenu = ({restaurantId, menus, onOptionSelect}) => {
          {menus.map((menu) => (
             <Grid container key={uuidv4()} item direction="row" justifyContent="space-between"
                   onClick={() => goToMenuPage(menu)}>
-               <Grid item >
+               <Grid item>
                   <Grid item>
                      <Typography variant="h5">{menu.name}</Typography>
                   </Grid>
@@ -146,6 +148,13 @@ const RestaurantPage = () => {
    const [currentTab, setCurrentTab] = useState(0); // 0 for Menu, 1 for Reviews
    const [total, setTotal] = useState(0);
 
+   // review example
+   const [reviews, setReviews] = useState([]);
+   const [reviewCount, setReviewCount] = useState(0);
+   const [rating, setRating] = useState(0);
+   const [ratingDistribution, setRatingDistribution] = useState({});
+
+
    const isTestMode = true;
 
    useEffect(() => {
@@ -155,6 +164,20 @@ const RestaurantPage = () => {
          console.log(mockRestaurant.menuDtoList)
          setRestaurantState(mockRestaurant);
          setRestaurantIdState(restaurant.id);
+
+         const reviewList = ReviewsTestData.get(restaurant.id)
+         setReviews(reviewList);
+         setReviewCount(reviewList.length)
+         setRating(5.0);
+         setReviewCount(503);
+         setRatingDistribution({
+            5: 98,
+            4: 1,
+            3: 1,
+            2: 0,
+            1: 0
+         })
+
       } else {
          const {restaurant} = location.state;
          setRestaurantIdState(restaurant.id);
@@ -170,6 +193,7 @@ const RestaurantPage = () => {
          fetchRestaurantContent(restaurantId);
       }
    }, [location]);
+
 
    const handleTabChange = (event, newValue) => {
       setCurrentTab(newValue);
@@ -215,22 +239,15 @@ const RestaurantPage = () => {
                )}
                {currentTab === 1 && (
                   <Grid container>
-                     {/* Review content goes here */}
+                     <ReviewComponent
+                        reviews={reviews}
+                        rating={rating}
+                        reviewCount={reviewCount}
+                        ratingDistribution={ratingDistribution}
+                     />
                   </Grid>
                )}
             </Grid>
-         </Grid>
-         {/* TODO need to fix this checkout button */}
-         <Grid item>
-            <Button
-               variant="contained"
-               color="success"
-               onClick={goToCheckoutPage}
-               fullWidth
-            >
-               Checkout
-            </Button>
-
          </Grid>
       </Container>
    );

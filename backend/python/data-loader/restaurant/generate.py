@@ -349,6 +349,43 @@ def generate_options():
     ]
 
 
+def generate_review(user_id, user_name, restaurant_id, menu_images):
+    now = datetime.datetime.now()
+    created_at = now - datetime.timedelta(days=random.randint(1, 30))  # 1~30일 전에 생성됨
+
+    return {
+        "id": str(uuid.uuid4()),
+        "userId": user_id,
+        "userName": user_name[:2] + "**",  # 이름의 첫 두 글자만 표시하고 나머지는 **로 마스킹
+        "restaurantId": restaurant_id,
+        "rating": round(random.uniform(1, 5), 1),  # 1.0에서 5.0 사이의 소수점 한 자리 rating
+        "created_at": created_at.isoformat(),  # ISO 형식의 문자열로 변환
+        "updated_at": now.isoformat(),  # 현재 시간을 업데이트 시간으로 사용
+        "imageUrl": random.choice(menu_images) if menu_images else None,
+        "comment": fake.paragraph()[:1000]  # 최대 1000자로 제한
+    }
+
+# 리뷰 생성 예시
+def generate_reviews_for_restaurant(_restaurant, _users, num_reviews=10):
+    _reviews = []
+    menu_images = [
+        "https://res.cloudinary.com/the-infatuation/image/upload/c_fill,w_1200,ar_4:3,g_center,f_auto/cms/7th_20Street_20Burger-Single_20Cheeseburger-Emily_20Schindler"
+        for _ in range(len(_restaurant["menuDtoList"]))]
+
+    # 랜덤하게 사용자 선택 (중복 없이)
+    selected_users = random.sample(_users, num_reviews)
+
+    for user in selected_users:
+        _review = generate_review(
+            user_id=user["id"],
+            user_name=user["username"],
+            restaurant_id=_restaurant["id"],
+            menu_images=menu_images
+        )
+        _reviews.append(_review)
+
+    return _reviews
+
 if GENERATE_FLAG:
     print('Starting Generation Data')
     # example_usage.py
@@ -385,8 +422,10 @@ if GENERATE_FLAG:
         userList.append(generate_user(userId, userName, str(), userEmail, str())) # one user per one restaurant)
         restaurantList.append(generate_restaurant(name, type, logo_url, menus, userId=userId))
 
-
-
+    all_reviews = []
+    for restaurant in restaurantList:
+        reviews = generate_reviews_for_restaurant(restaurant, userList)
+        all_reviews.extend(reviews)
 
     file_name = "web_crawled_logo_list.json"
     with open(file_name, "w+") as f:
@@ -403,6 +442,10 @@ if GENERATE_FLAG:
     file_name = "web_crawled_restaurant_data.json"
     with open(file_name, "w+") as f:
         json.dump(restaurantList, f, indent=2)
+
+    file_name = "generated_reviews.json"
+    with open(file_name, "w+") as f:
+        json.dump(all_reviews, f, indent=2)
 
     print(f"Restaurant data saved to '{file_name}'.")
 

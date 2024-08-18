@@ -88,7 +88,6 @@ const selectedMenuSlice = createSlice({
          const {restaurantId} = action.payload;
          console.assert(restaurantId !== undefined)
          console.assert(restaurantId != null)
-         console.assert(restaurantId !== {})
          if (state.restaurantId !== restaurantId) {
             // 현재 restaurantId와 새로운 restaurantId가 다르면 state 초기화
             return {
