@@ -1,0 +1,38 @@
+{{- define "postgresql-common.deployment" -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}-deployment
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      containers:
+      - name: postgresql
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+        env:
+        - name: POSTGRES_DB
+          value: {{ .Values.postgresql.db }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.user }}
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgresql.password }}
+        volumeMounts:
+        - name: postgres-data
+          mountPath: {{ .Values.deployment.volumeMounts.mountPath }}
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.name }}-pvc
+{{- end -}}

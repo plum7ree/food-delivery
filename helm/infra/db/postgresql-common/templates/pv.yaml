@@ -1,0 +1,15 @@
+{{- define "postgresql-common.pv" -}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.name }}-pv
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size }}
+  accessModes:
+    - ReadWriteMany
+  {{/* 동일한 storageClasName 으로 pvc 와 묶임. */}}
+  storageClassName: {{ .Values.persistence.storageClass }}
+  hostPath:
+    path: {{ .Values.persistence.hostPath }}
+{{- end -}}

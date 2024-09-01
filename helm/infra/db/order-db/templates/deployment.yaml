@@ -1,0 +1,2 @@
+{{- template "postgresql-common.deployment" . -}}
+{{/* "postgresql-common.deployment" 뒤에 점 (.) 반드시 넣어야함.*/}}
