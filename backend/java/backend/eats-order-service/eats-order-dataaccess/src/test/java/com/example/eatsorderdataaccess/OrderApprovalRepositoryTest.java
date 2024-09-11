@@ -75,7 +75,7 @@ class OrderApprovalRepositoryTest {
             .build();
 
         // 엔티티 저장
-        RestaurantApprovalOutboxMessageEntity savedEntity = restaurantApprovalRequestOutboxRepository.save(entity);
+        RestaurantApprovalOutboxMessageEntity savedEntity = restaurantApprovalRequestOutboxRepository.upsert(entity);
 
         // 저장된 엔티티 검증
         assertNotNull(savedEntity);

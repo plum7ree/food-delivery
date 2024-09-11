@@ -7,7 +7,7 @@ import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutbo
 import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.eatsorderdomain.data.mapper.DtoDataMapper;
 import com.example.kafka.avro.model.RequestAvroModel;
-import com.example.kafkaproducer.KafkaProducer;
+import com.example.kafkaproducer.GeneralKafkaProducer;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,7 +38,7 @@ import static com.example.commondata.domain.aggregate.valueobject.SagaType.EATS_
 @RequiredArgsConstructor
 public class OutboxMessageScheduler {
     private final RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository;
-    private final KafkaProducer<String, RequestAvroModel> kafkaProducer;
+    private final GeneralKafkaProducer<String, RequestAvroModel> kafkaProducer;
     private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final ObjectMapper objectMapper;
 
@@ -143,7 +142,7 @@ public class OutboxMessageScheduler {
                         originalEntity.setCreatedAt(originalEntity.getCreatedAt());
                         originalEntity.setVersion(originalEntity.getVersion());
 
-                        restaurantApprovalRequestOutboxRepository.save(originalEntity);
+                        restaurantApprovalRequestOutboxRepository.upsert(originalEntity);
                         log.info("OrderPaymentOutboxMessage is updated with outbox status: {}", OutboxStatus.COMPLETED.name());
                     });
             });

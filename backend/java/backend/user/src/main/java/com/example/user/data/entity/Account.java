@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    // 주의: Generated Value 를 사용하면 Dto 에서 id 를 넘겨줄수가없다. 다른 값을 생성해버림.
     private UUID id;
 
     @Column(nullable = false, unique = true)
@@ -36,6 +37,26 @@ public class Account {
 
     private String oauth2Provider;
     private String oauth2Sub;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonIgnore
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @JsonIgnore
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
     // fetch Lazy restaurant + avoid N + 1?
     // or seperate into another table?

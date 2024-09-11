@@ -24,9 +24,9 @@ public class OrderItemEntity {
     private OrderEntity order;
 
     private UUID productId;
-    private BigDecimal price;
+    private Double price;
     private Integer quantity;
-    private BigDecimal subTotal;
+    private Double subTotal;
 
     @Override
     public boolean equals(Object o) {

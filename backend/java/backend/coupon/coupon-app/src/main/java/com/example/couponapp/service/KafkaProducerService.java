@@ -2,7 +2,7 @@ package com.example.couponapp.service;
 
 import com.example.couponapp.dto.IssueRequestDto;
 import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
-import com.example.kafkaproducer.KafkaProducer;
+import com.example.kafkaproducer.GeneralKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Slf4j
 public class KafkaProducerService {
 
-    private final KafkaProducer<String, CouponIssueRequestAvroModel> kafkaProducer;
+    private final GeneralKafkaProducer<String, CouponIssueRequestAvroModel> kafkaProducer;
 
     // kafka producer 자체적인 retries 랑은 다르다.
     // kafka producer 자체적인 retries 가 n 이라고 하고, timeout 이고10ms 라고 하면,

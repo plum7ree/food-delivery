@@ -1,6 +1,7 @@
 package com.example.user.data.dto.order;
 
 
+import com.example.user.data.dto.AddressDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

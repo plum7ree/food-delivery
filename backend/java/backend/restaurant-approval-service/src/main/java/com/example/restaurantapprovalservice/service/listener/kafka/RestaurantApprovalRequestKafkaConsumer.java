@@ -1,10 +1,8 @@
 package com.example.restaurantapprovalservice.service.listener.kafka;
 
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
-import com.example.commondata.domain.aggregate.valueobject.OutboxStatus;
 import com.example.commondata.domain.aggregate.valueobject.RestaurantApprovalStatus;
 import com.example.commondata.domain.aggregate.valueobject.SagaStatus;
-import com.example.eatsorderdataaccess.mapper.RepositoryEntityDataMapper;
+import com.example.eatsorderdataaccess.mapper.EntityDtoMapper;
 import com.example.eatsorderdataaccess.repository.OrderApprovalRepository;
 import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
 import com.example.eatsorderdomain.data.domainentity.Order;
@@ -97,7 +95,7 @@ public class RestaurantApprovalRequestKafkaConsumer {
     }
 
     private boolean processRecord(RequestAvroModel message) {
-        log.info("coupon issue request topic received: {}", message);
+        log.info("processRecord: {}", message);
 
         try {
             OrderStatus orderStatus = OrderStatus.valueOf(message.getOrderStatus().name());
@@ -105,7 +103,7 @@ public class RestaurantApprovalRequestKafkaConsumer {
                 log.info("Processing payment for order id: {}", message.getPaymentId());
                 complete(DtoDataMapper
                     .requestAvroToOrder(message), message.getSagaId());
-            } else if (OrderStatus.CALLER_CANCELLED == orderStatus) {
+            } else if (OrderStatus.USER_CANCELED == orderStatus) {
 //                log.info("Cancelling payment for order id: {}", paymentRequestAvroModel.getOrderId());
 //                paymentRequestMessageListener.cancel(paymentMessagingDataMapper
 //                    .paymentRequestAvroModelToPaymentRequest(paymentRequestAvroModel));
@@ -134,14 +132,14 @@ public class RestaurantApprovalRequestKafkaConsumer {
 
         // validate(order);
         try {
-            var entity = RepositoryEntityDataMapper.orderToOrderApproval(order, RestaurantApprovalStatus.APPROVED);
+            var entity = EntityDtoMapper.orderToOrderApproval(order, RestaurantApprovalStatus.APPROVED);
             orderApprovalRepository.save(entity);
         } catch (Exception e) {
             throw new Exception("error orderApprovalRepository.save(entity): " + e.getMessage());
         }
         try {
-            order.setOrderStatus(OrderStatus.CALLEE_APPROVED);
-            var entity = RepositoryEntityDataMapper.orderToRestaurantApprovalOutboxMessageEntity(
+            order.setOrderStatus(OrderStatus.RESTAURANT_APPROVED);
+            var entity = EntityDtoMapper.orderToRestaurantApprovalOutboxMessageEntity(
                 order,
                 sagaId,
                 EATS_ORDER.name(),
@@ -149,7 +147,7 @@ public class RestaurantApprovalRequestKafkaConsumer {
                 SagaStatus.NOT_USED
             );
 
-            restaurantApprovalRequestOutboxRepository.save(entity);
+            restaurantApprovalRequestOutboxRepository.upsert(entity);
         } catch (Exception e) {
             throw new Exception("error restaurantApprovalRequestOutboxRepository.save(entity): " + e.getMessage());
         }

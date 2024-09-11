@@ -20,7 +20,7 @@ public class OrderItemDto {
     @NotNull
     private Integer quantity;
     @NotNull
-    private BigDecimal price;
+    private Double price;
 
     private List<OptionDto> optionDtoList;
 

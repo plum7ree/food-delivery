@@ -21,7 +21,7 @@ public class Menu {
 
     private String name;
     private String description;
-
+    @Column(name = "picture_url")
     private String pictureUrl;
 
     private BigInteger price;

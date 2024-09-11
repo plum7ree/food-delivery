@@ -117,7 +117,8 @@
                             <resources>
                                 <resource>
                                     <!-- compile 해야 설치됨. -->
-                                    <directory>${project.parent.basedir}/test-data-generation/restaurant-approval
+                                    <directory>
+                                        ${project.parent.basedir}/test-data-generation/data-loader/schema/restaurant-approval
                                     </directory>
                                     <includes>
                                         <!--                                        <include>init-data.sql</include>-->

@@ -1,24 +1,11 @@
 package com.example.eatsorderdataaccess.repository;
 
 import com.example.eatsorderdataaccess.entity.PaymentOutboxMessageEntity;
-import com.example.eatsorderdataaccess.entity.RestaurantApprovalOutboxMessageEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+public interface PaymentOutboxRepository {
 
-public interface PaymentOutboxRepository extends JpaRepository<PaymentOutboxMessageEntity, UUID> {
+    Mono<PaymentOutboxMessageEntity> upsert(PaymentOutboxMessageEntity entity);
 
-    @Query(value = "SELECT * FROM payment_outbox " +
-        "WHERE saga_id = :sagaId " +
-        "AND saga_status = :sagaStatus",
-        nativeQuery = true)
-    Optional<PaymentOutboxMessageEntity> findBySagaIdAndSagaStatus(
-        @Param("sagaId") String sagaType,
-        @Param("sagaStatus") String sagaStatus);
-
-
+    Mono<PaymentOutboxMessageEntity> findBySagaIdAndSagaStatus(String sagaId, String sagaStatus);
 }

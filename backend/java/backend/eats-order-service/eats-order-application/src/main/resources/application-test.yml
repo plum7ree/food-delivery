@@ -41,7 +41,8 @@ spring:
       schema-locations: classpath:orders/init-schema.sql
       data-locations: classpath:orders/init-data.sql
       mode: always
-
+  data:
+    redis-server: redis://localhost:6379
 
 retry-config:
   initial-interval-ms: 1000

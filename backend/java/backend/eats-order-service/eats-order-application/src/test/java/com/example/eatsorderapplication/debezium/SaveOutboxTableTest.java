@@ -4,8 +4,6 @@
  */
 package com.example.eatsorderapplication.debezium;
 
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
-import com.example.commondata.domain.aggregate.valueobject.OutboxStatus;
 import com.example.commondata.domain.aggregate.valueobject.SagaStatus;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;
 import com.example.eatsorderdataaccess.entity.RestaurantApprovalOutboxMessageEntity;
@@ -94,7 +92,7 @@ public class SaveOutboxTableTest {
                 .build();
 
             // When
-            outboxRepository.save(entity);
+            outboxRepository.upsert(entity);
 
             // Then
             ConsumerRecords<String, RequestAvroModel> records = consumer.poll(Duration.ofSeconds(10));

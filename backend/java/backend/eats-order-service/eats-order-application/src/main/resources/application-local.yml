@@ -34,6 +34,40 @@ spring:
   h2:
     console:
       enabled: true
+  data:
+    redis-server: redis://localhost:6379
+
+  cloud:
+    function:
+      definition: restaurantApprovalInput;restaurantApprovalOutput
+    stream:
+      default:
+        producer:
+          useNativeEncoding: true
+      bindings:
+        restaurantApprovalProcessor-in-0:
+          destination: restaurant-approval-response-topic
+          group: restaurant-approval-group
+        restaurantApprovalProcessor-out-0:
+          destination: restaurant-notification
+      kafka:
+        binder:
+          consumer-properties:
+            "value.deserializer": io.confluent.kafka.serializers.KafkaAvroDeserializer
+            "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
+            "auto.offset.reset": "earliest" #TODO seek offset 사용해서 최근 n 개 부터 가져오기.
+          producer-properties:
+            "value.serializer": io.confluent.kafka.serializers.KafkaAvroDeserializer
+            "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+        bindings:
+          restaurantApprovalProcessor-in-0:
+            consumer:
+              autoCommitOffset: false
+              configuration:
+                isolation.level: read_committed
+          restaurantApprovalProcessor-out-0:
+            producer:
+              recordMetadataChannel: restaurantApprovalResults
 
 retry-config:
   initial-interval-ms: 1000
@@ -104,6 +138,8 @@ kafka-producer-config:
   linger-ms: 5
   request-timeout-ms: 60000
   retry-count: 5
+  driver-matching-notification-transaction-id: tx-driver-matching-notification-transaction-id
+  order-approved-notification-transaction-id: tx-order-approved-notification-transaction-id
 
 kafka-consumer-config:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -137,4 +173,13 @@ this-service:
   outbox-scheduler-fixed-rate-ms: 1000
   outbox-scheduler-initial-delay-ms: 1000
 
+feign-client:
+  user-service:
+    url: "http://localhost:8077"
 
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000  # 연결 타임아웃 (밀리초)
+        readTimeout: 5000     # 읽기 타임아웃 (밀리초)

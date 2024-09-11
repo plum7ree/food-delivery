@@ -1,5 +1,6 @@
 package com.example.user.controller;
 
+import com.example.user.data.dto.AddressDto;
 import com.example.user.data.dto.order.*;
 import com.example.user.service.AccountService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -200,7 +201,7 @@ public class PayController {
 
     private AddressDto createAddress(JsonNode jsonNode) {
         // Address 생성 로직 구현
-        return new AddressDto(UUID.randomUUID(), "", "", ""); // 실제 구현에 맞게 수정 필요
+        return new AddressDto(UUID.randomUUID().toString(), "", "", "", "", 0d, 0d); // 실제 구현에 맞게 수정 필요
     }
 
     private PaymentDto createPaymentDto(String paymentKey) {

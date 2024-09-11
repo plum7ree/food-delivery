@@ -1,0 +1,86 @@
+{
+  "namespace": "com.example.kafka.avro.model",
+  "type": "record",
+  "name": "DriverMatchingEventAvroModel",
+  "fields": [
+    {
+      "name": "userId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "notificationType",
+      "type": {
+        "type": "enum",
+        "name": "NotificationType",
+        "symbols": [
+          "ORDER_APPROVED",
+          "DRIVER_MATCHED",
+          "ORDER_CANCELLED",
+          "DRIVER_ARRIVED"
+        ]
+      }
+    },
+    {
+      "name": "message",
+      "type": "string",
+      "default": ""
+    },
+    {
+      "name": "orderDetails",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "OrderDetails",
+          "fields": [
+            {
+              "name": "orderId",
+              "type": {
+                "type": "string",
+                "logicalType": "uuid"
+              }
+            },
+            {
+              "name": "totalAmount",
+              "type": {
+                "type": "bytes",
+                "logicalType": "decimal",
+                "precision": 10,
+                "scale": 2
+              }
+            }
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "driverDetails",
+      "type": [
+        "null",
+        {
+          "type": "record",
+          "name": "DriverDetails",
+          "fields": [
+            {
+              "name": "driverId",
+              "type": "string"
+            },
+            {
+              "name": "lat",
+              "type": "double"
+            },
+            {
+              "name": "lon",
+              "type": "double"
+            }
+          ]
+        }
+      ],
+      "default": null
+    }
+  ]
+}

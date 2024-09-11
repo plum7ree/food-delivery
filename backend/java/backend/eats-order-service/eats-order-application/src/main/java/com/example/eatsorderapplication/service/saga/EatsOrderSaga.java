@@ -1,11 +1,6 @@
 package com.example.eatsorderapplication.service.saga;
 
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
 import com.example.commondata.domain.aggregate.valueobject.SagaStatus;
-import com.example.eatsorderdataaccess.entity.OrderEntity;
-import com.example.eatsorderdataaccess.mapper.RepositoryEntityDataMapper;
-import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
-import com.example.eatsorderdomain.data.domainentity.Order;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,28 +13,37 @@ public class EatsOrderSaga {
     public SagaStatus updateSagaStatus(SagaStatus sagaStatus, OrderStatus newEvent) {
         switch (sagaStatus) {
             case STARTED:
+                // 결제 완료
                 if (newEvent == OrderStatus.PAYMENT_COMPLETED) {
                     return SagaStatus.PROCESSING;
-                } else if (newEvent == OrderStatus.CALLER_CANCELLED) {
+                    // 사용자가 주문취소
+                } else if (newEvent == OrderStatus.USER_CANCELED) {
+                    // 결제 취소 완료
                     return SagaStatus.COMPENSATED;
                 }
                 break;
             case PROCESSING:
-                if (newEvent == OrderStatus.CALLEE_APPROVED) {
+                // restaurant 에서 주문 승인.
+                if (newEvent == OrderStatus.RESTAURANT_APPROVED) {
                     return SagaStatus.SUCCEEDED;
-                } else if (newEvent == OrderStatus.CALLEE_REJECTED) {
+                    // restaurant 에서 주문 취소
+                } else if (newEvent == OrderStatus.RESTAURANT_REJECTED) {
                     // 이미 paid 는 끝난 상태이고, restaurant 에서 주문 거부한 상태이다.
                     // payment service 에 cancel 요청 보내야함.
                     return SagaStatus.COMPENSATING;
                 }
                 break;
+            // 주문 취소되서 결제 취소를 요청하는 단계.
             case COMPENSATING:
+                // 결제 취소 완료
                 if (newEvent == OrderStatus.PAYMENT_CANCELLED) {
+                    // 취소 완료.
                     return SagaStatus.COMPENSATED;
                 }
                 break;
             case FAILED:
             case SUCCEEDED:
+                // 결제 취소 완료상태.
             case COMPENSATED:
                 // 이미 최종 상태이므로 변경 없음
                 return sagaStatus;

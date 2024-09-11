@@ -14,10 +14,10 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-    private static final long serialVersionUID = -5517991805172461099L;
+    private static final long serialVersionUID = -196970811768261736L;
 
 
-    public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"RequestAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callerId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"orderId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"paymentId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"calleeId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"orderStatus\",\"type\":{\"type\":\"enum\",\"name\":\"OrderStatus\",\"symbols\":[\"PENDING\",\"CALLER_CANCELLED\",\"PAYMENT_COMPLETED\",\"PAYMENT_CANCELLED\",\"CALLEE_APPROVED\",\"CALLEE_REJECTED\"]}},{\"name\":\"trackingId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"address\",\"type\":{\"type\":\"record\",\"name\":\"Address\",\"fields\":[{\"name\":\"street\",\"type\":\"string\"},{\"name\":\"city\",\"type\":\"string\"},{\"name\":\"postalCode\",\"type\":\"string\"}]}},{\"name\":\"items\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"OrderItem\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"quantity\",\"type\":\"int\"},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}}]}}},{\"name\":\"failureMessages\",\"type\":[\"null\",{\"type\":\"array\",\"items\":\"string\"}],\"default\":null}]}");
+    public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"RequestAvroModel\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"eventType\",\"type\":\"string\"},{\"name\":\"sagaId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"callerId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"orderId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"paymentId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"calleeId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}},{\"name\":\"createdAt\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"}},{\"name\":\"orderStatus\",\"type\":{\"type\":\"enum\",\"name\":\"OrderStatus\",\"symbols\":[\"PENDING\",\"CALLER_CANCELLED\",\"PAYMENT_COMPLETED\",\"PAYMENT_CANCELLED\",\"CALLEE_APPROVED\",\"CALLEE_REJECTED\"]}},{\"name\":\"trackingId\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"address\",\"type\":{\"type\":\"record\",\"name\":\"Address\",\"fields\":[{\"name\":\"street\",\"type\":\"string\"},{\"name\":\"city\",\"type\":\"string\"},{\"name\":\"postalCode\",\"type\":\"string\"}]}},{\"name\":\"items\",\"type\":{\"type\":\"array\",\"items\":{\"type\":\"record\",\"name\":\"OrderItem\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"quantity\",\"type\":\"int\"},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}}]}}},{\"name\":\"failureMessages\",\"type\":[\"null\",{\"type\":\"array\",\"items\":\"string\"}],\"default\":null}]}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
     private static final SpecificData MODEL$ = new SpecificData();
@@ -80,6 +80,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   }
 
     private java.util.UUID id;
+    private java.lang.CharSequence eventType;
     private java.util.UUID sagaId;
     private java.util.UUID callerId;
     private java.util.UUID orderId;
@@ -103,6 +104,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   /**
    * All-args constructor.
    * @param id The new value for id
+   * @param eventType The new value for eventType
    * @param sagaId The new value for sagaId
    * @param callerId The new value for callerId
    * @param orderId The new value for orderId
@@ -116,8 +118,9 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
    * @param items The new value for items
    * @param failureMessages The new value for failureMessages
    */
-  public RequestAvroModel(java.util.UUID id, java.util.UUID sagaId, java.util.UUID callerId, java.util.UUID orderId, java.util.UUID paymentId, java.util.UUID calleeId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.OrderStatus orderStatus, java.util.UUID trackingId, com.example.kafka.avro.model.Address address, java.util.List<com.example.kafka.avro.model.OrderItem> items, java.util.List<java.lang.CharSequence> failureMessages) {
+  public RequestAvroModel(java.util.UUID id, java.lang.CharSequence eventType, java.util.UUID sagaId, java.util.UUID callerId, java.util.UUID orderId, java.util.UUID paymentId, java.util.UUID calleeId, java.nio.ByteBuffer price, java.time.Instant createdAt, com.example.kafka.avro.model.OrderStatus orderStatus, java.util.UUID trackingId, com.example.kafka.avro.model.Address address, java.util.List<com.example.kafka.avro.model.OrderItem> items, java.util.List<java.lang.CharSequence> failureMessages) {
     this.id = id;
+      this.eventType = eventType;
     this.sagaId = sagaId;
     this.callerId = callerId;
       this.orderId = orderId;
@@ -143,27 +146,31 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   public java.lang.Object get(int field$) {
     switch (field$) {
     case 0: return id;
-    case 1: return sagaId;
-    case 2: return callerId;
+        case 1:
+            return eventType;
+        case 2:
+            return sagaId;
         case 3:
-            return orderId;
+            return callerId;
         case 4:
-            return paymentId;
+            return orderId;
         case 5:
-            return calleeId;
+            return paymentId;
         case 6:
-            return price;
+            return calleeId;
         case 7:
-            return createdAt;
+            return price;
         case 8:
-            return orderStatus;
+            return createdAt;
         case 9:
-            return trackingId;
+            return orderStatus;
         case 10:
-            return address;
+            return trackingId;
         case 11:
-            return items;
+            return address;
         case 12:
+            return items;
+        case 13:
             return failureMessages;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
@@ -172,6 +179,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   private static final org.apache.avro.Conversion<?>[] conversions =
       new org.apache.avro.Conversion<?>[] {
           new org.apache.avro.Conversions.UUIDConversion(),
+          null,
           new org.apache.avro.Conversions.UUIDConversion(),
           new org.apache.avro.Conversions.UUIDConversion(),
           new org.apache.avro.Conversions.UUIDConversion(),
@@ -201,39 +209,42 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
             id = (java.util.UUID) value$;
             break;
         case 1:
-            sagaId = (java.util.UUID) value$;
+            eventType = (java.lang.CharSequence) value$;
             break;
         case 2:
-            callerId = (java.util.UUID) value$;
+            sagaId = (java.util.UUID) value$;
             break;
         case 3:
-            orderId = (java.util.UUID) value$;
+            callerId = (java.util.UUID) value$;
             break;
         case 4:
-            paymentId = (java.util.UUID) value$;
+            orderId = (java.util.UUID) value$;
             break;
         case 5:
-            calleeId = (java.util.UUID) value$;
+            paymentId = (java.util.UUID) value$;
             break;
         case 6:
-            price = (java.nio.ByteBuffer) value$;
+            calleeId = (java.util.UUID) value$;
             break;
         case 7:
-            createdAt = (java.time.Instant) value$;
+            price = (java.nio.ByteBuffer) value$;
             break;
         case 8:
-            orderStatus = (com.example.kafka.avro.model.OrderStatus) value$;
+            createdAt = (java.time.Instant) value$;
             break;
         case 9:
-            trackingId = (java.util.UUID) value$;
+            orderStatus = (com.example.kafka.avro.model.OrderStatus) value$;
             break;
         case 10:
-            address = (com.example.kafka.avro.model.Address) value$;
+            trackingId = (java.util.UUID) value$;
             break;
         case 11:
-            items = (java.util.List<com.example.kafka.avro.model.OrderItem>) value$;
+            address = (com.example.kafka.avro.model.Address) value$;
             break;
         case 12:
+            items = (java.util.List<com.example.kafka.avro.model.OrderItem>) value$;
+            break;
+        case 13:
             failureMessages = (java.util.List<java.lang.CharSequence>) value$;
             break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
@@ -256,6 +267,25 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   public void setId(java.util.UUID value) {
     this.id = value;
   }
+
+    /**
+     * Gets the value of the 'eventType' field.
+     *
+     * @return The value of the 'eventType' field.
+     */
+    public java.lang.CharSequence getEventType() {
+        return eventType;
+    }
+
+
+    /**
+     * Sets the value of the 'eventType' field.
+     *
+     * @param value the value to set.
+     */
+    public void setEventType(java.lang.CharSequence value) {
+        this.eventType = value;
+    }
 
   /**
    * Gets the value of the 'sagaId' field.
@@ -296,7 +326,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
    * @return The value of the 'orderId' field.
    */
   public java.util.UUID getOrderId() {
-      return orderId;
+    return orderId;
   }
 
 
@@ -324,7 +354,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
      * @param value the value to set.
      */
     public void setPaymentId(java.util.UUID value) {
-        this.paymentId = value;
+    this.paymentId = value;
   }
 
   /**
@@ -380,20 +410,21 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'orderStatus' field.
+     *
      * @return The value of the 'orderStatus' field.
      */
     public com.example.kafka.avro.model.OrderStatus getOrderStatus() {
-    return orderStatus;
-    }
+        return orderStatus;
+  }
 
 
-    /**
-     * Sets the value of the 'orderStatus' field.
+  /**
+   * Sets the value of the 'orderStatus' field.
    * @param value the value to set.
-     */
-    public void setOrderStatus(com.example.kafka.avro.model.OrderStatus value) {
-        this.orderStatus = value;
-    }
+   */
+  public void setOrderStatus(com.example.kafka.avro.model.OrderStatus value) {
+      this.orderStatus = value;
+  }
 
     /**
      * Gets the value of the 'trackingId' field.
@@ -416,7 +447,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'address' field.
-     *
      * @return The value of the 'address' field.
      */
     public com.example.kafka.avro.model.Address getAddress() {
@@ -435,7 +465,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'items' field.
-     *
      * @return The value of the 'items' field.
      */
     public java.util.List<com.example.kafka.avro.model.OrderItem> getItems() {
@@ -454,7 +483,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'failureMessages' field.
-     *
      * @return The value of the 'failureMessages' field.
      */
     public java.util.List<java.lang.CharSequence> getFailureMessages() {
@@ -464,11 +492,10 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'failureMessages' field.
-     *
      * @param value the value to set.
      */
-    public void setFailureMessages(java.util.List<java.lang.CharSequence> value) {
-        this.failureMessages = value;
+  public void setFailureMessages(java.util.List<java.lang.CharSequence> value) {
+    this.failureMessages = value;
   }
 
   /**
@@ -513,10 +540,11 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
       implements org.apache.avro.data.RecordBuilder<RequestAvroModel> {
 
       private java.util.UUID id;
-      private java.util.UUID sagaId;
+      private java.lang.CharSequence eventType;
+    private java.util.UUID sagaId;
       private java.util.UUID callerId;
-    private java.util.UUID orderId;
-    private java.util.UUID paymentId;
+      private java.util.UUID orderId;
+      private java.util.UUID paymentId;
       private java.util.UUID calleeId;
       private java.nio.ByteBuffer price;
       private java.time.Instant createdAt;
@@ -525,7 +553,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
       private com.example.kafka.avro.model.Address address;
       private com.example.kafka.avro.model.Address.Builder addressBuilder;
       private java.util.List<com.example.kafka.avro.model.OrderItem> items;
-      private java.util.List<java.lang.CharSequence> failureMessages;
+    private java.util.List<java.lang.CharSequence> failureMessages;
 
     /** Creates a new Builder */
     private Builder() {
@@ -540,58 +568,62 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
       super(other);
       if (isValidValue(fields()[0], other.id)) {
         this.id = data().deepCopy(fields()[0].schema(), other.id);
-        fieldSetFlags()[0] = other.fieldSetFlags()[0];
+          fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
-      if (isValidValue(fields()[1], other.sagaId)) {
-        this.sagaId = data().deepCopy(fields()[1].schema(), other.sagaId);
-        fieldSetFlags()[1] = other.fieldSetFlags()[1];
-      }
-      if (isValidValue(fields()[2], other.callerId)) {
-        this.callerId = data().deepCopy(fields()[2].schema(), other.callerId);
-          fieldSetFlags()[2] = other.fieldSetFlags()[2];
-      }
-        if (isValidValue(fields()[3], other.orderId)) {
-        this.orderId = data().deepCopy(fields()[3].schema(), other.orderId);
+        if (isValidValue(fields()[1], other.eventType)) {
+        this.eventType = data().deepCopy(fields()[1].schema(), other.eventType);
+            fieldSetFlags()[1] = other.fieldSetFlags()[1];
+        }
+        if (isValidValue(fields()[2], other.sagaId)) {
+            this.sagaId = data().deepCopy(fields()[2].schema(), other.sagaId);
+            fieldSetFlags()[2] = other.fieldSetFlags()[2];
+        }
+        if (isValidValue(fields()[3], other.callerId)) {
+            this.callerId = data().deepCopy(fields()[3].schema(), other.callerId);
             fieldSetFlags()[3] = other.fieldSetFlags()[3];
         }
-        if (isValidValue(fields()[4], other.paymentId)) {
-        this.paymentId = data().deepCopy(fields()[4].schema(), other.paymentId);
+        if (isValidValue(fields()[4], other.orderId)) {
+            this.orderId = data().deepCopy(fields()[4].schema(), other.orderId);
             fieldSetFlags()[4] = other.fieldSetFlags()[4];
         }
-        if (isValidValue(fields()[5], other.calleeId)) {
-        this.calleeId = data().deepCopy(fields()[5].schema(), other.calleeId);
+        if (isValidValue(fields()[5], other.paymentId)) {
+            this.paymentId = data().deepCopy(fields()[5].schema(), other.paymentId);
             fieldSetFlags()[5] = other.fieldSetFlags()[5];
         }
-      if (isValidValue(fields()[6], other.price)) {
-          this.price = data().deepCopy(fields()[6].schema(), other.price);
-          fieldSetFlags()[6] = other.fieldSetFlags()[6];
-      }
-        if (isValidValue(fields()[7], other.createdAt)) {
-        this.createdAt = data().deepCopy(fields()[7].schema(), other.createdAt);
+        if (isValidValue(fields()[6], other.calleeId)) {
+            this.calleeId = data().deepCopy(fields()[6].schema(), other.calleeId);
+            fieldSetFlags()[6] = other.fieldSetFlags()[6];
+        }
+        if (isValidValue(fields()[7], other.price)) {
+            this.price = data().deepCopy(fields()[7].schema(), other.price);
             fieldSetFlags()[7] = other.fieldSetFlags()[7];
         }
-        if (isValidValue(fields()[8], other.orderStatus)) {
-            this.orderStatus = data().deepCopy(fields()[8].schema(), other.orderStatus);
+        if (isValidValue(fields()[8], other.createdAt)) {
+            this.createdAt = data().deepCopy(fields()[8].schema(), other.createdAt);
             fieldSetFlags()[8] = other.fieldSetFlags()[8];
         }
-        if (isValidValue(fields()[9], other.trackingId)) {
-            this.trackingId = data().deepCopy(fields()[9].schema(), other.trackingId);
+        if (isValidValue(fields()[9], other.orderStatus)) {
+            this.orderStatus = data().deepCopy(fields()[9].schema(), other.orderStatus);
             fieldSetFlags()[9] = other.fieldSetFlags()[9];
         }
-        if (isValidValue(fields()[10], other.address)) {
-            this.address = data().deepCopy(fields()[10].schema(), other.address);
+        if (isValidValue(fields()[10], other.trackingId)) {
+            this.trackingId = data().deepCopy(fields()[10].schema(), other.trackingId);
             fieldSetFlags()[10] = other.fieldSetFlags()[10];
+        }
+        if (isValidValue(fields()[11], other.address)) {
+            this.address = data().deepCopy(fields()[11].schema(), other.address);
+            fieldSetFlags()[11] = other.fieldSetFlags()[11];
         }
         if (other.hasAddressBuilder()) {
             this.addressBuilder = com.example.kafka.avro.model.Address.newBuilder(other.getAddressBuilder());
         }
-        if (isValidValue(fields()[11], other.items)) {
-            this.items = data().deepCopy(fields()[11].schema(), other.items);
-            fieldSetFlags()[11] = other.fieldSetFlags()[11];
+        if (isValidValue(fields()[12], other.items)) {
+        this.items = data().deepCopy(fields()[12].schema(), other.items);
+            fieldSetFlags()[12] = other.fieldSetFlags()[12];
         }
-        if (isValidValue(fields()[12], other.failureMessages)) {
-            this.failureMessages = data().deepCopy(fields()[12].schema(), other.failureMessages);
-        fieldSetFlags()[12] = other.fieldSetFlags()[12];
+        if (isValidValue(fields()[13], other.failureMessages)) {
+            this.failureMessages = data().deepCopy(fields()[13].schema(), other.failureMessages);
+        fieldSetFlags()[13] = other.fieldSetFlags()[13];
       }
     }
 
@@ -602,73 +634,77 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
     private Builder(com.example.kafka.avro.model.RequestAvroModel other) {
       super(SCHEMA$, MODEL$);
       if (isValidValue(fields()[0], other.id)) {
-        this.id = data().deepCopy(fields()[0].schema(), other.id);
-        fieldSetFlags()[0] = true;
+          this.id = data().deepCopy(fields()[0].schema(), other.id);
+          fieldSetFlags()[0] = true;
       }
-      if (isValidValue(fields()[1], other.sagaId)) {
-        this.sagaId = data().deepCopy(fields()[1].schema(), other.sagaId);
-        fieldSetFlags()[1] = true;
-      }
-      if (isValidValue(fields()[2], other.callerId)) {
-          this.callerId = data().deepCopy(fields()[2].schema(), other.callerId);
-          fieldSetFlags()[2] = true;
-      }
-        if (isValidValue(fields()[3], other.orderId)) {
-            this.orderId = data().deepCopy(fields()[3].schema(), other.orderId);
+        if (isValidValue(fields()[1], other.eventType)) {
+            this.eventType = data().deepCopy(fields()[1].schema(), other.eventType);
+            fieldSetFlags()[1] = true;
+        }
+        if (isValidValue(fields()[2], other.sagaId)) {
+            this.sagaId = data().deepCopy(fields()[2].schema(), other.sagaId);
+            fieldSetFlags()[2] = true;
+        }
+        if (isValidValue(fields()[3], other.callerId)) {
+            this.callerId = data().deepCopy(fields()[3].schema(), other.callerId);
             fieldSetFlags()[3] = true;
         }
-        if (isValidValue(fields()[4], other.paymentId)) {
-            this.paymentId = data().deepCopy(fields()[4].schema(), other.paymentId);
+        if (isValidValue(fields()[4], other.orderId)) {
+            this.orderId = data().deepCopy(fields()[4].schema(), other.orderId);
             fieldSetFlags()[4] = true;
         }
-        if (isValidValue(fields()[5], other.calleeId)) {
-            this.calleeId = data().deepCopy(fields()[5].schema(), other.calleeId);
+        if (isValidValue(fields()[5], other.paymentId)) {
+            this.paymentId = data().deepCopy(fields()[5].schema(), other.paymentId);
             fieldSetFlags()[5] = true;
         }
-      if (isValidValue(fields()[6], other.price)) {
-          this.price = data().deepCopy(fields()[6].schema(), other.price);
-          fieldSetFlags()[6] = true;
-      }
-        if (isValidValue(fields()[7], other.createdAt)) {
-            this.createdAt = data().deepCopy(fields()[7].schema(), other.createdAt);
+        if (isValidValue(fields()[6], other.calleeId)) {
+            this.calleeId = data().deepCopy(fields()[6].schema(), other.calleeId);
+            fieldSetFlags()[6] = true;
+        }
+        if (isValidValue(fields()[7], other.price)) {
+            this.price = data().deepCopy(fields()[7].schema(), other.price);
             fieldSetFlags()[7] = true;
         }
-        if (isValidValue(fields()[8], other.orderStatus)) {
-            this.orderStatus = data().deepCopy(fields()[8].schema(), other.orderStatus);
+        if (isValidValue(fields()[8], other.createdAt)) {
+            this.createdAt = data().deepCopy(fields()[8].schema(), other.createdAt);
             fieldSetFlags()[8] = true;
         }
-        if (isValidValue(fields()[9], other.trackingId)) {
-            this.trackingId = data().deepCopy(fields()[9].schema(), other.trackingId);
+        if (isValidValue(fields()[9], other.orderStatus)) {
+            this.orderStatus = data().deepCopy(fields()[9].schema(), other.orderStatus);
             fieldSetFlags()[9] = true;
         }
-        if (isValidValue(fields()[10], other.address)) {
-            this.address = data().deepCopy(fields()[10].schema(), other.address);
+        if (isValidValue(fields()[10], other.trackingId)) {
+            this.trackingId = data().deepCopy(fields()[10].schema(), other.trackingId);
             fieldSetFlags()[10] = true;
         }
-        this.addressBuilder = null;
-        if (isValidValue(fields()[11], other.items)) {
-            this.items = data().deepCopy(fields()[11].schema(), other.items);
+        if (isValidValue(fields()[11], other.address)) {
+            this.address = data().deepCopy(fields()[11].schema(), other.address);
             fieldSetFlags()[11] = true;
         }
-        if (isValidValue(fields()[12], other.failureMessages)) {
-            this.failureMessages = data().deepCopy(fields()[12].schema(), other.failureMessages);
+        this.addressBuilder = null;
+        if (isValidValue(fields()[12], other.items)) {
+            this.items = data().deepCopy(fields()[12].schema(), other.items);
             fieldSetFlags()[12] = true;
         }
+        if (isValidValue(fields()[13], other.failureMessages)) {
+            this.failureMessages = data().deepCopy(fields()[13].schema(), other.failureMessages);
+        fieldSetFlags()[13] = true;
+      }
     }
 
     /**
       * Gets the value of the 'id' field.
-      * @return The value.
-      */
+     * @return The value.
+     */
     public java.util.UUID getId() {
-      return id;
+        return id;
     }
 
 
       /**
-       * Sets the value of the 'id' field.
-       * @param value The value of 'id'.
-       * @return This builder.
+      * Sets the value of the 'id' field.
+      * @param value The value of 'id'.
+      * @return This builder.
       */
     public com.example.kafka.avro.model.RequestAvroModel.Builder setId(java.util.UUID value) {
       validate(fields()[0], value);
@@ -691,70 +727,115 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
       * @return This builder.
       */
     public com.example.kafka.avro.model.RequestAvroModel.Builder clearId() {
-      id = null;
-      fieldSetFlags()[0] = false;
+        id = null;
+        fieldSetFlags()[0] = false;
         return this;
     }
 
       /**
-      * Gets the value of the 'sagaId' field.
-      * @return The value.
-      */
+       * Gets the value of the 'eventType' field.
+       *
+       * @return The value.
+       */
+      public java.lang.CharSequence getEventType() {
+          return eventType;
+      }
+
+
+      /**
+       * Sets the value of the 'eventType' field.
+       *
+       * @param value The value of 'eventType'.
+       * @return This builder.
+       */
+      public com.example.kafka.avro.model.RequestAvroModel.Builder setEventType(java.lang.CharSequence value) {
+          validate(fields()[1], value);
+          this.eventType = value;
+          fieldSetFlags()[1] = true;
+          return this;
+      }
+
+      /**
+       * Checks whether the 'eventType' field has been set.
+       *
+       * @return True if the 'eventType' field has been set, false otherwise.
+       */
+      public boolean hasEventType() {
+          return fieldSetFlags()[1];
+      }
+
+
+      /**
+       * Clears the value of the 'eventType' field.
+       *
+       * @return This builder.
+       */
+      public com.example.kafka.avro.model.RequestAvroModel.Builder clearEventType() {
+      eventType = null;
+      fieldSetFlags()[1] = false;
+          return this;
+      }
+
+      /**
+       * Gets the value of the 'sagaId' field.
+       * @return The value.
+       */
     public java.util.UUID getSagaId() {
       return sagaId;
     }
 
 
     /**
-     * Sets the value of the 'sagaId' field.
+      * Sets the value of the 'sagaId' field.
      * @param value The value of 'sagaId'.
      * @return This builder.
-      */
+     */
     public com.example.kafka.avro.model.RequestAvroModel.Builder setSagaId(java.util.UUID value) {
-      validate(fields()[1], value);
+      validate(fields()[2], value);
       this.sagaId = value;
-      fieldSetFlags()[1] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'sagaId' field has been set.
-      * @return True if the 'sagaId' field has been set, false otherwise.
-      */
-    public boolean hasSagaId() {
-      return fieldSetFlags()[1];
-    }
-
-
-    /**
-      * Clears the value of the 'sagaId' field.
-      * @return This builder.
-      */
-    public com.example.kafka.avro.model.RequestAvroModel.Builder clearSagaId() {
-      sagaId = null;
-      fieldSetFlags()[1] = false;
+      fieldSetFlags()[2] = true;
         return this;
     }
 
       /**
-      * Gets the value of the 'callerId' field.
-      * @return The value.
+       * Checks whether the 'sagaId' field has been set.
+      * @return True if the 'sagaId' field has been set, false otherwise.
       */
-    public java.util.UUID getCallerId() {
+    public boolean hasSagaId() {
+      return fieldSetFlags()[2];
+    }
+
+
+      /**
+       * Clears the value of the 'sagaId' field.
+       * @return This builder.
+      */
+    public com.example.kafka.avro.model.RequestAvroModel.Builder clearSagaId() {
+      sagaId = null;
+      fieldSetFlags()[2] = false;
+        return this;
+    }
+
+      /**
+       * Gets the value of the 'callerId' field.
+       *
+       * @return The value.
+       */
+      public java.util.UUID getCallerId() {
       return callerId;
     }
 
 
     /**
-     * Sets the value of the 'callerId' field.
+      * Sets the value of the 'callerId' field.
      * @param value The value of 'callerId'.
      * @return This builder.
       */
     public com.example.kafka.avro.model.RequestAvroModel.Builder setCallerId(java.util.UUID value) {
-      validate(fields()[2], value);
+      validate(fields()[3], value);
       this.callerId = value;
-      fieldSetFlags()[2] = true;
-      return this;
+      fieldSetFlags()[3] = true;
+        return this;
     }
 
     /**
@@ -762,59 +843,59 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
       * @return True if the 'callerId' field has been set, false otherwise.
       */
     public boolean hasCallerId() {
-      return fieldSetFlags()[2];
+        return fieldSetFlags()[3];
     }
 
 
-    /**
-      * Clears the value of the 'callerId' field.
-      * @return This builder.
-      */
-    public com.example.kafka.avro.model.RequestAvroModel.Builder clearCallerId() {
-        callerId = null;
-      fieldSetFlags()[2] = false;
-        return this;
-    }
+      /**
+       * Clears the value of the 'callerId' field.
+       * @return This builder.
+       */
+      public com.example.kafka.avro.model.RequestAvroModel.Builder clearCallerId() {
+      callerId = null;
+      fieldSetFlags()[3] = false;
+          return this;
+      }
 
       /**
        * Gets the value of the 'orderId' field.
        * @return The value.
-       */
-      public java.util.UUID getOrderId() {
+      */
+    public java.util.UUID getOrderId() {
       return orderId;
     }
 
 
     /**
-     * Sets the value of the 'orderId' field.
+      * Sets the value of the 'orderId' field.
      * @param value The value of 'orderId'.
      * @return This builder.
-      */
+     */
     public com.example.kafka.avro.model.RequestAvroModel.Builder setOrderId(java.util.UUID value) {
-        validate(fields()[3], value);
+      validate(fields()[4], value);
         this.orderId = value;
-        fieldSetFlags()[3] = true;
+        fieldSetFlags()[4] = true;
         return this;
     }
 
       /**
        * Checks whether the 'orderId' field has been set.
-      * @return True if the 'orderId' field has been set, false otherwise.
-       */
-      public boolean hasOrderId() {
-          return fieldSetFlags()[3];
-      }
+       * @return True if the 'orderId' field has been set, false otherwise.
+      */
+    public boolean hasOrderId() {
+        return fieldSetFlags()[4];
+    }
 
 
       /**
        * Clears the value of the 'orderId' field.
        * @return This builder.
-      */
-    public com.example.kafka.avro.model.RequestAvroModel.Builder clearOrderId() {
-        orderId = null;
-        fieldSetFlags()[3] = false;
-        return this;
-    }
+       */
+      public com.example.kafka.avro.model.RequestAvroModel.Builder clearOrderId() {
+          orderId = null;
+          fieldSetFlags()[4] = false;
+          return this;
+      }
 
       /**
        * Gets the value of the 'paymentId' field.
@@ -833,9 +914,9 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder setPaymentId(java.util.UUID value) {
-          validate(fields()[4], value);
+          validate(fields()[5], value);
           this.paymentId = value;
-          fieldSetFlags()[4] = true;
+          fieldSetFlags()[5] = true;
           return this;
       }
 
@@ -845,23 +926,22 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return True if the 'paymentId' field has been set, false otherwise.
        */
       public boolean hasPaymentId() {
-          return fieldSetFlags()[4];
-      }
-
-
-      /**
-       * Clears the value of the 'paymentId' field.
-       *
-       * @return This builder.
-       */
-      public com.example.kafka.avro.model.RequestAvroModel.Builder clearPaymentId() {
-          paymentId = null;
-      fieldSetFlags()[4] = false;
-      return this;
+          return fieldSetFlags()[5];
     }
 
+
     /**
-      * Gets the value of the 'calleeId' field.
+      * Clears the value of the 'paymentId' field.
+      * @return This builder.
+      */
+    public com.example.kafka.avro.model.RequestAvroModel.Builder clearPaymentId() {
+        paymentId = null;
+        fieldSetFlags()[5] = false;
+        return this;
+    }
+
+      /**
+       * Gets the value of the 'calleeId' field.
       * @return The value.
       */
     public java.util.UUID getCalleeId() {
@@ -869,75 +949,75 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
     }
 
 
-      /**
-       * Sets the value of the 'calleeId' field.
-       * @param value The value of 'calleeId'.
-       * @return This builder.
+    /**
+      * Sets the value of the 'calleeId' field.
+     * @param value The value of 'calleeId'.
+      * @return This builder.
       */
     public com.example.kafka.avro.model.RequestAvroModel.Builder setCalleeId(java.util.UUID value) {
-      validate(fields()[5], value);
-      this.calleeId = value;
-      fieldSetFlags()[5] = true;
+      validate(fields()[6], value);
+        this.calleeId = value;
+        fieldSetFlags()[6] = true;
         return this;
     }
 
       /**
       * Checks whether the 'calleeId' field has been set.
       * @return True if the 'calleeId' field has been set, false otherwise.
-      */
-    public boolean hasCalleeId() {
-      return fieldSetFlags()[5];
+       */
+      public boolean hasCalleeId() {
+      return fieldSetFlags()[6];
     }
 
 
-      /**
-       * Clears the value of the 'calleeId' field.
+    /**
+      * Clears the value of the 'calleeId' field.
       * @return This builder.
       */
     public com.example.kafka.avro.model.RequestAvroModel.Builder clearCalleeId() {
       calleeId = null;
-      fieldSetFlags()[5] = false;
-      return this;
+        fieldSetFlags()[6] = false;
+        return this;
     }
 
-    /**
-      * Gets the value of the 'price' field.
-      * @return The value.
-      */
+      /**
+        * Gets the value of the 'price' field.
+        * @return The value.
+        */
     public java.nio.ByteBuffer getPrice() {
-      return price;
+        return price;
     }
 
 
     /**
       * Sets the value of the 'price' field.
      * @param value The value of 'price'.
-     * @return This builder.
+      * @return This builder.
       */
     public com.example.kafka.avro.model.RequestAvroModel.Builder setPrice(java.nio.ByteBuffer value) {
-      validate(fields()[6], value);
-      this.price = value;
-      fieldSetFlags()[6] = true;
+      validate(fields()[7], value);
+        this.price = value;
+        fieldSetFlags()[7] = true;
         return this;
     }
 
     /**
       * Checks whether the 'price' field has been set.
       * @return True if the 'price' field has been set, false otherwise.
-      */
+     */
     public boolean hasPrice() {
-      return fieldSetFlags()[6];
+      return fieldSetFlags()[7];
     }
 
 
-      /**
-       * Clears the value of the 'price' field.
+    /**
+      * Clears the value of the 'price' field.
       * @return This builder.
       */
     public com.example.kafka.avro.model.RequestAvroModel.Builder clearPrice() {
       price = null;
-      fieldSetFlags()[6] = false;
-      return this;
+        fieldSetFlags()[7] = false;
+        return this;
     }
 
     /**
@@ -945,29 +1025,30 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
       * @return The value.
       */
     public java.time.Instant getCreatedAt() {
-      return createdAt;
+        return createdAt;
     }
 
 
-    /**
+      /**
       * Sets the value of the 'createdAt' field.
-     * @param value The value of 'createdAt'.
-      * @return This builder.
-      */
-    public com.example.kafka.avro.model.RequestAvroModel.Builder setCreatedAt(java.time.Instant value) {
-      validate(fields()[7], value);
+      * @param value The value of 'createdAt'.
+       * @return This builder.
+       */
+      public com.example.kafka.avro.model.RequestAvroModel.Builder setCreatedAt(java.time.Instant value) {
+      validate(fields()[8], value);
       this.createdAt = value.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
-      fieldSetFlags()[7] = true;
-        return this;
-    }
+          fieldSetFlags()[8] = true;
+          return this;
+      }
 
       /**
        * Checks whether the 'createdAt' field has been set.
-      * @return True if the 'createdAt' field has been set, false otherwise.
-      */
-    public boolean hasCreatedAt() {
-      return fieldSetFlags()[7];
-    }
+       *
+       * @return True if the 'createdAt' field has been set, false otherwise.
+       */
+      public boolean hasCreatedAt() {
+          return fieldSetFlags()[8];
+      }
 
 
       /**
@@ -976,7 +1057,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder clearCreatedAt() {
-          fieldSetFlags()[7] = false;
+          fieldSetFlags()[8] = false;
           return this;
       }
 
@@ -992,15 +1073,14 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
       /**
        * Sets the value of the 'orderStatus' field.
-       *
        * @param value The value of 'orderStatus'.
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder setOrderStatus(com.example.kafka.avro.model.OrderStatus value) {
-          validate(fields()[8], value);
+          validate(fields()[9], value);
           this.orderStatus = value;
-          fieldSetFlags()[8] = true;
-          return this;
+          fieldSetFlags()[9] = true;
+      return this;
       }
 
       /**
@@ -1009,58 +1089,58 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return True if the 'orderStatus' field has been set, false otherwise.
        */
       public boolean hasOrderStatus() {
-          return fieldSetFlags()[8];
+      return fieldSetFlags()[9];
       }
 
 
       /**
-       * Clears the value of the 'orderStatus' field.
-      * @return This builder.
+      * Clears the value of the 'orderStatus' field.
+       * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder clearOrderStatus() {
           orderStatus = null;
-          fieldSetFlags()[8] = false;
+          fieldSetFlags()[9] = false;
           return this;
-    }
+      }
 
-    /**
-      * Gets the value of the 'trackingId' field.
-     * @return The value.
-     */
-    public java.util.UUID getTrackingId() {
-        return trackingId;
-    }
+      /**
+       * Gets the value of the 'trackingId' field.
+       *
+       * @return The value.
+       */
+      public java.util.UUID getTrackingId() {
+          return trackingId;
+      }
 
 
       /**
        * Sets the value of the 'trackingId' field.
-      * @param value The value of 'trackingId'.
+       * @param value The value of 'trackingId'.
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder setTrackingId(java.util.UUID value) {
-          validate(fields()[9], value);
+          validate(fields()[10], value);
           this.trackingId = value;
-          fieldSetFlags()[9] = true;
+          fieldSetFlags()[10] = true;
           return this;
       }
 
-    /**
-      * Checks whether the 'trackingId' field has been set.
-     * @return True if the 'trackingId' field has been set, false otherwise.
-     */
-    public boolean hasTrackingId() {
-        return fieldSetFlags()[9];
-    }
+      /**
+       * Checks whether the 'trackingId' field has been set.
+       * @return True if the 'trackingId' field has been set, false otherwise.
+       */
+      public boolean hasTrackingId() {
+          return fieldSetFlags()[10];
+      }
 
 
       /**
        * Clears the value of the 'trackingId' field.
-       *
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder clearTrackingId() {
           trackingId = null;
-          fieldSetFlags()[9] = false;
+          fieldSetFlags()[10] = false;
           return this;
       }
 
@@ -1076,15 +1156,14 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
       /**
        * Sets the value of the 'address' field.
-       *
        * @param value The value of 'address'.
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder setAddress(com.example.kafka.avro.model.Address value) {
-          validate(fields()[10], value);
+          validate(fields()[11], value);
           this.addressBuilder = null;
           this.address = value;
-          fieldSetFlags()[10] = true;
+          fieldSetFlags()[11] = true;
           return this;
       }
 
@@ -1094,12 +1173,11 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return True if the 'address' field has been set, false otherwise.
        */
       public boolean hasAddress() {
-          return fieldSetFlags()[10];
+          return fieldSetFlags()[11];
       }
 
       /**
        * Gets the Builder instance for the 'address' field and creates one if it doesn't exist yet.
-       *
        * @return This builder.
        */
       public com.example.kafka.avro.model.Address.Builder getAddressBuilder() {
@@ -1128,7 +1206,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
       /**
        * Checks whether the 'address' field has an active Builder instance
-       *
        * @return True if the 'address' field has an active Builder instance
        */
       public boolean hasAddressBuilder() {
@@ -1137,13 +1214,12 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
       /**
        * Clears the value of the 'address' field.
-       *
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder clearAddress() {
           address = null;
           addressBuilder = null;
-          fieldSetFlags()[10] = false;
+          fieldSetFlags()[11] = false;
           return this;
       }
 
@@ -1164,9 +1240,9 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder setItems(java.util.List<com.example.kafka.avro.model.OrderItem> value) {
-          validate(fields()[11], value);
+          validate(fields()[12], value);
           this.items = value;
-          fieldSetFlags()[11] = true;
+          fieldSetFlags()[12] = true;
           return this;
       }
 
@@ -1176,7 +1252,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return True if the 'items' field has been set, false otherwise.
        */
       public boolean hasItems() {
-          return fieldSetFlags()[11];
+          return fieldSetFlags()[12];
       }
 
 
@@ -1187,7 +1263,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder clearItems() {
           items = null;
-          fieldSetFlags()[11] = false;
+          fieldSetFlags()[12] = false;
           return this;
       }
 
@@ -1203,14 +1279,13 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
       /**
        * Sets the value of the 'failureMessages' field.
-       *
        * @param value The value of 'failureMessages'.
        * @return This builder.
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder setFailureMessages(java.util.List<java.lang.CharSequence> value) {
-          validate(fields()[12], value);
+          validate(fields()[13], value);
           this.failureMessages = value;
-          fieldSetFlags()[12] = true;
+          fieldSetFlags()[13] = true;
           return this;
       }
 
@@ -1220,7 +1295,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        * @return True if the 'failureMessages' field has been set, false otherwise.
        */
       public boolean hasFailureMessages() {
-          return fieldSetFlags()[12];
+          return fieldSetFlags()[13];
       }
 
 
@@ -1231,7 +1306,7 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
        */
       public com.example.kafka.avro.model.RequestAvroModel.Builder clearFailureMessages() {
           failureMessages = null;
-          fieldSetFlags()[12] = false;
+          fieldSetFlags()[13] = false;
           return this;
       }
 
@@ -1241,27 +1316,28 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
           try {
               RequestAvroModel record = new RequestAvroModel();
               record.id = fieldSetFlags()[0] ? this.id : (java.util.UUID) defaultValue(fields()[0]);
-              record.sagaId = fieldSetFlags()[1] ? this.sagaId : (java.util.UUID) defaultValue(fields()[1]);
-              record.callerId = fieldSetFlags()[2] ? this.callerId : (java.util.UUID) defaultValue(fields()[2]);
-              record.orderId = fieldSetFlags()[3] ? this.orderId : (java.util.UUID) defaultValue(fields()[3]);
-              record.paymentId = fieldSetFlags()[4] ? this.paymentId : (java.util.UUID) defaultValue(fields()[4]);
-              record.calleeId = fieldSetFlags()[5] ? this.calleeId : (java.util.UUID) defaultValue(fields()[5]);
-              record.price = fieldSetFlags()[6] ? this.price : (java.nio.ByteBuffer) defaultValue(fields()[6]);
-              record.createdAt = fieldSetFlags()[7] ? this.createdAt : (java.time.Instant) defaultValue(fields()[7]);
-              record.orderStatus = fieldSetFlags()[8] ? this.orderStatus : (com.example.kafka.avro.model.OrderStatus) defaultValue(fields()[8]);
-              record.trackingId = fieldSetFlags()[9] ? this.trackingId : (java.util.UUID) defaultValue(fields()[9]);
+              record.eventType = fieldSetFlags()[1] ? this.eventType : (java.lang.CharSequence) defaultValue(fields()[1]);
+              record.sagaId = fieldSetFlags()[2] ? this.sagaId : (java.util.UUID) defaultValue(fields()[2]);
+              record.callerId = fieldSetFlags()[3] ? this.callerId : (java.util.UUID) defaultValue(fields()[3]);
+              record.orderId = fieldSetFlags()[4] ? this.orderId : (java.util.UUID) defaultValue(fields()[4]);
+              record.paymentId = fieldSetFlags()[5] ? this.paymentId : (java.util.UUID) defaultValue(fields()[5]);
+              record.calleeId = fieldSetFlags()[6] ? this.calleeId : (java.util.UUID) defaultValue(fields()[6]);
+              record.price = fieldSetFlags()[7] ? this.price : (java.nio.ByteBuffer) defaultValue(fields()[7]);
+              record.createdAt = fieldSetFlags()[8] ? this.createdAt : (java.time.Instant) defaultValue(fields()[8]);
+              record.orderStatus = fieldSetFlags()[9] ? this.orderStatus : (com.example.kafka.avro.model.OrderStatus) defaultValue(fields()[9]);
+              record.trackingId = fieldSetFlags()[10] ? this.trackingId : (java.util.UUID) defaultValue(fields()[10]);
               if (addressBuilder != null) {
                   try {
                       record.address = this.addressBuilder.build();
                   } catch (org.apache.avro.AvroMissingFieldException e) {
-                      e.addParentField(record.getSchema().getField("address"));
-                      throw e;
-                  }
-              } else {
-                  record.address = fieldSetFlags()[10] ? this.address : (com.example.kafka.avro.model.Address) defaultValue(fields()[10]);
-              }
-              record.items = fieldSetFlags()[11] ? this.items : (java.util.List<com.example.kafka.avro.model.OrderItem>) defaultValue(fields()[11]);
-              record.failureMessages = fieldSetFlags()[12] ? this.failureMessages : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[12]);
+            e.addParentField(record.getSchema().getField("address"));
+            throw e;
+          }
+        } else {
+          record.address = fieldSetFlags()[11] ? this.address : (com.example.kafka.avro.model.Address) defaultValue(fields()[11]);
+        }
+        record.items = fieldSetFlags()[12] ? this.items : (java.util.List<com.example.kafka.avro.model.OrderItem>) defaultValue(fields()[12]);
+        record.failureMessages = fieldSetFlags()[13] ? this.failureMessages : (java.util.List<java.lang.CharSequence>) defaultValue(fields()[13]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;

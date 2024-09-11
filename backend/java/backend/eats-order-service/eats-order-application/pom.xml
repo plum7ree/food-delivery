@@ -155,7 +155,34 @@
             <artifactId>spring-security-config</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-data-23</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-kafka-reactive</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -190,7 +217,9 @@
                             <resources>
                                 <resource>
                                     <!-- compile 해야 설치됨. -->
-                                    <directory>${project.parent.basedir}/test-data-generation/orders</directory>
+                                    <directory>
+                                        ${project.parent.basedir}/test-data-generation/data-loader/schema/orders
+                                    </directory>
                                     <includes>
                                         <include>init-data.sql</include>
                                         <include>init-schema.sql</include>

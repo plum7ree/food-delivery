@@ -11,6 +11,10 @@
       }
     },
     {
+      "name": "eventType",
+      "type": "string"
+    },
+    {
       "name": "sagaId",
       "type": {
         "type": "string",

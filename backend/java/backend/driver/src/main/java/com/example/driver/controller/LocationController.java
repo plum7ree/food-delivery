@@ -5,7 +5,7 @@ import com.example.driver.data.dto.ResponseDto;
 import com.example.driver.data.transformer.LocationToAvroTransformer;
 import com.example.kafka.avro.model.LocationAvroModel;
 import com.example.kafka.config.data.KafkaConfigData;
-import com.example.kafkaproducer.KafkaProducer;
+import com.example.kafkaproducer.GeneralKafkaProducer;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class LocationController {
     private static final Logger log = LoggerFactory.getLogger(LocationController.class);
 
-    private final KafkaProducer<Long, LocationAvroModel> kafkaProducer;
+    private final GeneralKafkaProducer<Long, LocationAvroModel> kafkaProducer;
     // figured in configserver's driver.yml
     private final KafkaConfigData kafkaConfigData;
 

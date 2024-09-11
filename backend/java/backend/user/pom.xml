@@ -176,11 +176,11 @@
                             <resources>
                                 <resource>
                                     <!-- compile 해야 설치됨. -->
-                                    <directory>${project.parent.basedir}/test-data-generation/users</directory>
+                                    <directory>${project.parent.basedir}/test-data-generation/data-loader/schema/users
+                                    </directory>
                                     <includes>
-                                        <include>user_list.json</include>
-                                        <include>web_crawled_restaurant_data.json</include>
                                         <include>init-schema.sql</include>
+                                        <include>init-data.sql</include>
                                     </includes>
                                 </resource>
                             </resources>

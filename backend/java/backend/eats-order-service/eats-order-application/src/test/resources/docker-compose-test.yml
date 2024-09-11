@@ -99,6 +99,7 @@ services:
     hostname: zookeeper
     ports:
       - "2181:2181"
+    restart: always
     environment:
       ZOOKEEPER_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
@@ -125,6 +126,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_COMPRESSION_TYPE: producer
+    restart: always
     depends_on:
       - zookeeper
     networks:
@@ -135,6 +137,7 @@ services:
     hostname: kafka-broker-2
     ports:
       - "29092:29092"
+    restart: always
     environment:
       KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -153,6 +156,7 @@ services:
     hostname: kafka-broker-3
     ports:
       - "39092:39092"
+    restart: always
     environment:
       KAFKA_BROKER_ID: 3
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -176,6 +180,7 @@ services:
       - kafka-broker-3
     ports:
       - "8081:8081"
+    restart: always
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'

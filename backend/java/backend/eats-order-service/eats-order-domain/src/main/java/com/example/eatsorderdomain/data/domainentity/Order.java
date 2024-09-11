@@ -2,6 +2,7 @@ package com.example.eatsorderdomain.data.domainentity;
 
 import com.example.commondata.domain.aggregate.AggregateRoot;
 import com.example.commondata.domain.aggregate.valueobject.*;
+import com.example.commondata.domain.events.order.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.UUID;
 
 //@Data //TODO hashCode conflict 에러 뜨는데 AggregateRoot 거 사용하기.
 @Getter
@@ -19,18 +21,19 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
-public class Order extends AggregateRoot<OrderId> implements Cloneable { // why clonable?
-    // private final: these are immutable.
+public class Order {
     @JsonProperty
-    private CallerId callerId;
+    private UUID id;
     @JsonProperty
-    private CalleeId calleeId;
+    private UUID callerId;
     @JsonProperty
-    private Money price;
+    private UUID calleeId;
+    @JsonProperty
+    private Double price;
 
     // private: these are mutable.
     @JsonProperty
-    private SimpleId trackingId;
+    private UUID trackingId;
     @JsonProperty
     private OrderStatus orderStatus;
     @JsonProperty

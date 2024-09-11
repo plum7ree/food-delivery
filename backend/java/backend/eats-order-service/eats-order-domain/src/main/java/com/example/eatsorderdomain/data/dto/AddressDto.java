@@ -11,7 +11,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressDto {
+    String id;
     String name;
+    String userId;
     String osmId;
     PointDto point;
+    String street;
+    String city;
+    String postalCode;
+    Double lat;
+    Double lon;
 }

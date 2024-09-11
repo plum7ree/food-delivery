@@ -4,9 +4,8 @@ import com.example.commondata.domain.aggregate.Payment;
 import com.example.commondata.domain.aggregate.valueobject.*;
 import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.eatsorderdomain.data.domainentity.OrderItem;
-import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
+import com.example.eatsorderdomain.data.dto.CreateOrderRequest;
 import com.example.eatsorderdomain.data.dto.ResponseDto;
-import com.example.eatsorderdomain.data.event.CallPaidEvent;
 import com.example.kafka.avro.model.DriverApprovalRequestAvroModel;
 import com.example.kafka.avro.model.DriverApprovalStatus;
 import com.example.kafka.avro.model.RequestAvroModel;
@@ -22,17 +21,17 @@ import java.util.stream.Collectors;
 public class DtoDataMapper {
     public static final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
 
-    public static Order orderDtoToOrder(CreateOrderCommandDto createOrderCommandDto) {
+    public static Order orderDtoToOrder(CreateOrderRequest createOrderRequest) {
         var orderId = new OrderId(UUID.randomUUID());
         return Order.builder()
             .id(orderId)
-            .callerId(new CallerId(createOrderCommandDto.getCallerId()))
-            .calleeId(new CalleeId(createOrderCommandDto.getCalleeId()))
-            .price(new Money(createOrderCommandDto.getPrice()))
+            .callerId(new CallerId(createOrderRequest.getCallerId()))
+            .calleeId(new CalleeId(createOrderRequest.getCalleeId()))
+            .price(new Money(createOrderRequest.getPrice()))
             .trackingId(new SimpleId(UUID.randomUUID()))
             .orderStatus(OrderStatus.PENDING)
-            .address(createOrderCommandDto.getAddress())
-            .items(createOrderCommandDto.getItems().stream().map(
+            .address(createOrderRequest.getAddress())
+            .items(createOrderRequest.getItems().stream().map(
                 orderItemDto -> OrderItem.builder()
                     .id(new SimpleId(orderItemDto.getId()))
                     .orderId(orderId)

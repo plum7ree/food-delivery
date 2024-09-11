@@ -29,12 +29,6 @@ public abstract class BaseOutboxMessageEntity {
     @Column(name = "saga_id")
     private UUID sagaId;
     @Nonnull
-    @Column(name = "created_at")
-    private ZonedDateTime createdAt;
-    @Nonnull
-    @Column(name = "processed_at")
-    private ZonedDateTime processedAt;
-    @Nonnull
     @Column(name = "saga_type")
     private String sagaType;
 
@@ -53,6 +47,12 @@ public abstract class BaseOutboxMessageEntity {
     @Nonnull
     @Column(name = "saga_status")
     private String sagaStatus;
+    @Nonnull
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
+    @Nonnull
+    @Column(name = "processed_at")
+    private ZonedDateTime processedAt;
 
     @Version
     private int version;

@@ -8,10 +8,9 @@ import com.example.eatsorderdataaccess.entity.RestaurantApprovalOutboxMessageEnt
 import com.example.eatsorderdataaccess.repository.OrderRepository;
 import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
 import com.example.eatsorderdomain.data.domainentity.Order;
-import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
-import com.example.eatsorderdomain.data.event.CallCreatedEvent;
+import com.example.eatsorderdomain.data.dto.CreateOrderRequest;
 import com.example.kafka.avro.model.RequestAvroModel;
-import com.example.kafkaproducer.KafkaProducer;
+import com.example.kafkaproducer.GeneralKafkaProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -37,7 +36,7 @@ class EatsOrderCommandServiceTestDO {
     private EatsOrderServiceConfigData eatsOrderServiceConfigData;
 
     @Mock
-    private KafkaProducer<String, RequestAvroModel> kafkaProducer;
+    private GeneralKafkaProducer<String, RequestAvroModel> kafkaProducer;
 
     @Captor
     private ArgumentCaptor<String> topicNameCaptor;
@@ -78,7 +77,7 @@ class EatsOrderCommandServiceTestDO {
             .postalCode(postalCode)
             .city(city)
             .build();
-        var createEatsOrderCommandDto = CreateOrderCommandDto.builder()
+        var createEatsOrderCommandDto = CreateOrderRequest.builder()
             .address(address)
             .calleeId(driverId)
             .price(price)
@@ -124,7 +123,7 @@ class EatsOrderCommandServiceTestDO {
         assertEquals(OrderStatus.PENDING, savedOrderEntity.getOrderStatus());
 
         // Verify RestaurantApprovalRequestOutboxRepository save call
-        verify(restaurantApprovalRequestOutboxRepository).save(restaurantApprovalRequestEntityCaptor.capture());
+        verify(restaurantApprovalRequestOutboxRepository).upsert(restaurantApprovalRequestEntityCaptor.capture());
         RestaurantApprovalOutboxMessageEntity savedRestaurantApprovalRequestEntity = restaurantApprovalRequestEntityCaptor.getValue();
         assertNotNull(savedRestaurantApprovalRequestEntity);
         assertEquals(OrderStatus.PENDING, savedRestaurantApprovalRequestEntity.getOrderStatus());

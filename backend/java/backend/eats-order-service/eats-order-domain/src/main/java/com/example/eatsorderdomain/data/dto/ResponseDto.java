@@ -1,6 +1,5 @@
 package com.example.eatsorderdomain.data.dto;
 
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

@@ -3,13 +3,10 @@ package com.example.eatsorderapplication.controller;
 import com.example.commondata.domain.aggregate.valueobject.CalleeId;
 import com.example.commondata.domain.aggregate.valueobject.CallerId;
 import com.example.commondata.domain.aggregate.valueobject.Money;
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
-import com.example.eatsorderapplication.service.EatsOrderCommandService;
 import com.example.eatsorderapplication.utils.TestDataGenerator;
 import com.example.eatsorderdomain.data.domainentity.Order;
-import com.example.eatsorderdomain.data.dto.CreateOrderCommandDto;
+import com.example.eatsorderdomain.data.dto.CreateOrderRequest;
 import com.example.eatsorderdomain.data.dto.UserDto;
-import com.example.eatsorderdomain.data.event.CallCreatedEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -128,10 +125,10 @@ public class EatsOrderControllerTestDO {
 
 
         // then
-        ArgumentCaptor<CreateOrderCommandDto> captor = ArgumentCaptor.forClass(CreateOrderCommandDto.class);
+        ArgumentCaptor<CreateOrderRequest> captor = ArgumentCaptor.forClass(CreateOrderRequest.class);
         verify(eatsOrderCommandServiceInjected, times(1)).createAndSaveOrder(captor.capture());
 
-        CreateOrderCommandDto capturedArgument = captor.getValue();
+        CreateOrderRequest capturedArgument = captor.getValue();
         // Verify the captured argument
         assertEquals(testData.userId, capturedArgument.getCallerId());
         assertEquals(testData.driverId, capturedArgument.getCalleeId());

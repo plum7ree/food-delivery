@@ -28,4 +28,6 @@ public class KafkaConsumerConfigData {
     private Boolean enableAutoCommit;
     @Value("${kafka-consumer-config.ack-mode:BATCH}")
     private String ackMode;
+    @Value("${kafka-consumer-config.isolation-level:read_committed}")
+    private String isolationLevel;
 }

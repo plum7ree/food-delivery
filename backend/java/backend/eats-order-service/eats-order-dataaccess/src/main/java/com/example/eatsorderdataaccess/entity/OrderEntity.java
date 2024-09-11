@@ -1,13 +1,10 @@
 package com.example.eatsorderdataaccess.entity;
 
-import com.example.commondata.domain.aggregate.valueobject.OrderStatus;
+import com.example.commondata.domain.events.order.OrderStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.ColumnTransformer;
-import org.hibernate.annotations.Type;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,11 +26,11 @@ public class OrderEntity {
     private UUID customerId;
     private UUID restaurantId;
     private UUID trackingId;
-    private BigDecimal price;
+    private Double price;
 
     @Column(columnDefinition = "order_status")
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private String orderStatus;
     private String failureMessages;
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)

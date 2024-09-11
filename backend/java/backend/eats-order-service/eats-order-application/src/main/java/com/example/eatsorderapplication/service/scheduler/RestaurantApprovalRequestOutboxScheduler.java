@@ -7,7 +7,7 @@ import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutbo
 import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.eatsorderdomain.data.mapper.DtoDataMapper;
 import com.example.kafka.avro.model.RequestAvroModel;
-import com.example.kafkaproducer.KafkaProducer;
+import com.example.kafkaproducer.GeneralKafkaProducer;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,12 +37,12 @@ import static com.example.commondata.domain.aggregate.valueobject.SagaType.EATS_
 public class RestaurantApprovalRequestOutboxScheduler {
 
     private final RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository;
-    private final KafkaProducer<String, RequestAvroModel> kafkaProducer;
+    private final GeneralKafkaProducer<String, RequestAvroModel> kafkaProducer;
     private final EatsOrderServiceConfigData eatsOrderServiceConfigData;
     private final ObjectMapper objectMapper;
 
 
-    public RestaurantApprovalRequestOutboxScheduler(RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository, KafkaProducer<String, RequestAvroModel> kafkaProducer, EatsOrderServiceConfigData eatsOrderServiceConfigData, ObjectMapper objectMapper) {
+    public RestaurantApprovalRequestOutboxScheduler(RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository, GeneralKafkaProducer<String, RequestAvroModel> kafkaProducer, EatsOrderServiceConfigData eatsOrderServiceConfigData, ObjectMapper objectMapper) {
         this.restaurantApprovalRequestOutboxRepository = restaurantApprovalRequestOutboxRepository;
         this.kafkaProducer = kafkaProducer;
         this.eatsOrderServiceConfigData = eatsOrderServiceConfigData;
@@ -107,11 +107,14 @@ public class RestaurantApprovalRequestOutboxScheduler {
     public void processStartedSaga() {
         // db 에서 OutboxStatus.STARTED 인 데이터를 읽어오기. 사실 FAILED 된 것도 읽어와야할듯?
 
-        Optional<List<RestaurantApprovalOutboxMessageEntity>> outboxEntities = Optional.ofNullable(
-            restaurantApprovalRequestOutboxRepository.findBySagaTypeAndOutboxStatusAndSagaStatusIn(EATS_ORDER.name(),
+        Optional<List<RestaurantApprovalOutboxMessageEntity>> outboxEntities =
+            Optional.ofNullable(
+                restaurantApprovalRequestOutboxRepository.findBySagaTypeAndOutboxStatusAndSagaStatusIn(
+                    EATS_ORDER.name(),
                     OutboxStatus.STARTED.name(),
-                    new String[]{SagaStatus.STARTED.name(), SagaStatus.COMPENSATING.name()})
-                .orElseGet(() -> null));
+                    new String[]{SagaStatus.STARTED.name(), SagaStatus.COMPENSATING.name()}
+                )
+            ).filter(list -> !list.isEmpty()); // 비어 있지 않으면 Optional로 감싸고, 비어 있으면 Optional.empty()
 
         if (outboxEntities.isEmpty()) {
             return;
@@ -154,7 +157,7 @@ public class RestaurantApprovalRequestOutboxScheduler {
                         originalEntity.setCreatedAt(originalEntity.getCreatedAt());
                         originalEntity.setVersion(originalEntity.getVersion());
 
-                        restaurantApprovalRequestOutboxRepository.save(originalEntity);
+                        restaurantApprovalRequestOutboxRepository.upsert(originalEntity);
                         log.info("OrderPaymentOutboxMessage is updated with outbox status: {}", OutboxStatus.COMPLETED.name());
                     });
             });
@@ -173,9 +176,9 @@ public class RestaurantApprovalRequestOutboxScheduler {
 
         Optional<List<RestaurantApprovalOutboxMessageEntity>> outboxEntities = Optional.ofNullable(
             restaurantApprovalRequestOutboxRepository.findBySagaTypeAndOutboxStatusAndSagaStatusIn(EATS_ORDER.name(),
-                    OutboxStatus.COMPLETED.name(),
-                    new String[]{SagaStatus.SUCCEEDED.name()})
-                .orElseGet(() -> null));
+                OutboxStatus.COMPLETED.name(),
+                new String[]{SagaStatus.SUCCEEDED.name()})
+        ).filter(list -> !list.isEmpty());
 
 
     }

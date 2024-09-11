@@ -28,6 +28,8 @@ spring:
   h2:
     console:
       enabled: true
+  data:
+    redis-server: redis://redis:6379
 
 retry-config:
   initial-interval-ms: 1000
