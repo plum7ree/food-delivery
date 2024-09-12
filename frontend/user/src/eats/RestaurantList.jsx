@@ -33,7 +33,7 @@ const RestaurantList = () => {
    const navigate = useNavigate();
 
 
-   const isTestMode = true; // 테스트 플래그 변수
+   const isTestMode = false; // 테스트 플래그 변수
 
    useEffect(() => {
       //TODO 모든 타입을 한번 fetch, 그 다음 해당 탭으로 넘어가면, 해당 타입 레스토랑들을 페이지 형식으로 update.

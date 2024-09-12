@@ -22,6 +22,7 @@ import Register from "./eats/Register";
 import {asyncGetAuth} from "./state/authSlice";
 import {toast, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import DriverMap from "./eats/driver/DriverMap";
 
 const IconContainer = styled(Box)({
    display: "flex",
@@ -79,7 +80,9 @@ const PrivateRoute = ({children}) => {
       return <Navigate to="/login"/>;
    }
 
-   return isLoggedIn ? children : <Navigate to="/login"/>;
+   if (getAuthStatus === 'fulfilled') {
+      return isLoggedIn ? children : <Navigate to="/login"/>;
+   }
 };
 const router = createBrowserRouter([
    {
@@ -212,6 +215,7 @@ export default function App() {
    return (
       <>
          <RouterProvider router={router}/>
+         <DriverMap />
          <ToastContainer autoClose={2000} stacked />
       </>
    );

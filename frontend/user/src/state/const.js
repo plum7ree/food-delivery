@@ -1,3 +1,6 @@
+
+export const IS_TEST_MODE = false;
+
 export const SERVER_URL = "http://localhost:8080";
 export const FRONTEND_HOME_URL = "http://localhost:5173";
 

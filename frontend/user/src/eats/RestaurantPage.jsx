@@ -155,7 +155,7 @@ const RestaurantPage = () => {
    const [ratingDistribution, setRatingDistribution] = useState({});
 
 
-   const isTestMode = true;
+   const isTestMode = false;
 
    useEffect(() => {
       const restaurant = location.state['restaurant']
@@ -179,21 +179,24 @@ const RestaurantPage = () => {
          })
 
       } else {
-         const {restaurant} = location.state;
          setRestaurantIdState(restaurant.id);
 
-         const fetchRestaurantContent = async (restaurantId) => {
-            try {
-               const response = await axiosInstance.get(`/user/api/seller/restaurant/${restaurantId}`);
-               setRestaurantState(response.data);
-            } catch (error) {
-               console.error('Error fetching restaurant data:', error);
-            }
-         };
-         fetchRestaurantContent(restaurantId);
       }
-   }, [location]);
+   }, []);
 
+
+   useEffect(() => {
+      const fetchRestaurantContent = async (restaurantId) => {
+         try {
+            const response = await axiosInstance.get(`/user/api/seller/restaurant/${restaurantId}`);
+            console.log(response.data)
+            setRestaurantState(response.data);
+         } catch (error) {
+            console.error('Error fetching restaurant data:', error);
+         }
+      };
+      fetchRestaurantContent(restaurantIdState);
+   },[restaurantIdState]);
 
    const handleTabChange = (event, newValue) => {
       setCurrentTab(newValue);

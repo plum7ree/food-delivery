@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useNavigate} from 'react-router-dom';
-import {useDispatch, useSelector} from "react-redux";
-import {fetchProfilePicture} from "../state/fetchProfilePicture";
-import {Grid, Typography, TextField, IconButton, Autocomplete} from '@mui/material';
-import {styled} from '@mui/material/styles';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProfilePicture } from "../state/fetchProfilePicture";
+import { Grid, Typography, TextField, IconButton, Autocomplete } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import {Container} from "@mui/system";
+import { Container } from "@mui/system";
 import axiosInstance from "../state/axiosInstance";
 import RestaurantType from "./RestaurantType";
-import {GetAllTestRestaurantList as mockRestaurant} from "./resources/RestaurantListTestData";
 import RestaurantLabelLargePicture from "./RestaurantLabelLargePicture";
+import { fetchRestaurantsByType } from "../state/restaurantSlice";
 
-const SearchBar = styled(Grid)(({theme}) => ({
+const SearchBar = styled(Grid)(({ theme }) => ({
    display: 'flex',
    alignItems: 'center',
    backgroundColor: theme.palette.background.paper,
@@ -28,20 +28,21 @@ const CategoryLink = styled(Link)({
    },
 });
 
-const EatsMain = () => {
-   const categories = [
-      {name: '햄버거', icon: '🍔', type: RestaurantType.BURGER},
-      {name: '피자', icon: '🍕', type: RestaurantType.PIZZA},
-      {name: '한식', icon: '🍲', type: RestaurantType.KOREAN},
-      {name: '중식', icon: '🍜', type: RestaurantType.CHINESE},
-      {name: '일식', icon: '🍣', type: RestaurantType.JAPANESE},
-      {name: '멕시칸', icon: '🌮', type: RestaurantType.MEXICAN},
-      {name: '이탈리안', icon: '🍝', type: RestaurantType.ITALIAN},
-      {name: '미국식', icon: '🍗', type: RestaurantType.AMERICAN},
-      {name: '퓨전', icon: '🥗', type: RestaurantType.FUSION},
-      {name: '기타', icon: '🍽️', type: RestaurantType.MISC},
-   ];
+// Move the categories array outside of the EatsMain component
+const categories = [
+   { name: '햄버거', icon: '🍔', type: RestaurantType.BURGER },
+   { name: '피자', icon: '🍕', type: RestaurantType.PIZZA },
+   { name: '한식', icon: '🍲', type: RestaurantType.KOREAN },
+   { name: '중식', icon: '🍜', type: RestaurantType.CHINESE },
+   { name: '일식', icon: '🍣', type: RestaurantType.JAPANESE },
+   { name: '멕시칸', icon: '🌮', type: RestaurantType.MEXICAN },
+   { name: '이탈리안', icon: '🍝', type: RestaurantType.ITALIAN },
+   { name: '미국식', icon: '🍗', type: RestaurantType.AMERICAN },
+   { name: '퓨전', icon: '🥗', type: RestaurantType.FUSION },
+   { name: '기타', icon: '🍽️', type: RestaurantType.MISC },
+];
 
+const EatsMain = () => {
    const dispatch = useDispatch();
    const profilePictureUrl = useSelector((state) => state.profilePicture.url);
    const [searchResult, setSearchResult] = useState([]);
@@ -49,23 +50,26 @@ const EatsMain = () => {
    const [restaurantsFromSearchResult, setRestaurantsFromSearchResult] = useState([]);
    const [searchText, setSearchText] = useState('');
    const navigate = useNavigate();
-   const [restaurantState, setRestaurantState] = useState({});
+   const restaurantListByTypeState = useSelector((state) => state.restaurants.restaurantListByType);
+
+   // TODO scroll 기능
+   useEffect(() => {
+      categories.forEach((category) => {
+         dispatch(fetchRestaurantsByType({ type: category.type, limit: 10 }));
+      });
+
+   }, [dispatch]); // Only dispatch is needed here, categories is now stable.
 
    useEffect(() => {
-      console.log(mockRestaurant)
-      setRestaurantState(mockRestaurant)
-   }, []);
-
-   useEffect(() => {
-      dispatch(fetchProfilePicture());
+      // dispatch(fetchProfilePicture());
    }, [dispatch]);
 
    useEffect(() => {
       const restaurantsNames = searchResult.map((restaurant) => restaurant.name);
-      setRecommendedRestaurantNamesForSearch(restaurantsNames)
-
-      setRestaurantsFromSearchResult(searchResult)
+      setRecommendedRestaurantNamesForSearch(restaurantsNames);
+      setRestaurantsFromSearchResult(searchResult);
    }, [searchResult]);
+
 
    const handleCategoryClick = (categoryType) => {
       navigate(`/eats/restaurants/${categoryType}`, {
@@ -81,7 +85,7 @@ const EatsMain = () => {
       if (value) {
          try {
             const response = await axiosInstance.get(`/eatssearch/api/search?text=${value}`);
-            console.log(response.data)
+            console.log(response.data);
             setSearchResult(response.data);
          } catch (error) {
             console.error('Error fetching search suggestions:', error);
@@ -100,38 +104,38 @@ const EatsMain = () => {
          });
       }
    };
+
    const handleRestaurantClick = (restaurant) => {
-      console.log(restaurant)
       navigate(`/eats/restaurant/restaurant-page`, {
          state: {
             restaurant: restaurant
          }
       });
    };
+
    return (
       <Container maxWidth="sm">
          <Grid container direction="column" spacing={2}>
             <Grid container item>
                <Grid container direction="row" alignItems="center" justifyContent="space-between">
-                  <SearchBar item sx={{flexGrow: 1, marginRight: 1}}>
-                     <SearchIcon/>
-                     {/*<TextField placeholder="음식점 또는 음식 검색" fullWidth />*/}
+                  <SearchBar item sx={{ flexGrow: 1, marginRight: 1 }}>
+                     <SearchIcon />
                      <Autocomplete
-                        sx={{flexGrow: 1}}
+                        sx={{ flexGrow: 1 }}
                         freeSolo
                         options={recommendedRestaurantNamesForSearch}
                         onInputChange={handleSearchChange}
                         onChange={handleSearchSubmit}
                         renderInput={(params) => (
-                           <TextField {...params} placeholder="음식점 또는 음식 검색" fullWidth/>
+                           <TextField {...params} placeholder="음식점 또는 음식 검색" fullWidth />
                         )}
                      />
                   </SearchBar>
                   <IconButton component={Link} to="/eats/mypage">
                      {profilePictureUrl ? (
-                        <img src={profilePictureUrl} alt="Profile"/>
+                        <img src={profilePictureUrl} alt="Profile" />
                      ) : (
-                        <AccountCircleIcon fontSize="large"/>)}
+                        <AccountCircleIcon fontSize="large" />)}
                   </IconButton>
                </Grid>
             </Grid>
@@ -141,7 +145,7 @@ const EatsMain = () => {
                <Grid container spacing={2} mb={3} alignItems="center" justifyContent="space-between">
                   {categories.map((category, index) => (
                      <Grid item key={index} component={CategoryLink} to={`/eats/restaurants/${category.type}`}
-                           state={{type: category.type}}>
+                           state={{ type: category.type }}>
                         <Grid container direction="column" alignItems="center">
                            <Typography variant="h4">{category.icon}</Typography>
                            <Typography>{category.name}</Typography>
@@ -153,26 +157,22 @@ const EatsMain = () => {
 
             <Grid container item justifyContent="center" alignItems="center">
                <Typography variant="h6" mb={3}>인기 음식점</Typography>
-               <Grid item container spacing={5} justifyContent="center" alignItems="center" direction="column">
-                  {Array.from({length: 10}, (_, i) => (
-
-                     restaurantState &&
-                     restaurantState[i] &&
-                     <RestaurantLabelLargePicture key={restaurantState[i].id}
-                                                  restaurant={restaurantState[i]}
-                                                  handleRestaurantClick={handleRestaurantClick}
-
-
-                     />
-                  ))}
-               </Grid>
+               {Object.entries(restaurantListByTypeState).map(([type, restaurantList]) => (
+                  <Grid key={type} item container spacing={5} justifyContent="center" alignItems="center"
+                        direction="column">
+                     {restaurantList.map((restaurant, i) => (
+                        <RestaurantLabelLargePicture
+                           key={restaurant.id}
+                           restaurant={restaurant}
+                           handleRestaurantClick={handleRestaurantClick}
+                        />
+                     ))}
+                  </Grid>
+               ))}
             </Grid>
          </Grid>
-
-
       </Container>
-   )
-      ;
+   );
 };
 
 export default EatsMain;

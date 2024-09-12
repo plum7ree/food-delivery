@@ -4,6 +4,8 @@ import selectedMenuReducer from "./checkout/selectedMenuSlice";
 import authReducer from "./authSlice";
 import notificationReducer from './notificationSlice';
 import websocketMiddleware from './websocketMiddleware';
+import restaurantReducer from './restaurantSlice';
+import driverReducer from './driverSlice';
 import {persistStore, persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
@@ -14,6 +16,9 @@ export default configureStore({
       selectedMenu: selectedMenuReducer,
       auth: authReducer,
       notifications: notificationReducer,
+      restaurants: restaurantReducer,
+      drivers: driverReducer,
+
    },
 
    middleware: (getDefaultMiddleware) =>

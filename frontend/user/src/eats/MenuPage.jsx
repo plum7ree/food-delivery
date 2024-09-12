@@ -5,7 +5,6 @@ import {v4 as uuidv4} from 'uuid';
 import {Container} from "@mui/system";
 import {useDispatch} from "react-redux";
 import {addMenu} from "../state/checkout/selectedMenuSlice";
-import {fetchProfilePicture} from "../state/fetchProfilePicture";
 import {ArrowBack, Home} from "@mui/icons-material";
 
 const MenuPicture = (props) => {

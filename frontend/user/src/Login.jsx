@@ -18,24 +18,23 @@ const Login = () => {
    const handleLoginSuccess = async (response) => {
       try {
          await dispatch(asyncStoreAuth({clientId: response.clientId, credential: response.credential}));
-         const result = await axiosInstance.get(SERVER_URL + "/user/api/info", {
-            headers: {
-               Authorization: `Bearer ${response.credential}`,
-            },
-         });
+         const result = await axiosInstance.get(SERVER_URL + "/user/api/info");
          // 에러 발생 없으면 로그인 처리 후 홈으로 리다이렉트
          await dispatch(asyncLogin());
          navigate('/');
 
       } catch (error) {
-         console.error("After Oauth2 request to user service failed. 가입이 필요해서, registration 페이지로 전환.:", error);
-         if (error.code === "ERR_NETWORK") {
+         console.log("user api info error: ", error);
+         if (error.code === "ERR_BAD_REQUEST") {
             // id가 빈 문자열이면 /register로 리다이렉트
+            console.error("After Oauth2 request to user service failed. 가입이 필요해서, registration 페이지로 전환.:", error);
             await dispatch(asyncLogout());
             navigate('/register');
          } else if (error.response.code === 503) {
             console.error("user service not available");
             await dispatch(asyncLogout());
+         } else {
+            console.error("예측못한 에러. 핸들링 불가");
          }
       }
    };

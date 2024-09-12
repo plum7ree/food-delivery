@@ -5,6 +5,7 @@ import SockJS from "sockjs-client/dist/sockjs"
 import {Client, Stomp} from '@stomp/stompjs';
 import {addNotification, setConnectionStatus} from './notificationSlice';
 import {toast} from "react-toastify";
+import {addDriver, removeDriver} from "./driverSlice";
 
 // 로그인 후 jwt 담아서 ws 연결
 const websocketMiddleware = store => {
@@ -16,14 +17,29 @@ const websocketMiddleware = store => {
       // /user 가 들어가면 사용자별 메시지 라우팅이다.
       stompClient.subscribe('/user/queue/notifications', message => {
          const newNotification = JSON.parse(message.body);
-         store.dispatch(addNotification(newNotification));
-         toast.success("Order Approved by Restaurant: " + newNotification.message);
+         switch (newNotification.type) {
+            case 'ORDER_APPROVED':
+               store.dispatch(addNotification(newNotification));
+               toast.success('Order Approved by Restaurant: ' + newNotification.message);
+               break;
+            case 'DRIVER_MATCHED':
+               const {driverId, lat, lon} = newNotification.driverDetails;
+               console.log(lat, lon);
+               store.dispatch(addDriver({driverId, lat, lon}));
+               break;
+            case 'DRIVER_LEFT':
+               const {driverId: removedDriverId} = newNotification.driverDetails;
+               store.dispatch(removeDriver({driverId: removedDriverId}));
+               break;
+            default:
+               console.warn('Unknown notification type:', newNotification.type);
+         }
+         // stompClient.subscribe('/topic/heartbeat', message => {
+         //    const newNotification = JSON.parse(message.body);
+         //    store.dispatch(addNotification(newNotification));
+         // });
       });
-      // stompClient.subscribe('/topic/heartbeat', message => {
-      //    const newNotification = JSON.parse(message.body);
-      //    store.dispatch(addNotification(newNotification));
-      // });
-   };
+   }
 
    const onDisconnect = () => {
       store.dispatch(setConnectionStatus(false));
