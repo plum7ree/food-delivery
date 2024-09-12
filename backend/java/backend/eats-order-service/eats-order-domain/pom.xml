@@ -34,12 +34,6 @@
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
-            <artifactId>call-config-data</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.example</groupId>
             <artifactId>kafka-producer</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>

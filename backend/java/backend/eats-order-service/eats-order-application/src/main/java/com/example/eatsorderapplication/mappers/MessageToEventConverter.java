@@ -1,6 +1,7 @@
 package com.example.eatsorderapplication.mappers;
 
 import com.example.commondata.domain.events.order.OrderEvent;
+import com.example.commondata.message.Record;
 import com.example.kafka.avro.model.RequestAvroModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.support.KafkaHeaders;

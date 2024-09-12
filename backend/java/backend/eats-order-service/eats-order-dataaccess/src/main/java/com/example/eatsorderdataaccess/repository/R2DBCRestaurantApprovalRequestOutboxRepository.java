@@ -55,7 +55,7 @@ public class R2DBCRestaurantApprovalRequestOutboxRepository implements Restauran
 
     @Override
     public Mono<Boolean> updateStatus(UUID orderId, OutboxStatus outboxStatus) {
-        String query = "UPDATE order_outbox SET id = :id, correlation_id = :correlation_id, status := status";
+        String query = "UPDATE restaurant_approval_outbox SET id = :id, correlation_id = :correlation_id, status = :status";
         return databaseClient.sql(query)
             .bind("id", UUID.randomUUID())
             .bind("correlation_id", orderId)

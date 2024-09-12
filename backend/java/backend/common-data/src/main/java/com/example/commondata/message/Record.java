@@ -1,4 +1,4 @@
-package com.example.eatsorderapplication.mappers;
+package com.example.commondata.message;
 
 import reactor.kafka.receiver.ReceiverOffset;
 

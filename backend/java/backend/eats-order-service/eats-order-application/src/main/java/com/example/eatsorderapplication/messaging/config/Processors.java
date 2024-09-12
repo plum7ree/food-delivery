@@ -9,6 +9,7 @@ import com.example.kafka.avro.model.RequestAvroModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Flux;
@@ -77,7 +78,7 @@ public class Processors {
             NotificationAvroModel model = NotificationAvroModel.newBuilder()
                 .build();
             return MessageBuilder.withPayload(model)
-                .setHeader("key", event.orderId().toString())
+                .setHeader(KafkaHeaders.PARTITION, 0)
                 .build();
         });
     }
@@ -87,8 +88,10 @@ public class Processors {
             DriverMatchingEventAvroModel model = DriverMatchingEventAvroModel.newBuilder()
                 .build();
             return MessageBuilder.withPayload(model)
-                .setHeader("key", event.orderId().toString())
+                .setHeader(KafkaHeaders.PARTITION, 0)
                 .build();
         });
     }
 }
+
+

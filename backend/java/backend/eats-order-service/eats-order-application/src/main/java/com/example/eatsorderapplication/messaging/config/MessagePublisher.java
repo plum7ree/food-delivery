@@ -46,7 +46,7 @@ public class MessagePublisher {
     }
 
     // publish 되었던 메시지 sendResult 처리
-    private final Sinks.Many<SenderResult<String>> sendResult = Sinks.many().unicast().onBackpressureBuffer();
+    private final Sinks.Many<SenderResult<UUID>> sendResult = Sinks.many().unicast().onBackpressureBuffer();
 
     @Bean(name = "requestRestaurantApprovalSendResultChannel")
     public FluxMessageChannel sendResultChannel() {
@@ -54,7 +54,7 @@ public class MessagePublisher {
     }
 
     @ServiceActivator(inputChannel = "requestRestaurantApprovalSendResultChannel")
-    public void receiveSendResult(SenderResult<String> results) {
+    public void receiveSendResult(SenderResult<UUID> results) {
         if (results.exception() != null) {
             log.error("sendEventMessage", results.exception().getMessage() != null
                 ? results.exception().getMessage()
@@ -70,11 +70,11 @@ public class MessagePublisher {
             .flatMap(result -> {
                 if (result.recordMetadata() != null) {
                     return restaurantApprovalRequestOutboxRepository.updateStatus(
-                        UUID.fromString(result.correlationMetadata()),
+                        result.correlationMetadata(),
                         OutboxStatus.SENT);
                 } else {
                     return restaurantApprovalRequestOutboxRepository.updateStatus(
-                        UUID.fromString(result.correlationMetadata()),
+                        result.correlationMetadata(),
                         OutboxStatus.FAILED);
                 }
             })
