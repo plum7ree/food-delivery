@@ -1,0 +1,13 @@
+osmium~=3.7.0
+elasticsearch~=8.13.0
+elasticsearch_dsl
+beautifulsoup4~=4.12.3
+requests~=2.31.0
+urllib3<=2.0
+selenium~=4.20.0
+networkx~=3.2.1
+fake_useragent
+lxml
+psycopg2=2-2.9.9
+json_stream
+Faker~=26.1.0
