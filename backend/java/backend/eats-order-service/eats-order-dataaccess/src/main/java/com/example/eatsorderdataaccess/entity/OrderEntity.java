@@ -25,7 +25,6 @@ public class OrderEntity {
     private UUID id;
     private UUID customerId;
     private UUID restaurantId;
-    private UUID trackingId;
     private Double price;
 
     @Column(columnDefinition = "order_status")

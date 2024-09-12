@@ -1,7 +1,7 @@
 package com.example.eatsorderapplication.messaging.config;
 
 import com.example.commondata.domain.events.notification.NotificationEvent;
-import com.example.eatsorderapplication.messaging.mapper.MessageConverter;
+import com.example.eatsorderapplication.mappers.MessageToEventConverter;
 import com.example.eatsorderapplication.messaging.processor.OrderEventProcessor;
 import com.example.kafka.avro.model.DriverMatchingEventAvroModel;
 import com.example.kafka.avro.model.NotificationAvroModel;
@@ -52,10 +52,10 @@ public class Processors {
     @Bean
     public Function<Flux<Message<RequestAvroModel>>,
         Tuple2<Flux<Message<NotificationAvroModel>>, Flux<Message<DriverMatchingEventAvroModel>>>
-        > restaurantApprovalProcessor() {
+        > restaurantApprovalResponseProcessor() {
         return flux ->
         {
-            flux.map(MessageConverter::toOrderEvent)
+            flux.map(MessageToEventConverter::toOrderEvent)
                 .filter(Objects::nonNull)  // null 값 필터링
                 .doOnNext(r -> log.info("approval event received {}", r.message()))
                 .concatMap(r -> eventProcessor.process(r.message())
@@ -70,6 +70,7 @@ public class Processors {
             );
         };
     }
+
 
     private Function<Flux<NotificationEvent>, Flux<Message<NotificationAvroModel>>> toNotificationMessage() {
         return flux -> flux.map(event -> {

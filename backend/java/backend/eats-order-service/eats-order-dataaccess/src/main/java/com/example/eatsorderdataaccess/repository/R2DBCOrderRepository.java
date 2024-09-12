@@ -23,14 +23,13 @@ public class R2DBCOrderRepository implements OrderRepository {
     @Override
     public Mono<OrderEntity> save(OrderEntity orderEntity) {
 
-        String query = "INSERT INTO orders (id, customer_id, restaurant_id, tracking_id, price, order_status, failure_messages) " +
-            "VALUES (:id, :customerId, :restaurantId, :trackingId, :price, :orderStatus, :failureMessages)";
+        String query = "INSERT INTO orders (id, customer_id, restaurant_id, price, order_status, failure_messages) " +
+            "VALUES (:id, :customerId, :restaurantId, :price, :orderStatus, :failureMessages)";
 
         return databaseClient.sql(query)
             .bind("id", orderEntity.getId())
             .bind("customerId", orderEntity.getCustomerId())
             .bind("restaurantId", orderEntity.getRestaurantId())
-            .bind("trackingId", orderEntity.getTrackingId())
             .bind("price", orderEntity.getPrice())
             .bind("orderStatus", orderEntity.getOrderStatus())
             .bind("failureMessages", orderEntity.getFailureMessages())
@@ -53,7 +52,7 @@ public class R2DBCOrderRepository implements OrderRepository {
 
     @Override
     public Mono<Order> findById(UUID id) {
-        String query = "SELECT id, customer_id, restaurant_id, tracking_id, price, order_status, failure_messages, address " +
+        String query = "SELECT id, customer_id, restaurant_id, price, order_status, failure_messages, address " +
             "FROM orders WHERE id = :id";
 
         return databaseClient.sql(query)
@@ -64,7 +63,6 @@ public class R2DBCOrderRepository implements OrderRepository {
                         .id(row.get("id", UUID.class))
                         .callerId(row.get("customer_id", UUID.class))
                         .calleeId(row.get("restaurant_id", UUID.class))
-                        .trackingId(row.get("tracking_id", UUID.class))
                         .price(row.get("price", Double.class))
                         .orderStatus(OrderStatus.valueOf(row.get("order_status", String.class)))
                         .build();

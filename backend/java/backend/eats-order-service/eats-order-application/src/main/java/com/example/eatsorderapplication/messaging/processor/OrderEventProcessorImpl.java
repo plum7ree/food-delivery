@@ -2,20 +2,11 @@ package com.example.eatsorderapplication.messaging.processor;
 
 import com.example.commondata.domain.events.notification.NotificationEvent;
 import com.example.commondata.domain.events.order.OrderEvent;
-import com.example.eatsorderapplication.messaging.mapper.MessageDtoMapper;
-import com.example.eatsorderapplication.service.OrderService;
-import com.example.eatsorderdomain.data.domainentity.Order;
-import com.example.eatsorderdomain.data.mapper.DtoDataMapper;
-import com.example.kafka.avro.model.NotificationType;
-import com.example.kafka.avro.model.OrderDetails;
+import com.example.eatsorderapplication.application.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
-
-import java.util.UUID;
 
 
 @Service
@@ -34,10 +25,11 @@ public class OrderEventProcessorImpl implements OrderEventProcessor<Notification
 
     @Override
     public Mono<NotificationEvent> handle(OrderEvent.OrderApprovedByRestaurant event) {
-        return this.orderService.completeRestaurantApproval(event.orderId())
-            .map(MessageDtoMapper::toNotificationCreated)
-            .doOnNext(e -> log.info("to NotificationCreated{}", e));
+//        return this.orderService.completeRestaurantApproval(event.orderId())
+//            .map(MessageDtoMapper::toNotificationCreated)
+//            .doOnNext(e -> log.info("to NotificationCreated{}", e));
 //            .transform(exceptionHandler(event));
+        return null;
     }
 
     @Override

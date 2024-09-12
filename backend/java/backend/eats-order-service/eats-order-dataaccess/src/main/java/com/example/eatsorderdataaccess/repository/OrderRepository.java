@@ -1,7 +1,6 @@
 package com.example.eatsorderdataaccess.repository;
 
 import com.example.eatsorderdataaccess.entity.OrderEntity;
-import com.example.eatsorderdataaccess.entity.OrderOutboxEntity;
 import com.example.eatsorderdomain.data.domainentity.Order;
 import reactor.core.publisher.Mono;
 
@@ -15,7 +14,7 @@ public interface OrderRepository {
 //    // 따라서 clearAutomatically 옵션으로 1차 캐시 날려줘야함.
 //    @Modifying(clearAutomatically = true)
 //    @Query(value = "INSERT INTO orders (id, customer_id, restaurant_id, tracking_id, price, order_status, failure_messages) " +
-//        "VALUES (:id, :customerId, :restaurantId, :trackingId, :price, :orderStatus, :failureMessages)",
+//        "VALUES (:id, :customerId, :restaurantId, :price, :orderStatus, :failureMessages)",
 //        nativeQuery = true)
     Mono<OrderEntity> save(OrderEntity order);
 

@@ -21,7 +21,6 @@
         <module>location-redis</module>
         <module>eats-order-service/eats-order-domain</module>
         <module>eats-order-service/eats-order-dataaccess</module>
-        <module>eats-order-service/eats-order-config-data</module>
         <module>eats-order-service/eats-order-application</module>
         <module>payment-service</module>
         <module>eats-search</module>
@@ -54,7 +53,7 @@
 
         <lombok.version>1.18.28</lombok.version>
 
-        <spring-boot.version>3.1.2</spring-boot.version>
+        <spring-boot.version>3.2.2</spring-boot.version>
         <spring-test.version>6.1.2</spring-test.version>
         <spring-retry.version>2.0.2</spring-retry.version>
         <spring-cloud.version>4.0.3</spring-cloud.version>
@@ -144,19 +143,7 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
-                <!--                <exclusions>-->
-                <!--                    <exclusion>-->
-                <!--                        <groupId>org.junit.vintage</groupId>-->
-                <!--                        <artifactId>junit-vintage-engine</artifactId>-->
-                <!--                    </exclusion>-->
-                <!--                </exclusions>-->
             </dependency>
-            <!--            <dependency>-->
-            <!--                <groupId>org.junit.vintage</groupId>-->
-            <!--                <artifactId>junit-vintage-engine</artifactId>-->
-            <!--                <version>RELEASE</version>-->
-            <!--                <scope>test</scope>-->
-            <!--            </dependency>-->
 
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -521,8 +508,12 @@
                 <artifactId>jgrapht-core</artifactId>
                 <version>1.5.2</version>
             </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>r2dbc-postgresql</artifactId>
+                <version>1.0.0.RELEASE</version>
+            </dependency>
         </dependencies>
-
 
     </dependencyManagement>
 

@@ -1,7 +1,9 @@
 package com.example.eatsorderdataaccess.repository;
 
 
+import com.example.commondata.domain.events.order.OutboxStatus;
 import com.example.eatsorderdataaccess.entity.RestaurantApprovalOutboxMessageEntity;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,5 +26,5 @@ public interface RestaurantApprovalRequestOutboxRepository {
         String status
     );
 
-
+    Mono<Boolean> updateStatus(UUID orderId, OutboxStatus outboxStatus);
 }

@@ -15,13 +15,6 @@
       "type": "string"
     },
     {
-      "name": "sagaId",
-      "type": {
-        "type": "string",
-        "logicalType": "uuid"
-      }
-    },
-    {
       "name": "callerId",
       "type": {
         "type": "string",
@@ -51,12 +44,7 @@
     },
     {
       "name": "price",
-      "type": {
-        "type": "bytes",
-        "logicalType": "decimal",
-        "precision": 10,
-        "scale": 2
-      }
+      "type": "double"
     },
     {
       "name": "createdAt",
@@ -67,25 +55,7 @@
     },
     {
       "name": "orderStatus",
-      "type": {
-        "type": "enum",
-        "name": "OrderStatus",
-        "symbols": [
-          "PENDING",
-          "CALLER_CANCELLED",
-          "PAYMENT_COMPLETED",
-          "PAYMENT_CANCELLED",
-          "CALLEE_APPROVED",
-          "CALLEE_REJECTED"
-        ]
-      }
-    },
-    {
-      "name": "trackingId",
-      "type": {
-        "type": "string",
-        "logicalType": "uuid"
-      }
+      "type": "string"
     },
     {
       "name": "address",
@@ -129,12 +99,7 @@
             },
             {
               "name": "price",
-              "type": {
-                "type": "bytes",
-                "logicalType": "decimal",
-                "precision": 10,
-                "scale": 2
-              }
+              "type": "double"
             }
           ]
         }

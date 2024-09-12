@@ -1,3 +1,137 @@
+server:
+  port: 8074
+
+logging:
+  level:
+    org.apache.kafka: ERROR
+    org.springframework.kafka: ERROR
+    kafka: ERROR
+    state.change.logger: ERROR
+
 spring:
-  profiles:
-    active: local
+  application:
+    name: eats-order-application
+
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5434/postgres?schema=order
+    username: postgres
+    password: admin
+  database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+
+  sql:
+    init:
+      platform: postgres
+      schema-locations: classpath:orders/init-schema.sql
+      # data-locations: classpath:orders/init-data.sql
+      mode: always
+
+  data:
+    redis-server: redis://localhost:6379
+
+  cloud:
+    function:
+      definition: restaurantApprovalResponseProcessor; restaurantApprovalRequester
+    stream:
+      default:
+        producer:
+          useNativeEncoding: true
+      bindings:
+        restaurantApprovalRequester-out-0:
+          destination: restaurant-approval-request
+        restaurantApprovalResponseProcessor-in-0:
+          destination: restaurant-approval-response
+          group: restaurant-approval-group
+        restaurantApprovalResponseProcessor-out-0:
+          destination: restaurant-notification
+        restaurantApprovalResponseProcessor-out-1:
+          destination: driver-matching
+
+      kafka: # https://cloud.spring.io/spring-cloud-stream-binder-kafka/spring-cloud-stream-binder-kafka.html
+        binder:
+          requiredAcks: all
+          brokers: localhost:19092,localhost:29092,localhost:39092
+          auto-create-topics: true
+          #          transaction:
+          #            transaction-id-prefix: wallet-
+          #            producer:
+          #              configuration:
+          #                transaction:
+          #                  timeout:
+          #                    ms: 30000
+          consumer-properties:
+            "value.deserializer": io.confluent.kafka.serializers.KafkaAvroDeserializer
+            "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
+            schema.registry.url: http://localhost:8081
+          producer-properties:
+            "value.serializer": io.confluent.kafka.serializers.KafkaAvroSerializer
+            "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+            schema.registry.url: http://localhost:8081
+        bindings:
+          restaurantApprovalRequester-out-0:
+            producer:
+              recordMetadataChannel: requestRestaurantApprovalSendResultChannel
+          restaurantApprovalResponseProcessor-in-0:
+            consumer:
+              configuration:
+                isolation.level: read_committed
+                "auto.offset.reset": "earliest" # 최근 n 개의 메시지를 가져오기 위해 사용
+                "enable.auto.commit": false
+
+
+
+retry-config:
+  initial-interval-ms: 1000
+  max-interval-ms: 10000
+  multiplier: 2.0
+  maxAttempts: 3
+  sleep-time-ms: 2000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # health, info, ...
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    shutdown:
+      enabled: true
+    heath:
+      probes:
+        enabled: true
+  info:
+    env:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+#
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+user:
+  service:
+    url: "http://localhost:8077/api/info" # TODO http://user:8077 ?
+  restaurant-info:
+    url: "http://localhost:8077/api/restaurant"
+
+feign-client:
+  user-service:
+    url: "http://localhost:8077"
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000  # 연결 타임아웃 (밀리초)
+        readTimeout: 5000     # 읽기 타임아웃 (밀리초)

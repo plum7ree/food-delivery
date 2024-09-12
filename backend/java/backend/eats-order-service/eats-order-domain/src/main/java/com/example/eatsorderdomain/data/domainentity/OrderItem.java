@@ -10,23 +10,27 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
-public class OrderItem extends BaseEntity<SimpleId> {
+public class OrderItem {
     @NotNull
-    private OrderId orderId;
+    private UUID id;
     @NotNull
-    private SimpleId productId;
+    private UUID orderId;
+    @NotNull
+    private UUID productId;
     @NotNull
     private Integer quantity;
     @NotNull
-    private Money price;
+    private Double price;
     @NotNull
-    private Money subTotal;
+    private Double subTotal;
 
 
 }

@@ -33,8 +33,6 @@ public class Order {
 
     // private: these are mutable.
     @JsonProperty
-    private UUID trackingId;
-    @JsonProperty
     private OrderStatus orderStatus;
     @JsonProperty
     private Address address;

@@ -13,7 +13,6 @@ CREATE TABLE "order".orders
     id            uuid              NOT NULL,
     customer_id   uuid              NOT NULL,
     restaurant_id uuid              NOT NULL,
-    tracking_id   uuid              NOT NULL,
     price         numeric(10, 2)    NOT NULL,
     order_status  character varying NOT NULL,
     failure_messages character varying COLLATE pg_catalog."default",
@@ -62,6 +61,8 @@ ALTER TABLE "order".order_address
 
 DROP TABLE IF EXISTS "order".restaurant_approval_outbox CASCADE;
 
+-- TODO idempotence key, partition key, payload 등을 추가하자.
+--  현재는 orderId 를 idempotency key, parition key, correlation_id 세개로 모두 쓰고 있음.
 CREATE TABLE "order".restaurant_approval_outbox
 (
     id             uuid              NOT NULL,

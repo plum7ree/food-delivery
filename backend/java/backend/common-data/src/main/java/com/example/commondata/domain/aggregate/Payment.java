@@ -1,6 +1,7 @@
 package com.example.commondata.domain.aggregate;
 
 import com.example.commondata.domain.aggregate.valueobject.*;
+import com.example.commondata.domain.events.order.OrderStatus;
 import jakarta.persistence.Transient;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

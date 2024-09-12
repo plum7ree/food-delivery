@@ -1,7 +1,10 @@
 package com.example.user.controller;
 
+import com.example.commondata.dto.order.CreateOrderRequestDto;
+import com.example.commondata.dto.order.OptionDto;
+import com.example.commondata.dto.order.OrderItemDto;
+import com.example.commondata.dto.order.PaymentDto;
 import com.example.user.data.dto.AddressDto;
-import com.example.user.data.dto.order.*;
 import com.example.user.service.AccountService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -174,19 +177,19 @@ public class PayController {
         String userId = accountEntity.get().getId();
         String restaurantId = jsonNode.get("restaurantId").asText();
 
-        CreateOrderCommandDto createOrderCommandDto = CreateOrderCommandDto.builder()
-            .callerId(UUID.fromString(userId))
-            .calleeId(UUID.fromString(restaurantId))
-            .price(new BigDecimal(amount))
-            .address(createAddress(jsonNode))
-            .payment(createPaymentDto(paymentKey))
-            .items(createOrderItems(jsonNode))
-            .orderId(UUID.fromString(orderId))
+        CreateOrderRequestDto createOrderCommandDto = CreateOrderRequestDto.builder()
+//            .callerId(UUID.fromString(userId))
+//            .calleeId(UUID.fromString(restaurantId))
+//            .price(new BigDecimal(amount))
+//            .address(createAddress(jsonNode))
+//            .payment(createPaymentDto(paymentKey))
+//            .items(createOrderItems(jsonNode))
+//            .orderId(UUID.fromString(orderId))
             .build();
         HttpHeaders orderRequestHeaders = new HttpHeaders();
         orderRequestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<CreateOrderCommandDto> orderRequest = new HttpEntity<>(createOrderCommandDto, orderRequestHeaders);
+        HttpEntity<CreateOrderRequestDto> orderRequest = new HttpEntity<>(createOrderCommandDto, orderRequestHeaders);
 
         ResponseEntity<String> response = restTemplate.exchange(
             orderServiceUri,
@@ -221,7 +224,7 @@ public class PayController {
             for (JsonNode optionNode : optionsNode) {
                 OptionDto option = OptionDto.builder()
                     .id(UUID.fromString(optionNode.get("optionId").asText()))
-                    .cost(BigInteger.valueOf(optionNode.get("quantity").asLong()))
+                    .cost(optionNode.get("quantity").asDouble())
                     .build();
                 options.add(option);
             }
@@ -229,7 +232,7 @@ public class PayController {
             OrderItemDto orderItem = OrderItemDto.builder()
                 .id(menuId)
                 .quantity(quantity)
-                .price(BigDecimal.ZERO) // 서버에서 계산
+                .price(0d) // 서버에서 계산
                 .optionDtoList(options)
                 .build();
             items.add(orderItem);

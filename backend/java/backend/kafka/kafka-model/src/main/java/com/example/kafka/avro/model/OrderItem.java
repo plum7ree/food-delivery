@@ -14,10 +14,10 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class OrderItem extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-    private static final long serialVersionUID = -2463395263566179779L;
+    private static final long serialVersionUID = 2201727948687306222L;
 
 
-    public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OrderItem\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"quantity\",\"type\":\"int\"},{\"name\":\"price\",\"type\":{\"type\":\"bytes\",\"logicalType\":\"decimal\",\"precision\":10,\"scale\":2}}]}");
+    public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"OrderItem\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"id\",\"type\":{\"type\":\"string\",\"logicalType\":\"uuid\"}},{\"name\":\"quantity\",\"type\":\"int\"},{\"name\":\"price\",\"type\":\"double\"}]}");
 
     public static org.apache.avro.Schema getClassSchema() {
         return SCHEMA$;
@@ -27,7 +27,6 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
 
     static {
         MODEL$.addLogicalTypeConversion(new org.apache.avro.Conversions.UUIDConversion());
-        MODEL$.addLogicalTypeConversion(new org.apache.avro.Conversions.DecimalConversion());
     }
 
     private static final BinaryMessageEncoder<OrderItem> ENCODER =
@@ -88,7 +87,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
 
     private java.util.UUID id;
     private int quantity;
-    private java.nio.ByteBuffer price;
+    private double price;
 
     /**
      * Default constructor.  Note that this does not initialize fields
@@ -105,7 +104,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
      * @param quantity The new value for quantity
      * @param price    The new value for price
      */
-    public OrderItem(java.util.UUID id, java.lang.Integer quantity, java.nio.ByteBuffer price) {
+    public OrderItem(java.util.UUID id, java.lang.Integer quantity, java.lang.Double price) {
         this.id = id;
         this.quantity = quantity;
         this.price = price;
@@ -161,7 +160,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
                 quantity = (java.lang.Integer) value$;
                 break;
             case 2:
-                price = (java.nio.ByteBuffer) value$;
+                price = (java.lang.Double) value$;
                 break;
             default:
                 throw new IndexOutOfBoundsException("Invalid index: " + field$);
@@ -206,7 +205,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
      * Gets the value of the 'price' field.
      * @return The value of the 'price' field.
      */
-    public java.nio.ByteBuffer getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -215,7 +214,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
      * Sets the value of the 'price' field.
      * @param value the value to set.
      */
-    public void setPrice(java.nio.ByteBuffer value) {
+    public void setPrice(double value) {
         this.price = value;
     }
 
@@ -265,7 +264,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
 
         private java.util.UUID id;
         private int quantity;
-        private java.nio.ByteBuffer price;
+        private double price;
 
         /**
          * Creates a new Builder
@@ -405,7 +404,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
          *
          * @return The value.
          */
-        public java.nio.ByteBuffer getPrice() {
+        public double getPrice() {
             return price;
         }
 
@@ -415,7 +414,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
          * @param value The value of 'price'.
          * @return This builder.
          */
-        public com.example.kafka.avro.model.OrderItem.Builder setPrice(java.nio.ByteBuffer value) {
+        public com.example.kafka.avro.model.OrderItem.Builder setPrice(double value) {
             validate(fields()[2], value);
             this.price = value;
             fieldSetFlags()[2] = true;
@@ -437,7 +436,6 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
          * @return This builder.
          */
         public com.example.kafka.avro.model.OrderItem.Builder clearPrice() {
-            price = null;
             fieldSetFlags()[2] = false;
             return this;
         }
@@ -449,7 +447,7 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
                 OrderItem record = new OrderItem();
                 record.id = fieldSetFlags()[0] ? this.id : (java.util.UUID) defaultValue(fields()[0]);
                 record.quantity = fieldSetFlags()[1] ? this.quantity : (java.lang.Integer) defaultValue(fields()[1]);
-                record.price = fieldSetFlags()[2] ? this.price : (java.nio.ByteBuffer) defaultValue(fields()[2]);
+                record.price = fieldSetFlags()[2] ? this.price : (java.lang.Double) defaultValue(fields()[2]);
                 return record;
             } catch (org.apache.avro.AvroMissingFieldException e) {
                 throw e;
@@ -457,16 +455,15 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
                 throw new org.apache.avro.AvroRuntimeException(e);
             }
         }
-    }
+  }
 
-    @SuppressWarnings("unchecked")
-    private static final org.apache.avro.io.DatumWriter<OrderItem>
-        WRITER$ = (org.apache.avro.io.DatumWriter<OrderItem>) MODEL$.createDatumWriter(SCHEMA$);
+  @SuppressWarnings("unchecked")
+  private static final org.apache.avro.io.DatumWriter<OrderItem>
+    WRITER$ = (org.apache.avro.io.DatumWriter<OrderItem>)MODEL$.createDatumWriter(SCHEMA$);
 
-    @Override
-    public void writeExternal(java.io.ObjectOutput out)
-        throws java.io.IOException {
-        WRITER$.write(this, SpecificData.getEncoder(out));
+  @Override public void writeExternal(java.io.ObjectOutput out)
+    throws java.io.IOException {
+    WRITER$.write(this, SpecificData.getEncoder(out));
   }
 
   @SuppressWarnings("unchecked")

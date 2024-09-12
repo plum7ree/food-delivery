@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,7 +18,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
-public class Restaurant extends AggregateRoot<SimpleId> {
+public class Restaurant {
+    private UUID id;
     private List<RestaurantMenu> restaurantMenus;
     private boolean active;
 

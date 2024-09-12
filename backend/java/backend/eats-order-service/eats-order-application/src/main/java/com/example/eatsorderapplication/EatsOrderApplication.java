@@ -11,8 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableConfigurationProperties
 @EnableScheduling
-@EnableAsync
-@EnableFeignClients(basePackages = "com.example.eatsorderapplication.service.client")
 public class EatsOrderApplication {
 
     public static void main(String[] args) {

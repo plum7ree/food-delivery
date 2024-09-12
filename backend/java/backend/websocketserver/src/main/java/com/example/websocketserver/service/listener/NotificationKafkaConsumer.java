@@ -1,9 +1,11 @@
 package com.example.websocketserver.service.listener;
 
 
+import com.example.kafka.avro.model.DriverDetails;
 import com.example.kafka.avro.model.NotificationAvroModel;
+import com.example.kafka.avro.model.OrderDetails;
+import com.example.websocketserver.data.dto.DriverDetailsDto;
 import com.example.websocketserver.service.NotificationService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
@@ -16,13 +18,11 @@ import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @RequiredArgsConstructor
@@ -43,6 +43,8 @@ public class NotificationKafkaConsumer {
     // bean 이 map 인 경우는 @Resource 를 사용해야한다. 안그러면 map of map 리 리턴되어서 이름으로 다시 찾아야함.
     private Map<String, Object> commonConsumerConfigs;
 
+    @Resource(name = "driverMatchingMap")
+    private final ConcurrentHashMap<String, DriverDetailsDto> driverMatchingMap;
 
     @PostConstruct
     public void init() {
@@ -82,8 +84,6 @@ public class NotificationKafkaConsumer {
             }
         } catch (Exception e) {
             log.error("Error in Kafka polling loop: {}", e.getMessage());
-        } finally {
-            consumer.close();
         }
     }
 
@@ -91,7 +91,32 @@ public class NotificationKafkaConsumer {
         log.info("topic received: {}", message);
         String userId = message.getUserId().toString();
         String content = message.getMessage().toString();
-        notificationService.sendNotification(userId, content);
+        switch (message.getNotificationType()) {
+            case ORDER_APPROVED: {
+                OrderDetails details = message.getOrderDetails();
+                notificationService.sendOrderApprovedNotification(userId, content);
+                break;
+            }
+            case DRIVER_MATCHED: {
+                //TODO 지속적으로 ETA 도 업데이트 해줘야함.
+                DriverDetails details = message.getDriverDetails();
+                DriverDetailsDto driverDetailsDto = DriverDetailsDto.builder()
+                    .driverId(details.getDriverId().toString())
+                    .lon(details.getLon())
+                    .lat(details.getLat())
+                    .build();
+                driverMatchingMap.put(userId, driverDetailsDto);
+                break;
+            }
+            case DRIVER_ARRIVED: {
+                DriverDetails details = message.getDriverDetails();
+                var driverId = details.getDriverId().toString();
+                driverMatchingMap.remove(driverId);
+                break;
+            }
+
+
+        }
         return true;
     }
 

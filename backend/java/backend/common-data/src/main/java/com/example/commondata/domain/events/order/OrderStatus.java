@@ -1,8 +1,8 @@
 package com.example.commondata.domain.events.order;
 
 public enum OrderStatus {
-    PENDING,
-    USER_CANCELED,
+    CREATED,
+    USER_CANCELLED,
     PAYMENT_COMPLETED,
     PAYMENT_CANCELLED,
     RESTAURANT_APPROVED,
