@@ -23,9 +23,9 @@ spring:
       bindings:
         processor-in-0:
           destination: restaurant-approval-request
-          group: restaurant-approval-group
+          group: restaurant-approval-request-group
         processor-out-0:
-          destination: restaurant-approval-request
+          destination: restaurant-approval-response
 
       kafka:
         binder:
@@ -35,7 +35,8 @@ spring:
           consumer-properties:
             "value.deserializer": io.confluent.kafka.serializers.KafkaAvroDeserializer
             "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
-            schema.registry.url: http://localhost:8081
+            "schema.registry.url": http://localhost:8081
+            "specific.avro.reader": true
           producer-properties:
             "value.serializer": io.confluent.kafka.serializers.KafkaAvroSerializer
             "key.serializer": org.apache.kafka.common.serialization.StringSerializer

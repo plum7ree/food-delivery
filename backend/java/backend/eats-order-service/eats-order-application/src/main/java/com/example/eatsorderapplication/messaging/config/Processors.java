@@ -1,11 +1,10 @@
 package com.example.eatsorderapplication.messaging.config;
 
-import com.example.commondata.domain.events.notification.NotificationEvent;
-import com.example.eatsorderapplication.mappers.MessageToEventConverter;
+import com.example.commondata.message.MessageConverter;
 import com.example.eatsorderapplication.messaging.processor.OrderEventProcessor;
-import com.example.kafka.avro.model.DriverMatchingEventAvroModel;
-import com.example.kafka.avro.model.NotificationAvroModel;
-import com.example.kafka.avro.model.RequestAvroModel;
+import com.example.kafka.avro.model.DriverMatchingEvent;
+import com.example.kafka.avro.model.OrderEvent;
+import com.example.kafka.avro.model.RestaurantApprovalNotificationEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +12,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Sinks;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
@@ -25,72 +24,55 @@ import java.util.function.Function;
 public class Processors {
 
 
-    private final OrderEventProcessor<NotificationEvent> eventProcessor;
-    private final Sinks.Many<NotificationEvent> notificationEventSink = Sinks.many().multicast().onBackpressureBuffer();
+    private final OrderEventProcessor<RestaurantApprovalNotificationEvent> userNotificationEventProcessor;
+    private final OrderEventProcessor<DriverMatchingEvent> driverMatchingEventProcessor;
 
-    public Processors(OrderEventProcessor<NotificationEvent> eventProcessor) {
 
-        this.eventProcessor = eventProcessor;
+    public Processors(OrderEventProcessor<RestaurantApprovalNotificationEvent> userNotificationEventProcessor, OrderEventProcessor<DriverMatchingEvent> driverMatchingEventProcessor) {
+        this.userNotificationEventProcessor = userNotificationEventProcessor;
+        this.driverMatchingEventProcessor = driverMatchingEventProcessor;
+
     }
 
-    // Kafka Receiver 역할
-//    @Bean
-//    public Consumer<Message<RequestAvroModel>> restaurantApprovalInput() {
-//        return message -> {
-//            RequestAvroModel request = message.getPayload();
-//            log.info("Received Kafka message: {}", request);
-//
-//            try {
-//                OrderStatus orderStatus = OrderStatus.valueOf(request.getOrderStatus().name());
-//                if (OrderStatus.CALLEE_APPROVED == orderStatus) {
-//                    processOrder(request);
-//                }
-//            } catch (Exception e) {
-//                log.error("Error processing message: {}", e.getMessage());
-//            }
-//        };
-//    }
     @Bean
-    public Function<Flux<Message<RequestAvroModel>>,
-        Tuple2<Flux<Message<NotificationAvroModel>>, Flux<Message<DriverMatchingEventAvroModel>>>
+    public Function<Flux<Message<OrderEvent>>,
+        Tuple2<Flux<Message<RestaurantApprovalNotificationEvent>>, Flux<Message<DriverMatchingEvent>>>
         > restaurantApprovalResponseProcessor() {
-        return flux ->
-        {
-            flux.map(MessageToEventConverter::toOrderEvent)
-                .filter(Objects::nonNull)  // null 값 필터링
-                .doOnNext(r -> log.info("approval event received {}", r.message()))
-                .concatMap(r -> eventProcessor.process(r.message())
-                    .doOnSuccess(e -> r.acknowledgement().acknowledge())
-                )
-                .doOnNext(notificationEventSink::tryEmitNext)
-                .subscribe(); // 초기에 subscribe() 한번 되고 이제 계속 유지됨.
+        return flux -> {
+            // 두 개의 개별 Flux 생성
+            Flux<Tuple2<Message<RestaurantApprovalNotificationEvent>, Message<DriverMatchingEvent>>> processedFlux =
+                flux.map(MessageConverter::toRecord)
+                    .filter(Objects::nonNull)  // null 값 필터링
+                    .doOnNext(r -> log.info("approval event received {}", r.message()))
+                    .flatMap(r -> Mono.zip(
+                        userNotificationEventProcessor.process(r.message()),  // 첫 번째 이벤트 프로세서
+                        driverMatchingEventProcessor.process(r.message())    // 두 번째 이벤트 프로세서
+                    ).map(tuple -> {
+                        // 각각의 결과를 Message로 변환
+                        Message<RestaurantApprovalNotificationEvent> notificationMessage = toMessage(tuple.getT1());
+                        Message<DriverMatchingEvent> driverMatchingMessage = toMessage(tuple.getT2());
+                        return Tuples.of(notificationMessage, driverMatchingMessage);
+                    }));
 
-            return Tuples.of(
-                notificationEventSink.asFlux().transform(toNotificationMessage()),
-                notificationEventSink.asFlux().transform(toDriverMatchingMessage())
-            );
+            // 각각의 Flux로 분리
+            Flux<Message<RestaurantApprovalNotificationEvent>> notificationFlux = processedFlux.map(Tuple2::getT1);
+            Flux<Message<DriverMatchingEvent>> driverMatchingFlux = processedFlux.map(Tuple2::getT2);
+
+            return Tuples.of(notificationFlux, driverMatchingFlux);  // 두 개의 Flux를 Tuple2로 반환
         };
     }
 
 
-    private Function<Flux<NotificationEvent>, Flux<Message<NotificationAvroModel>>> toNotificationMessage() {
-        return flux -> flux.map(event -> {
-            NotificationAvroModel model = NotificationAvroModel.newBuilder()
-                .build();
-            return MessageBuilder.withPayload(model)
-                .setHeader(KafkaHeaders.PARTITION, 0)
-                .build();
-        });
+    private Message<DriverMatchingEvent> toMessage(DriverMatchingEvent event) {
+        return MessageBuilder.withPayload(event)
+            .setHeader(KafkaHeaders.KEY, event.getCorrelationId().toString()) // Order ID를 key로 사용
+            .build();
     }
 
-    private Function<Flux<NotificationEvent>, Flux<Message<DriverMatchingEventAvroModel>>> toDriverMatchingMessage() {
-        return flux -> flux.map(event -> {
-            DriverMatchingEventAvroModel model = DriverMatchingEventAvroModel.newBuilder()
-                .build();
-            return MessageBuilder.withPayload(model)
-                .setHeader(KafkaHeaders.PARTITION, 0)
-                .build();
-        });
+    private Message<RestaurantApprovalNotificationEvent> toMessage(RestaurantApprovalNotificationEvent event) {
+        return MessageBuilder.withPayload(event)
+            .setHeader(KafkaHeaders.KEY, event.getCorrelationId().toString()) // Order ID를 key로 사용
+            .build();
     }
 }
 

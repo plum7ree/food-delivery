@@ -213,7 +213,7 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
      */
     public void setNotificationType(com.example.kafka.avro.model.NotificationType value) {
         this.notificationType = value;
-    }
+  }
 
   /**
    * Gets the value of the 'message' field.
@@ -267,7 +267,7 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
      * @param value the value to set.
      */
     public void setDriverDetails(com.example.kafka.avro.model.DriverDetails value) {
-        this.driverDetails = value;
+    this.driverDetails = value;
   }
 
   /**
@@ -309,10 +309,10 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
    */
   @org.apache.avro.specific.AvroGenerated
   public static class Builder extends org.apache.avro.specific.SpecificRecordBuilderBase<NotificationAvroModel>
-    implements org.apache.avro.data.RecordBuilder<NotificationAvroModel> {
+      implements org.apache.avro.data.RecordBuilder<NotificationAvroModel> {
 
-      private java.util.UUID userId;
-    private com.example.kafka.avro.model.NotificationType notificationType;
+    private java.util.UUID userId;
+      private com.example.kafka.avro.model.NotificationType notificationType;
       private java.lang.CharSequence message;
       private com.example.kafka.avro.model.OrderDetails orderDetails;
       private com.example.kafka.avro.model.OrderDetails.Builder orderDetailsBuilder;
@@ -331,7 +331,7 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
     private Builder(com.example.kafka.avro.model.NotificationAvroModel.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.userId)) {
-        this.userId = data().deepCopy(fields()[0].schema(), other.userId);
+          this.userId = data().deepCopy(fields()[0].schema(), other.userId);
           fieldSetFlags()[0] = other.fieldSetFlags()[0];
       }
         if (isValidValue(fields()[1], other.notificationType)) {
@@ -365,7 +365,7 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
     private Builder(com.example.kafka.avro.model.NotificationAvroModel other) {
       super(SCHEMA$, MODEL$);
       if (isValidValue(fields()[0], other.userId)) {
-        this.userId = data().deepCopy(fields()[0].schema(), other.userId);
+          this.userId = data().deepCopy(fields()[0].schema(), other.userId);
           fieldSetFlags()[0] = true;
       }
         if (isValidValue(fields()[1], other.notificationType)) {
@@ -388,23 +388,23 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
         this.driverDetailsBuilder = null;
     }
 
-      /**
-       * Gets the value of the 'userId' field.
-      * @return The value.
-      */
-      public java.util.UUID getUserId() {
-          return userId;
-      }
+    /**
+     * Gets the value of the 'userId' field.
+     * @return The value.
+     */
+    public java.util.UUID getUserId() {
+        return userId;
+    }
 
 
       /**
        * Sets the value of the 'userId' field.
-       * @param value The value of 'userId'.
+      * @param value The value of 'userId'.
       * @return This builder.
       */
     public com.example.kafka.avro.model.NotificationAvroModel.Builder setUserId(java.util.UUID value) {
-      validate(fields()[0], value);
-      this.userId = value;
+        validate(fields()[0], value);
+        this.userId = value;
         fieldSetFlags()[0] = true;
         return this;
     }
@@ -412,14 +412,14 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
       /**
        * Checks whether the 'userId' field has been set.
        * @return True if the 'userId' field has been set, false otherwise.
-      */
+       */
       public boolean hasUserId() {
           return fieldSetFlags()[0];
-      }
+    }
 
 
-      /**
-       * Clears the value of the 'userId' field.
+    /**
+      * Clears the value of the 'userId' field.
       * @return This builder.
       */
     public com.example.kafka.avro.model.NotificationAvroModel.Builder clearUserId() {
@@ -453,7 +453,6 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
 
       /**
        * Checks whether the 'notificationType' field has been set.
-       *
        * @return True if the 'notificationType' field has been set, false otherwise.
        */
       public boolean hasNotificationType() {
@@ -468,14 +467,14 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
        */
       public com.example.kafka.avro.model.NotificationAvroModel.Builder clearNotificationType() {
           notificationType = null;
-      fieldSetFlags()[1] = false;
+          fieldSetFlags()[1] = false;
       return this;
     }
 
-    /**
-      * Gets the value of the 'message' field.
-     * @return The value.
-     */
+      /**
+       * Gets the value of the 'message' field.
+      * @return The value.
+      */
     public java.lang.CharSequence getMessage() {
         return message;
     }
@@ -484,20 +483,20 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
     /**
       * Sets the value of the 'message' field.
       * @param value The value of 'message'.
-     * @return This builder.
-      */
+      * @return This builder.
+     */
     public com.example.kafka.avro.model.NotificationAvroModel.Builder setMessage(java.lang.CharSequence value) {
-        validate(fields()[2], value);
-        this.message = value;
+      validate(fields()[2], value);
+      this.message = value;
         fieldSetFlags()[2] = true;
         return this;
     }
 
-    /**
+      /**
       * Checks whether the 'message' field has been set.
-     * @return True if the 'message' field has been set, false otherwise.
-     */
-    public boolean hasMessage() {
+      * @return True if the 'message' field has been set, false otherwise.
+       */
+      public boolean hasMessage() {
       return fieldSetFlags()[2];
     }
 
@@ -514,7 +513,6 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
 
       /**
        * Gets the value of the 'orderDetails' field.
-       *
        * @return The value.
        */
       public com.example.kafka.avro.model.OrderDetails getOrderDetails() {
@@ -538,7 +536,6 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
 
       /**
        * Checks whether the 'orderDetails' field has been set.
-       *
        * @return True if the 'orderDetails' field has been set, false otherwise.
        */
       public boolean hasOrderDetails() {
@@ -576,7 +573,6 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
 
       /**
        * Checks whether the 'orderDetails' field has an active Builder instance
-       *
        * @return True if the 'orderDetails' field has an active Builder instance
        */
       public boolean hasOrderDetailsBuilder() {
@@ -585,7 +581,6 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
 
       /**
        * Clears the value of the 'orderDetails' field.
-       *
        * @return This builder.
        */
       public com.example.kafka.avro.model.NotificationAvroModel.Builder clearOrderDetails() {
@@ -646,7 +641,6 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
 
       /**
        * Sets the Builder instance for the 'driverDetails' field
-       *
        * @param value The builder instance that must be set.
        * @return This builder.
        */
@@ -690,25 +684,25 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
                   try {
                       record.orderDetails = this.orderDetailsBuilder.build();
                   } catch (org.apache.avro.AvroMissingFieldException e) {
-                      e.addParentField(record.getSchema().getField("orderDetails"));
-                      throw e;
-                  }
-              } else {
-                  record.orderDetails = fieldSetFlags()[3] ? this.orderDetails : (com.example.kafka.avro.model.OrderDetails) defaultValue(fields()[3]);
-              }
-              if (driverDetailsBuilder != null) {
+            e.addParentField(record.getSchema().getField("orderDetails"));
+            throw e;
+          }
+        } else {
+          record.orderDetails = fieldSetFlags()[3] ? this.orderDetails : (com.example.kafka.avro.model.OrderDetails) defaultValue(fields()[3]);
+        }
+        if (driverDetailsBuilder != null) {
           try {
             record.driverDetails = this.driverDetailsBuilder.build();
           } catch (org.apache.avro.AvroMissingFieldException e) {
-            e.addParentField(record.getSchema().getField("driverDetails"));
+              e.addParentField(record.getSchema().getField("driverDetails"));
             throw e;
           }
         } else {
           record.driverDetails = fieldSetFlags()[4] ? this.driverDetails : (com.example.kafka.avro.model.DriverDetails) defaultValue(fields()[4]);
-              }
+        }
               return record;
           } catch (org.apache.avro.AvroMissingFieldException e) {
-        throw e;
+              throw e;
       } catch (java.lang.Exception e) {
         throw new org.apache.avro.AvroRuntimeException(e);
       }
@@ -717,7 +711,7 @@ public class NotificationAvroModel extends org.apache.avro.specific.SpecificReco
 
   @SuppressWarnings("unchecked")
   private static final org.apache.avro.io.DatumWriter<NotificationAvroModel>
-      WRITER$ = (org.apache.avro.io.DatumWriter<NotificationAvroModel>) MODEL$.createDatumWriter(SCHEMA$);
+    WRITER$ = (org.apache.avro.io.DatumWriter<NotificationAvroModel>)MODEL$.createDatumWriter(SCHEMA$);
 
   @Override public void writeExternal(java.io.ObjectOutput out)
     throws java.io.IOException {

@@ -31,19 +31,16 @@ spring:
 
   cloud:
     function:
-      definition: restaurantApprovalResponseProcessor; restaurantApprovalRequester
+      definition: restaurantApprovalResponseProcessor; restaurantApprovalSender
     stream:
-      default:
-        producer:
-          useNativeEncoding: true
       bindings:
-        restaurantApprovalRequester-out-0:
+        restaurantApprovalSender-out-0:
           destination: restaurant-approval-request
         restaurantApprovalResponseProcessor-in-0:
           destination: restaurant-approval-response
-          group: restaurant-approval-group
+          group: restaurant-approval-response-group
         restaurantApprovalResponseProcessor-out-0:
-          destination: restaurant-notification
+          destination: restaurant-approval-notification
         restaurantApprovalResponseProcessor-out-1:
           destination: driver-matching
 
@@ -62,13 +59,14 @@ spring:
           consumer-properties:
             "value.deserializer": io.confluent.kafka.serializers.KafkaAvroDeserializer
             "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
-            schema.registry.url: http://localhost:8081
+            "schema.registry.url": http://localhost:8081
+            "specific.avro.reader": true
           producer-properties:
             "value.serializer": io.confluent.kafka.serializers.KafkaAvroSerializer
             "key.serializer": org.apache.kafka.common.serialization.StringSerializer
             schema.registry.url: http://localhost:8081
         bindings:
-          restaurantApprovalRequester-out-0:
+          restaurantApprovalSender-out-0:
             producer:
               recordMetadataChannel: requestRestaurantApprovalSendResultChannel
           restaurantApprovalResponseProcessor-in-0:
@@ -77,6 +75,12 @@ spring:
                 isolation.level: read_committed
                 "auto.offset.reset": "earliest" # 최근 n 개의 메시지를 가져오기 위해 사용
                 "enable.auto.commit": false
+          restaurantApprovalResponseProcessor-out-0:
+            producer:
+              bufferSize: 14000
+          restaurantApprovalResponseProcessor-out-1:
+            producer:
+              bufferSize: 14000
 
 
 

@@ -2,7 +2,7 @@ package com.example.eatsorderapplication.messaging.config;
 
 import com.example.commondata.domain.events.order.OutboxStatus;
 import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
-import com.example.kafka.avro.model.RequestAvroModel;
+import com.example.kafka.avro.model.RestaurantEvent;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,16 +29,16 @@ public class MessagePublisher {
         this.restaurantApprovalRequestOutboxRepository = restaurantApprovalRequestOutboxRepository;
     }
 
-    // 트랜잭션 이후 sink 에 tryNextEmit 되었던 메시지 publish
+    // OrderService 의 dispatchAfterCommit 에서 tryNextEmit 되었던 메시지 publish
     @Bean
     @Qualifier("restaurantApprovalSinks")
-    public Sinks.Many<Message<RequestAvroModel>> restaurantApprovalSinks() {
+    public Sinks.Many<Message<RestaurantEvent>> restaurantApprovalSinks() {
         return Sinks.many().unicast().onBackpressureBuffer();
     }
 
     @Bean
-    public Supplier<Flux<Message<RequestAvroModel>>> restaurantApprovalRequester(
-        @Qualifier("restaurantApprovalSinks") Sinks.Many<Message<RequestAvroModel>> sender) {
+    public Supplier<Flux<Message<RestaurantEvent>>> restaurantApprovalSender(
+        @Qualifier("restaurantApprovalSinks") Sinks.Many<Message<RestaurantEvent>> sender) {
         return () -> sender.asFlux()
             .onErrorContinue((err, obj) -> {
                 log.error("requestRestaurantApproval: e: {}", err.getMessage() != null ? err.getMessage() : "failed to send eventMessage", err);
@@ -46,7 +46,7 @@ public class MessagePublisher {
     }
 
     // publish 되었던 메시지 sendResult 처리
-    private final Sinks.Many<SenderResult<UUID>> sendResult = Sinks.many().unicast().onBackpressureBuffer();
+    private final Sinks.Many<SenderResult<String>> sendResult = Sinks.many().unicast().onBackpressureBuffer();
 
     @Bean(name = "requestRestaurantApprovalSendResultChannel")
     public FluxMessageChannel sendResultChannel() {
@@ -54,7 +54,7 @@ public class MessagePublisher {
     }
 
     @ServiceActivator(inputChannel = "requestRestaurantApprovalSendResultChannel")
-    public void receiveSendResult(SenderResult<UUID> results) {
+    public void receiveSendResult(SenderResult<String> results) {
         if (results.exception() != null) {
             log.error("sendEventMessage", results.exception().getMessage() != null
                 ? results.exception().getMessage()
@@ -70,11 +70,11 @@ public class MessagePublisher {
             .flatMap(result -> {
                 if (result.recordMetadata() != null) {
                     return restaurantApprovalRequestOutboxRepository.updateStatus(
-                        result.correlationMetadata(),
+                        UUID.fromString(result.correlationMetadata()),
                         OutboxStatus.SENT);
                 } else {
                     return restaurantApprovalRequestOutboxRepository.updateStatus(
-                        result.correlationMetadata(),
+                        UUID.fromString(result.correlationMetadata()),
                         OutboxStatus.FAILED);
                 }
             })

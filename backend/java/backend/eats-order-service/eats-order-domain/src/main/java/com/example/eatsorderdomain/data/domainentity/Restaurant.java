@@ -1,7 +1,5 @@
 package com.example.eatsorderdomain.data.domainentity;
 
-import com.example.commondata.domain.aggregate.AggregateRoot;
-import com.example.commondata.domain.aggregate.valueobject.SimpleId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

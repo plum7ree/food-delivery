@@ -159,7 +159,7 @@ public class LocationAvroModel extends org.apache.avro.specific.SpecificRecordBa
                 coord = (com.example.kafka.avro.model.Coordinates) value$;
                 break;
             case 4:
-                createdAt = (java.lang.Long) value$;
+                createdAt = (java.lang.Long)value$;
                 break;
             default:
                 throw new IndexOutOfBoundsException("Invalid index: " + field$);
@@ -720,20 +720,20 @@ public class LocationAvroModel extends org.apache.avro.specific.SpecificRecordBa
         } else {
             for (int i = 0; i < 5; i++) {
                 switch (fieldOrder[i].pos()) {
-                    case 0:
-                        this.driverId = in.readString(this.driverId instanceof Utf8 ? (Utf8) this.driverId : null);
-                        break;
+        case 0:
+          this.driverId = in.readString(this.driverId instanceof Utf8 ? (Utf8)this.driverId : null);
+          break;
 
-                    case 1:
-                        this.edgeId = in.readString(this.edgeId instanceof Utf8 ? (Utf8) this.edgeId : null);
-                        break;
+        case 1:
+          this.edgeId = in.readString(this.edgeId instanceof Utf8 ? (Utf8)this.edgeId : null);
+          break;
 
-                    case 2:
-                        this.oldEdgeId = in.readString(this.oldEdgeId instanceof Utf8 ? (Utf8) this.oldEdgeId : null);
-                        break;
+        case 2:
+          this.oldEdgeId = in.readString(this.oldEdgeId instanceof Utf8 ? (Utf8)this.oldEdgeId : null);
+          break;
 
-                    case 3:
-                        if (this.coord == null) {
+        case 3:
+          if (this.coord == null) {
             this.coord = new com.example.kafka.avro.model.Coordinates();
           }
           this.coord.customDecode(in);

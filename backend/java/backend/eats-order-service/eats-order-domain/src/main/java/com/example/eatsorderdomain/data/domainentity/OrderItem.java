@@ -1,10 +1,6 @@
 package com.example.eatsorderdomain.data.domainentity;
 
 
-import com.example.commondata.domain.aggregate.entity.BaseEntity;
-import com.example.commondata.domain.aggregate.valueobject.Money;
-import com.example.commondata.domain.aggregate.valueobject.OrderId;
-import com.example.commondata.domain.aggregate.valueobject.SimpleId;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

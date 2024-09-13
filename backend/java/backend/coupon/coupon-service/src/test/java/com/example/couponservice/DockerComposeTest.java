@@ -3,7 +3,6 @@ package com.example.couponservice;
 
 
 import com.example.commonutil.DockerComposeStarter;
-import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;

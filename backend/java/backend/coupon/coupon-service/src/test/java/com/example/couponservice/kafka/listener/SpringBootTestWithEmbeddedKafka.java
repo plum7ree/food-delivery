@@ -6,7 +6,6 @@ import com.example.couponservice.entity.Coupon;
 import com.example.couponservice.entity.CouponIssue;
 import com.example.couponservice.repository.CouponIssueRepository;
 import com.example.couponservice.repository.CouponRepository;
-import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;

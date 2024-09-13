@@ -52,7 +52,7 @@ public class R2DBCOrderRepository implements OrderRepository {
 
     @Override
     public Mono<Order> findById(UUID id) {
-        String query = "SELECT id, customer_id, restaurant_id, price, order_status, failure_messages, address " +
+        String query = "SELECT id, customer_id, restaurant_id, price, order_status, failure_messages " +
             "FROM orders WHERE id = :id";
 
         return databaseClient.sql(query)

@@ -38,7 +38,7 @@ public class KafkaProducerService {
         long issueIdLong = (issueId.getMostSignificantBits() << 64) | issueId.getLeastSignificantBits();
         CouponIssueRequestAvroModel message = CouponIssueRequestAvroModel.newBuilder()
             .setIssueId(issueIdLong)
-            .setCallerId(issueRequestDto.getUserId())
+            .setCallerId(UUID.fromString(issueRequestDto.getUserId()))
             .setCouponId(issueRequestDto.getCouponId())
             .setAmount(1L)
             .setCreatedAt(Instant.ofEpochSecond(Instant.now().toEpochMilli()))

@@ -400,15 +400,16 @@ public class Coordinates extends org.apache.avro.specific.SpecificRecordBase imp
 
     @Override
     public void customDecode(org.apache.avro.io.ResolvingDecoder in)
-        throws java.io.IOException {
-        org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
-        if (fieldOrder == null) {
-            this.lat = in.readFloat();
+    throws java.io.IOException
+  {
+    org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
+    if (fieldOrder == null) {
+      this.lat = in.readFloat();
 
-            this.lon = in.readFloat();
+      this.lon = in.readFloat();
 
-        } else {
-            for (int i = 0; i < 2; i++) {
+    } else {
+      for (int i = 0; i < 2; i++) {
         switch (fieldOrder[i].pos()) {
         case 0:
           this.lat = in.readFloat();

@@ -21,7 +21,7 @@
       "name": "couponId",
       "type": {
         "type": "long",
-        "logicalType": "uuid"
+        "logicalType": "long"
       }
     },
     {

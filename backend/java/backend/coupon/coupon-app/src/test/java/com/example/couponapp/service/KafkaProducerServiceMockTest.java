@@ -1,7 +1,6 @@
 package com.example.couponapp.service;
 
 import com.example.couponapp.dto.IssueRequestDto;
-import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
 import com.example.kafkaproducer.GeneralKafkaProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

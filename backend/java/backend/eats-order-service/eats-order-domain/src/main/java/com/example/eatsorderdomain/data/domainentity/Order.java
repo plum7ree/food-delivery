@@ -1,7 +1,6 @@
 package com.example.eatsorderdomain.data.domainentity;
 
-import com.example.commondata.domain.aggregate.AggregateRoot;
-import com.example.commondata.domain.aggregate.valueobject.*;
+import com.example.commondata.domain.aggregate.valueobject.Address;
 import com.example.commondata.domain.events.order.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

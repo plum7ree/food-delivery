@@ -1,10 +1,8 @@
 package com.example.restaurantapprovalservice.config;
 
 
-import com.example.commondata.domain.events.notification.NotificationEvent;
 import com.example.commondata.message.MessageConverter;
-import com.example.kafka.avro.model.NotificationAvroModel;
-import com.example.kafka.avro.model.RequestAvroModel;
+import com.example.kafka.avro.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +10,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
 
@@ -26,16 +25,36 @@ public class Processors {
     }
 
 
+    public Mono<OrderEvent> process(RestaurantEvent event) {
+        if (event.getEvent() instanceof RequestApproval requestApproval) {
+            return Mono.just(OrderEvent.newBuilder()
+                .setCorrelationId(requestApproval.getOrderId())
+                .setEvent(OrderApprovedByRestaurant.newBuilder()
+                    .setOrderId(requestApproval.getOrderId())
+                    .setCreatedAt(requestApproval.getCreatedAt())
+                    .build())
+                .build());
+        } else if (event.getEvent() instanceof UserCancelled userCancelled) {
+            // Handle UserCancelled event if needed
+            return Mono.empty(); // or some other processing
+        }
+        return Mono.empty();
+    }
+
     @Bean
-    public Function<Flux<Message<RequestAvroModel>>, Flux<Message<RequestAvroModel>>> processor() {
+    public Function<Flux<Message<RestaurantEvent>>, Flux<Message<OrderEvent>>> processor() {
         return flux -> flux.map(MessageConverter::toRecord)
-            .doOnNext(r -> r.acknowledgement().acknowledge())
-            .doOnNext(r -> log.info("inventory service received {}", r.message()))
-            .flatMap(r -> Flux.just(MessageBuilder.withPayload(r.message())
-                .setHeader(KafkaHeaders.PARTITION, 0)
-                .build()
-            ));
+            .doOnNext(r -> log.info("restaurant service received {}", r.message()))
+            .concatMap(r -> process(r.message())
+                .doOnSuccess(e -> r.acknowledgement().acknowledge())
+            )
+            .map(this::toMessage);
     }
 
 
+    private Message<OrderEvent> toMessage(OrderEvent event) {
+        return MessageBuilder.withPayload(event)
+            .setHeader(KafkaHeaders.KEY, event.getCorrelationId().toString())
+            .build();
+    }
 }

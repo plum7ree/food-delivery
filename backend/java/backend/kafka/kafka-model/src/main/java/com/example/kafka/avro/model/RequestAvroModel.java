@@ -21,7 +21,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
-
   static {
     MODEL$.addLogicalTypeConversion(new org.apache.avro.Conversions.UUIDConversion());
     MODEL$.addLogicalTypeConversion(new org.apache.avro.data.TimeConversions.TimestampMillisConversion());
@@ -139,28 +138,28 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   public java.lang.Object get(int field$) {
     switch (field$) {
     case 0: return id;
-      case 1:
-        return eventType;
-      case 2:
-        return callerId;
-      case 3:
-        return orderId;
-      case 4:
-        return paymentId;
-      case 5:
-        return calleeId;
-      case 6:
-        return price;
-      case 7:
-        return createdAt;
-      case 8:
-        return orderStatus;
-      case 9:
-        return address;
-      case 10:
-        return items;
-      case 11:
-        return failureMessages;
+        case 1:
+            return eventType;
+        case 2:
+            return callerId;
+        case 3:
+            return orderId;
+        case 4:
+            return paymentId;
+        case 5:
+            return calleeId;
+        case 6:
+            return price;
+        case 7:
+            return createdAt;
+        case 8:
+            return orderStatus;
+        case 9:
+            return address;
+        case 10:
+            return items;
+        case 11:
+            return failureMessages;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -192,42 +191,42 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
   @SuppressWarnings(value="unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-      case 0:
-        id = (java.util.UUID) value$;
-        break;
-      case 1:
-        eventType = (java.lang.CharSequence) value$;
-        break;
-      case 2:
-        callerId = (java.util.UUID) value$;
-        break;
-      case 3:
-        orderId = (java.util.UUID) value$;
-        break;
-      case 4:
-        paymentId = (java.util.UUID) value$;
-        break;
-      case 5:
-        calleeId = (java.util.UUID) value$;
-        break;
-      case 6:
-        price = (java.lang.Double) value$;
-        break;
-      case 7:
-        createdAt = (java.time.Instant) value$;
-        break;
-      case 8:
-        orderStatus = (java.lang.CharSequence) value$;
-        break;
-      case 9:
-        address = (com.example.kafka.avro.model.Address) value$;
-        break;
-      case 10:
-        items = (java.util.List<com.example.kafka.avro.model.OrderItem>) value$;
-        break;
-      case 11:
-        failureMessages = (java.util.List<java.lang.CharSequence>) value$;
-        break;
+        case 0:
+            id = (java.util.UUID) value$;
+            break;
+        case 1:
+            eventType = (java.lang.CharSequence) value$;
+            break;
+        case 2:
+            callerId = (java.util.UUID) value$;
+            break;
+        case 3:
+            orderId = (java.util.UUID) value$;
+            break;
+        case 4:
+            paymentId = (java.util.UUID) value$;
+            break;
+        case 5:
+            calleeId = (java.util.UUID) value$;
+            break;
+        case 6:
+            price = (java.lang.Double) value$;
+            break;
+        case 7:
+            createdAt = (java.time.Instant) value$;
+            break;
+        case 8:
+            orderStatus = (java.lang.CharSequence) value$;
+            break;
+        case 9:
+            address = (com.example.kafka.avro.model.Address) value$;
+            break;
+        case 10:
+            items = (java.util.List<com.example.kafka.avro.model.OrderItem>) value$;
+            break;
+        case 11:
+            failureMessages = (java.util.List<java.lang.CharSequence>) value$;
+            break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -251,7 +250,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Gets the value of the 'eventType' field.
-   *
    * @return The value of the 'eventType' field.
    */
   public java.lang.CharSequence getEventType() {
@@ -261,7 +259,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Sets the value of the 'eventType' field.
-   *
    * @param value the value to set.
    */
   public void setEventType(java.lang.CharSequence value) {
@@ -304,7 +301,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Gets the value of the 'paymentId' field.
-   *
    * @return The value of the 'paymentId' field.
    */
   public java.util.UUID getPaymentId() {
@@ -314,7 +310,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Sets the value of the 'paymentId' field.
-   *
    * @param value the value to set.
    */
   public void setPaymentId(java.util.UUID value) {
@@ -374,7 +369,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Gets the value of the 'orderStatus' field.
-   *
    * @return The value of the 'orderStatus' field.
    */
   public java.lang.CharSequence getOrderStatus() {
@@ -392,7 +386,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Gets the value of the 'address' field.
-   *
    * @return The value of the 'address' field.
    */
   public com.example.kafka.avro.model.Address getAddress() {
@@ -402,7 +395,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Sets the value of the 'address' field.
-   *
    * @param value the value to set.
    */
   public void setAddress(com.example.kafka.avro.model.Address value) {
@@ -411,7 +403,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Gets the value of the 'items' field.
-   *
    * @return The value of the 'items' field.
    */
   public java.util.List<com.example.kafka.avro.model.OrderItem> getItems() {
@@ -421,7 +412,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
   /**
    * Sets the value of the 'items' field.
-   *
    * @param value the value to set.
    */
   public void setItems(java.util.List<com.example.kafka.avro.model.OrderItem> value) {
@@ -672,7 +662,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'eventType' field.
-     *
      * @param value The value of 'eventType'.
      * @return This builder.
      */
@@ -774,7 +763,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Clears the value of the 'orderId' field.
-     *
      * @return This builder.
      */
     public com.example.kafka.avro.model.RequestAvroModel.Builder clearOrderId() {
@@ -794,7 +782,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'paymentId' field.
-     *
      * @param value The value of 'paymentId'.
      * @return This builder.
      */
@@ -875,7 +862,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'price' field.
-     *
      * @param value The value of 'price'.
      * @return This builder.
      */
@@ -945,7 +931,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'orderStatus' field.
-     *
      * @return The value.
      */
     public java.lang.CharSequence getOrderStatus() {
@@ -955,7 +940,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'orderStatus' field.
-     *
      * @param value The value of 'orderStatus'.
      * @return This builder.
      */
@@ -987,7 +971,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'address' field.
-     *
      * @return The value.
      */
     public com.example.kafka.avro.model.Address getAddress() {
@@ -997,7 +980,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'address' field.
-     *
      * @param value The value of 'address'.
      * @return This builder.
      */
@@ -1011,7 +993,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Checks whether the 'address' field has been set.
-     *
      * @return True if the 'address' field has been set, false otherwise.
      */
     public boolean hasAddress() {
@@ -1020,7 +1001,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the Builder instance for the 'address' field and creates one if it doesn't exist yet.
-     *
      * @return This builder.
      */
     public com.example.kafka.avro.model.Address.Builder getAddressBuilder() {
@@ -1048,7 +1028,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Checks whether the 'address' field has an active Builder instance
-     *
      * @return True if the 'address' field has an active Builder instance
      */
     public boolean hasAddressBuilder() {
@@ -1057,7 +1036,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Clears the value of the 'address' field.
-     *
      * @return This builder.
      */
     public com.example.kafka.avro.model.RequestAvroModel.Builder clearAddress() {
@@ -1069,7 +1047,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'items' field.
-     *
      * @return The value.
      */
     public java.util.List<com.example.kafka.avro.model.OrderItem> getItems() {
@@ -1079,7 +1056,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'items' field.
-     *
      * @param value The value of 'items'.
      * @return This builder.
      */
@@ -1111,7 +1087,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Gets the value of the 'failureMessages' field.
-     *
      * @return The value.
      */
     public java.util.List<java.lang.CharSequence> getFailureMessages() {
@@ -1121,7 +1096,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Sets the value of the 'failureMessages' field.
-     *
      * @param value The value of 'failureMessages'.
      * @return This builder.
      */
@@ -1143,7 +1117,6 @@ public class RequestAvroModel extends org.apache.avro.specific.SpecificRecordBas
 
     /**
      * Clears the value of the 'failureMessages' field.
-     *
      * @return This builder.
      */
     public com.example.kafka.avro.model.RequestAvroModel.Builder clearFailureMessages() {

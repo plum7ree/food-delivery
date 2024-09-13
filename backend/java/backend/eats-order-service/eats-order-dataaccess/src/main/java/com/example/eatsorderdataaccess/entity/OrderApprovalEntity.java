@@ -1,9 +1,6 @@
 package com.example.eatsorderdataaccess.entity;
 
-import com.example.commondata.domain.aggregate.valueobject.ApprovalStatus;
-import com.example.commondata.domain.aggregate.valueobject.OrderId;
-import com.example.commondata.domain.aggregate.valueobject.RestaurantApprovalStatus;
-import com.example.commondata.domain.aggregate.valueobject.SimpleId;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

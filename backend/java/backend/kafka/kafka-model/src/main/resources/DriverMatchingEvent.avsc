@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "DriverMatchingEvent",
+  "namespace": "com.example.kafka.avro.model",
+  "fields": [
+    {
+      "name": "correlationId",
+      "type": "string"
+    },
+    {
+      "name": "createdAt",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

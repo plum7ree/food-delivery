@@ -48,6 +48,8 @@ CREATE TABLE "order".order_address
     street      character varying COLLATE pg_catalog."default" NOT NULL,
     postal_code character varying COLLATE pg_catalog."default" NOT NULL,
     city        character varying COLLATE pg_catalog."default" NOT NULL,
+    lat numeric(8, 6) NOT NULL,
+    lon numeric(9, 6) NOT NULL,
     CONSTRAINT order_address_pkey PRIMARY KEY (id, order_id) -- id, order_id 가 다중 키
 );
 

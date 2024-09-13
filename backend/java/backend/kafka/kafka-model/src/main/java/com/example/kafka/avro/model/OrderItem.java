@@ -447,14 +447,14 @@ public class OrderItem extends org.apache.avro.specific.SpecificRecordBase imple
                 OrderItem record = new OrderItem();
                 record.id = fieldSetFlags()[0] ? this.id : (java.util.UUID) defaultValue(fields()[0]);
                 record.quantity = fieldSetFlags()[1] ? this.quantity : (java.lang.Integer) defaultValue(fields()[1]);
-                record.price = fieldSetFlags()[2] ? this.price : (java.lang.Double) defaultValue(fields()[2]);
-                return record;
-            } catch (org.apache.avro.AvroMissingFieldException e) {
-                throw e;
-            } catch (java.lang.Exception e) {
-                throw new org.apache.avro.AvroRuntimeException(e);
-            }
-        }
+        record.price = fieldSetFlags()[2] ? this.price : (java.lang.Double) defaultValue(fields()[2]);
+        return record;
+      } catch (org.apache.avro.AvroMissingFieldException e) {
+        throw e;
+      } catch (java.lang.Exception e) {
+        throw new org.apache.avro.AvroRuntimeException(e);
+      }
+    }
   }
 
   @SuppressWarnings("unchecked")
