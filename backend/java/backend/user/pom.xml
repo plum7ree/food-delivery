@@ -140,6 +140,10 @@
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-data-23</artifactId>
+        </dependency>
 
 
     </dependencies>
@@ -157,7 +161,33 @@
                     </to>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/classes/users</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <!-- compile 해야 설치됨. -->
+                                    <directory>${project.parent.basedir}/test-data-generation/data-loader/schema/users
+                                    </directory>
+                                    <includes>
+                                        <include>init-schema.sql</include>
+                                        <include>init-data.sql</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
 
     </build>

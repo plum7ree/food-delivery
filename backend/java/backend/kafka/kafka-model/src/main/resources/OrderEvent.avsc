@@ -1,0 +1,84 @@
+{
+  "type": "record",
+  "name": "OrderEvent",
+  "namespace": "com.example.kafka.avro.model",
+  "fields": [
+    {
+      "name": "correlationId",
+      "type": "string"
+    },
+    {
+      "name": "event",
+      "type": [
+        {
+          "type": "record",
+          "name": "OrderCreated",
+          "fields": [
+            {
+              "name": "orderId",
+              "type": "string"
+            },
+            {
+              "name": "createdAt",
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            }
+          ]
+        },
+        {
+          "type": "record",
+          "name": "OrderApprovedByRestaurant",
+          "fields": [
+            {
+              "name": "orderId",
+              "type": "string"
+            },
+            {
+              "name": "createdAt",
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            }
+          ]
+        },
+        {
+          "type": "record",
+          "name": "OrderRejectedByRestaurant",
+          "fields": [
+            {
+              "name": "orderId",
+              "type": "string"
+            },
+            {
+              "name": "createdAt",
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            }
+          ]
+        },
+        {
+          "type": "record",
+          "name": "OrderCompleted",
+          "fields": [
+            {
+              "name": "orderId",
+              "type": "string"
+            },
+            {
+              "name": "createdAt",
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

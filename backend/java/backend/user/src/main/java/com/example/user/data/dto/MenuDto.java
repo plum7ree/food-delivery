@@ -18,7 +18,6 @@ import java.util.UUID;
 public class MenuDto {
     @Builder.Default
     List<OptionGroupDto> optionGroupDtoList = new ArrayList<>();
-    @JsonIgnore
     private UUID id;
     private UUID restaurantId;
     private String name;

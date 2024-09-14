@@ -1,10 +1,7 @@
 package com.example.user.service;
 
 
-import com.example.user.data.dto.MenuDto;
-import com.example.user.data.dto.OptionDto;
-import com.example.user.data.dto.OptionGroupDto;
-import com.example.user.data.dto.RestaurantDto;
+import com.example.user.data.dto.*;
 import com.example.user.data.entity.*;
 import com.example.user.data.repository.MenuRepository;
 import com.example.user.data.repository.OptionGroupRepository;
@@ -12,6 +9,8 @@ import com.example.user.data.repository.OptionRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +39,7 @@ public class RestaurantService {
 
     public RestaurantDto findRestaurantById(String restaurantId) {
         return restaurantRepository.findById(UUID.fromString(restaurantId))
-                .orElseThrow(() -> new IllegalArgumentException("no repository by id"));
+            .orElseThrow(() -> new IllegalArgumentException("no repository by id"));
     }
 
     @Transactional
@@ -52,13 +51,13 @@ public class RestaurantService {
         var menuDtoList = restaurantDto.getMenuDtoList();
 
         var restaurantEntity = Restaurant.builder()
-                .account(Account.builder().id(UUID.fromString(restaurantDto.getUserId())).build())
-                .name(restaurantDto.getName())
-                .type(restaurantDto.getType())
-                .openTime(restaurantDto.getOpenTime())
-                .closeTime(restaurantDto.getCloseTime())
+            .account(Account.builder().id(UUID.fromString(restaurantDto.getUserId())).build())
+            .name(restaurantDto.getName())
+            .type(restaurantDto.getType())
+            .openTime(restaurantDto.getOpenTime())
+            .closeTime(restaurantDto.getCloseTime())
 //                .pictureUrl1("picture")
-                .build();
+            .build();
         List<Menu> menuEntityList = new ArrayList<>();
         List<OptionGroup> optionGroupEntityList = new ArrayList<>();
         List<Option> optionEntityList = new ArrayList<>();
@@ -67,30 +66,30 @@ public class RestaurantService {
         if (menuDtoList != null) {
             menuEntityList.addAll(menuDtoList.stream().map(menuDto -> {
                 var menuEntity = Menu.builder()
-                        .name(menuDto.getName())
-                        .pictureUrl(menuDto.getPictureUrl())
-                        .price(menuDto.getPrice())
-                        .restaurant(restaurantEntity)
-                        .build();
+                    .name(menuDto.getName())
+                    .pictureUrl(menuDto.getPictureUrl())
+                    .price(menuDto.getPrice())
+                    .restaurant(restaurantEntity)
+                    .build();
 
                 if (menuDto.getOptionGroupDtoList() != null) {
 
                     optionGroupEntityList.addAll(menuDto.getOptionGroupDtoList().stream().map(optionGroupDto -> {
                         var optionGroupEntity = OptionGroup.builder()
-                                .description(optionGroupDto.getDescription())
-                                .maxSelectNumber(optionGroupDto.getMaxSelectNumber())
-                                .isNecessary(optionGroupDto.isNecessary())
-                                .menu(menuEntity)
-                                .build();
+                            .description(optionGroupDto.getDescription())
+                            .maxSelectNumber(optionGroupDto.getMaxSelectNumber())
+                            .isNecessary(optionGroupDto.isNecessary())
+                            .menu(menuEntity)
+                            .build();
 
                         if (optionGroupDto.getOptionDtoList() != null) {
                             optionEntityList.addAll(optionGroupDto.getOptionDtoList().stream()
-                                    .map(optionDto -> Option.builder()
-                                            .name(optionDto.getName())
-                                            .cost(optionDto.getCost())
-                                            .optionGroup(optionGroupEntity)
-                                            .build())
-                                    .collect(Collectors.toList()));
+                                .map(optionDto -> Option.builder()
+                                    .name(optionDto.getName())
+                                    .cost(optionDto.getCost())
+                                    .optionGroup(optionGroupEntity)
+                                    .build())
+                                .collect(Collectors.toList()));
 
                         }
                         return optionGroupEntity;
@@ -118,33 +117,34 @@ public class RestaurantService {
 
         return id;
     }
-    @Transactional
-    public Optional<List<MenuDto>> findMenuByRestaurantId(String restaurantId) {
-        return menuRepository.findByRestaurantId(restaurantId);
-    }
+
 
     @Transactional
     public Optional<List<MenuDto>> findMenuAndAllChildrenByRestaurantId(String restaurantId) {
         List<MenuDto> menuDtoList = menuRepository.findByRestaurantId(restaurantId).get();
 
         List<MenuDto> updatedMenuDtoList = menuDtoList.stream()
-                .map(menuDto -> {
-                    List<OptionGroupDto> optionGroupDtoList = optionGroupRepository.findByMenuId(menuDto.getId()).get();
-                    menuDto.setOptionGroupDtoList(optionGroupDtoList);
+            .map(menuDto -> {
+                List<OptionGroupDto> optionGroupDtoList = optionGroupRepository.findByMenuId(menuDto.getId()).get();
+                menuDto.setOptionGroupDtoList(optionGroupDtoList);
 
-                    optionGroupDtoList.forEach(optionGroupDto -> {
-                        List<OptionDto> optionDtoList = optionRepository.findByOptionGroupId(optionGroupDto.getId()).get();
-                        optionGroupDto.setOptionDtoList(optionDtoList);
-                    });
-                    return menuDto;
-                })
-                .collect(Collectors.toList());
+                optionGroupDtoList.forEach(optionGroupDto -> {
+                    List<OptionDto> optionDtoList = optionRepository.findByOptionGroupId(optionGroupDto.getId()).get();
+                    optionGroupDto.setOptionDtoList(optionDtoList);
+                });
+                return menuDto;
+            })
+            .collect(Collectors.toList());
 
         return Optional.of(updatedMenuDtoList);
     }
 
-    public MenuDto saveMenu(MenuDto menu) {
-        return menu;
+    @Transactional
+    public Page<RestaurantDto> findByType(RestaurantTypeEnum type, Pageable pageable) throws Exception {
+        try {
+            return restaurantRepository.findListByType(type, pageable);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
     }
-
 }

@@ -49,6 +49,7 @@ public class KafkaConsumerConfig<K extends Serializable, V extends SpecificRecor
                         kafkaConsumerConfigData.getMaxPartitionFetchBytesBoostFactor());
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, kafkaConsumerConfigData.getMaxPollRecords());
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, kafkaConsumerConfigData.getEnableAutoCommit());
+        props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, kafkaConsumerConfigData.getIsolationLevel());
         return props;
 
     }

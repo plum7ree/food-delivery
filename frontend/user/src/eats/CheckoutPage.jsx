@@ -118,12 +118,13 @@ export const CheckoutPage = () => {
    const navigate = useNavigate();
    const [paymentMethod, setPaymentMethod] = useState('credit_card');
    // selectedMenuItems = [{menuItem, selectedOptions}...]
-   const selectedMenuItems = useSelector((state) => state.selectedMenu);
+   const selectedMenuItems = useSelector((state) => state.selectedMenu.menus);
   const [totalPrice, setTotalPrice] = useState(0);
   const [showTossPayment, setShowTossPayment] = useState(false);
 
 
 useEffect(() => {
+   console.log(selectedMenuItems)
     const calculatedTotalPrice = selectedMenuItems.reduce((total, { menuItem, selectedOptions }) => {
       const selectedOptionsPrice = calculateTotalPrice({ optionGroupDtoList: menuItem.optionGroupDtoList, selectedOptions });
       return total + parseInt(menuItem.price) + selectedOptionsPrice;

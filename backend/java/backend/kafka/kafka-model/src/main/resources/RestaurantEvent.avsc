@@ -1,0 +1,50 @@
+{
+  "type": "record",
+  "name": "RestaurantEvent",
+  "namespace": "com.example.kafka.avro.model",
+  "fields": [
+    {
+      "name": "correlationId",
+      "type": "string"
+    },
+    {
+      "name": "event",
+      "type": [
+        {
+          "type": "record",
+          "name": "RequestApproval",
+          "fields": [
+            {
+              "name": "orderId",
+              "type": "string"
+            },
+            {
+              "name": "createdAt",
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            }
+          ]
+        },
+        {
+          "type": "record",
+          "name": "UserCancelled",
+          "fields": [
+            {
+              "name": "orderId",
+              "type": "string"
+            },
+            {
+              "name": "createdAt",
+              "type": {
+                "type": "long",
+                "logicalType": "timestamp-millis"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

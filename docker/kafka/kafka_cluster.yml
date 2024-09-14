@@ -85,6 +85,8 @@ services:
       VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
       CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONNECT_LOG4J_ROOT_LOGLEVEL: INFO
+      CONNECT_LOG4J_LOGGERS: io.debezium=DEBUG
     depends_on:
       - kafka-broker-1
       - kafka-broker-2
@@ -115,3 +117,7 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
     networks:
       - ${GLOBAL_NETWORK:-kafka}
+
+networks:
+  global-my-network:
+    driver: bridge

@@ -6,7 +6,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SearchIcon from '@mui/icons-material/Search';
 import {Tabs, Tab} from "@mui/material";
 import {Container} from "@mui/system";
-import { GetAllTestRestaurantList as mockRestaurants } from './resources/RestaurantListTestData';
 import RestaurantLabel from "./RestaurantLabel"; // restaurants 데이터 가져오기
 import {v4 as uuidv4} from 'uuid';
 
@@ -28,21 +27,14 @@ const RestaurantListFromSearch = () => {
    const navigate = useNavigate();
 
 
-   const isTestMode = false; // 테스트 플래그 변수
 
 
    useEffect(() => {
-      if (isTestMode) {
-        // 테스트 모드인 경우 가짜 데이터 사용
-        setRestaurants(mockRestaurants);
-      } else {
-         var _restaurants = location.state['restaurants']
-         if (_restaurants) {
-            setRestaurants(_restaurants);
-         }
+      var _restaurants = location.state['restaurants']
+      if (_restaurants) {
+         setRestaurants(_restaurants);
       }
    }, [location]);
-
 
 
    const handleRestaurantClick = (restaurant) => {
@@ -82,11 +74,11 @@ const RestaurantListFromSearch = () => {
             </Grid>
             <Grid item container spacing={2} direction="column" style={{overflowY: 'scroll'}}>
                {restaurants && restaurants.map((restaurant) => (
-                     <RestaurantLabel key={uuidv4()}
-                                       restaurant={restaurant}
-                                      handleRestaurantClick={handleRestaurantClick}
-                     />
-                  ))}
+                  <RestaurantLabel key={uuidv4()}
+                                   restaurant={restaurant}
+                                   handleRestaurantClick={handleRestaurantClick}
+                  />
+               ))}
             </Grid>
          </Grid>
       </Container>

@@ -12,6 +12,10 @@ services:
       - "max_connections=200"
       - "-c"
       - "max_replication_slots=4"
+      - "-c"
+      - "log_statement=all"
+      - "-c"
+      - "log_min_messages=DEBUG"
     volumes:
       - "./volumes/postgres:/var/lib/postgresql/data"
     environment:
@@ -19,3 +23,7 @@ services:
       - "POSTGRES_PASSWORD=admin"
     networks:
       - ${GLOBAL_NETWORK:-postgres}
+
+networks:
+  global-my-network:
+    driver: bridge

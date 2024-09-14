@@ -1,8 +1,7 @@
 package com.example.couponapp.service;
 
 import com.example.couponapp.dto.IssueRequestDto;
-import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
-import com.example.kafkaproducer.KafkaProducer;
+import com.example.kafkaproducer.GeneralKafkaProducer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -18,7 +17,7 @@ import static org.mockito.Mockito.doAnswer;
 class KafkaProducerServiceMockTest {
 
     @Mock
-    private KafkaProducer<String, CouponIssueRequestAvroModel> kafkaProducer;
+    private GeneralKafkaProducer<String, CouponIssueRequestAvroModel> kafkaProducer;
 
     private KafkaProducerService kafkaProducerService;
 

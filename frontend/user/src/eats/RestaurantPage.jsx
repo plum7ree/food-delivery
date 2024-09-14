@@ -7,7 +7,10 @@ import {v4 as uuidv4} from 'uuid';
 import {SearchRestaurantTestData as mockSearchRestaurant} from "./resources/RestaurantTestData";
 import {Container, maxWidth} from "@mui/system";
 import {selectCartItemCount} from "../state/checkout/selectedMenuSlice";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {initRestaurantIfNeeded} from "../state/checkout/selectedMenuSlice";
+import ReviewComponent from "./ReviewComponent";
+import ReviewsTestData from "./resources/ReviewsTestData";
 
 const RestaurantPicture = (props) => {
    const {pictureUrl1, type} = props.restaurant;
@@ -101,11 +104,13 @@ const RestaurantActions = ({onCheckout}) => {
    );
 };
 
-const RestaurantMenu = ({menus, onOptionSelect}) => {
+const RestaurantMenu = ({restaurantId, menus, onOptionSelect}) => {
    const navigate = useNavigate();
+   const dispatch = useDispatch();
 
    const goToMenuPage = (menu) => {
       console.log(menu)
+      dispatch(initRestaurantIfNeeded({restaurantId: restaurantId}));
       navigate(`/eats/restaurant/menu`, {
          state: {
             menu,
@@ -116,8 +121,9 @@ const RestaurantMenu = ({menus, onOptionSelect}) => {
    return (
       <Grid container item direction="column" alignItems="center" spacing={3}>
          {menus.map((menu) => (
-            <Grid container key={uuidv4()} item direction="row" justifyContent="space-between" onClick={() => goToMenuPage(menu)}>
-               <Grid item spacing={2}>
+            <Grid container key={uuidv4()} item direction="row" justifyContent="space-between"
+                  onClick={() => goToMenuPage(menu)}>
+               <Grid item>
                   <Grid item>
                      <Typography variant="h5">{menu.name}</Typography>
                   </Grid>
@@ -125,8 +131,8 @@ const RestaurantMenu = ({menus, onOptionSelect}) => {
                      <Typography variant="subtitle1">{menu.price}</Typography>
                   </Grid>
                </Grid>
-               <Grid item >
-                  <img src={menu.pictureUrl} style={{width:'162px', height: '100px'}} />
+               <Grid item>
+                  <img src={menu.pictureUrl} style={{width: '162px', height: '100px'}}/>
                </Grid>
             </Grid>
          ))}
@@ -142,7 +148,14 @@ const RestaurantPage = () => {
    const [currentTab, setCurrentTab] = useState(0); // 0 for Menu, 1 for Reviews
    const [total, setTotal] = useState(0);
 
-   const isTestMode = true;
+   // review example
+   const [reviews, setReviews] = useState([]);
+   const [reviewCount, setReviewCount] = useState(0);
+   const [rating, setRating] = useState(0);
+   const [ratingDistribution, setRatingDistribution] = useState({});
+
+
+   const isTestMode = false;
 
    useEffect(() => {
       const restaurant = location.state['restaurant']
@@ -150,21 +163,40 @@ const RestaurantPage = () => {
          const mockRestaurant = restaurant
          console.log(mockRestaurant.menuDtoList)
          setRestaurantState(mockRestaurant);
-      } else {
-         const {restaurant} = location.state;
          setRestaurantIdState(restaurant.id);
 
-         const fetchRestaurantContent = async (restaurantId) => {
-            try {
-               const response = await axiosInstance.get(`/user/api/seller/restaurant/${restaurantId}`);
-               setRestaurantState(response.data);
-            } catch (error) {
-               console.error('Error fetching restaurant data:', error);
-            }
-         };
-         fetchRestaurantContent(restaurantId);
+         const reviewList = ReviewsTestData.get(restaurant.id)
+         setReviews(reviewList);
+         setReviewCount(reviewList.length)
+         setRating(5.0);
+         setReviewCount(503);
+         setRatingDistribution({
+            5: 98,
+            4: 1,
+            3: 1,
+            2: 0,
+            1: 0
+         })
+
+      } else {
+         setRestaurantIdState(restaurant.id);
+
       }
-   }, [location]);
+   }, []);
+
+
+   useEffect(() => {
+      const fetchRestaurantContent = async (restaurantId) => {
+         try {
+            const response = await axiosInstance.get(`/user/api/seller/restaurant/${restaurantId}`);
+            console.log(response.data)
+            setRestaurantState(response.data);
+         } catch (error) {
+            console.error('Error fetching restaurant data:', error);
+         }
+      };
+      fetchRestaurantContent(restaurantIdState);
+   },[restaurantIdState]);
 
    const handleTabChange = (event, newValue) => {
       setCurrentTab(newValue);
@@ -202,6 +234,7 @@ const RestaurantPage = () => {
                   <Grid container>
                      {restaurantState.menuDtoList && (
                         <RestaurantMenu
+                           restaurantId={restaurantIdState}
                            menus={restaurantState.menuDtoList}
                         />
                      )}
@@ -209,22 +242,15 @@ const RestaurantPage = () => {
                )}
                {currentTab === 1 && (
                   <Grid container>
-                     {/* Review content goes here */}
+                     <ReviewComponent
+                        reviews={reviews}
+                        rating={rating}
+                        reviewCount={reviewCount}
+                        ratingDistribution={ratingDistribution}
+                     />
                   </Grid>
                )}
             </Grid>
-         </Grid>
-         {/* TODO need to fix this checkout button */}
-         <Grid item>
-            <Button
-               variant="contained"
-               color="success"
-               onClick={goToCheckoutPage}
-               fullWidth
-            >
-               Checkout
-            </Button>
-
          </Grid>
       </Container>
    );

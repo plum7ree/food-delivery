@@ -32,6 +32,7 @@ public class RestaurantDto {
     Float rating;
     private String pictureUrl1;
     private String pictureUrl2;
+    private String pictureUrl3;
 
     private List<MenuDto> menuDtoList;
 

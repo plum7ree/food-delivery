@@ -111,7 +111,7 @@ public class SellerController {
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        var restaurantDtos = restaurantRepository.findByType(RestaurantTypeEnum.valueOf(type), pageable);
+        var restaurantDtos = restaurantRepository.findListByType(RestaurantTypeEnum.valueOf(type), pageable);
 
         // picture 에 대해 presigned URl 생성
         restaurantDtos.stream().map(restaurant -> imageService.createPresignedUrlForRestaurant(restaurant)).collect(Collectors.toList());
@@ -141,10 +141,8 @@ public class SellerController {
             return ResponseEntity.notFound().build();
         }
         log.info("getRestaurant restairamtEntity: {} ", restaurantDto.toString());
-        //        restaurantDto = imageService.createPresignedUrlForRestaurant(restaurantDto);
 
         var menuDtoList = restaurantService.findMenuAndAllChildrenByRestaurantId(restaurantId).orElse(null);
-        menuDtoList = menuDtoList.stream().map(imageService::createPresignedUrlForMenuAndAllChildren).collect(Collectors.toList());
         restaurantDto.setMenuDtoList(menuDtoList);
 
         log.info("getRestaurant: menuList : {}", menuDtoList.toString());

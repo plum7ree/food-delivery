@@ -41,16 +41,17 @@ public class RestaurantRepository {
     public Optional<RestaurantDto> findById(UUID id) {
         QRestaurant restaurant = QRestaurant.restaurant;
         return Optional.ofNullable(jpaQueryFactory.select(Projections.fields(
-                        RestaurantDto.class,
-                        restaurant.id,
-                        restaurant.name,
-                        restaurant.type,
-                        restaurant.openTime,
-                        restaurant.closeTime
-                ))
-                .from(restaurant)
-                .where(restaurant.id.eq(id))
-                .fetchOne());
+                RestaurantDto.class,
+                restaurant.id,
+                restaurant.name,
+                restaurant.type,
+                restaurant.openTime,
+                restaurant.closeTime,
+                restaurant.pictureUrl1
+            ))
+            .from(restaurant)
+            .where(restaurant.id.eq(id))
+            .fetchOne());
     }
 
     public Restaurant save(Restaurant restaurant) {
@@ -62,28 +63,34 @@ public class RestaurantRepository {
         return restaurant;
     }
 
-    public Page<RestaurantDto> findByType(RestaurantTypeEnum type, Pageable pageable) {
+    public Page<RestaurantDto> findListByType(RestaurantTypeEnum type, Pageable pageable) {
         QRestaurant restaurant = QRestaurant.restaurant;
 
-        //TODO instead of count entire db, how about make a recomendation system (memory or disk)?
-        long total = jpaQueryFactory.select(restaurant)
-                .from(restaurant)
-                .where(restaurant.type.eq(type))
-                .fetchCount();
-
         List<RestaurantDto> restaurantDtos = jpaQueryFactory.select(Projections.fields(
-                        RestaurantDto.class,
-                        restaurant.id,
-                        restaurant.name,
-                        restaurant.type,
-                        restaurant.openTime,
-                        restaurant.closeTime
-                ))
-                .from(restaurant)
-                .where(restaurant.type.eq(type))
-                .offset((int) pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                RestaurantDto.class,
+                restaurant.id,
+                restaurant.name,
+                restaurant.type,
+                restaurant.openTime,
+                restaurant.closeTime,
+                restaurant.pictureUrl1,
+                restaurant.pictureUrl2,
+                restaurant.pictureUrl3
+            ))
+            .from(restaurant)
+            .where(restaurant.type.eq(type))
+            .offset((int) pageable.getOffset())
+            .limit(pageable.getPageSize() + 1)  // 추가로 한 개 더 가져와서 다음 페이지 여부 판단
+            .fetch();
+
+        boolean hasNext = false;
+        if (restaurantDtos.size() > pageable.getPageSize()) {
+            hasNext = true;
+            restaurantDtos.remove(restaurantDtos.size() - 1);  // 추가로 가져온 데이터는 삭제
+        }
+
+        // total을 추정하거나 계산하지 않으므로 offset + 실제 가져온 데이터 수를 활용
+        long total = hasNext ? pageable.getOffset() + pageable.getPageSize() + 1 : pageable.getOffset() + restaurantDtos.size();
 
         return new PageImpl<>(restaurantDtos, pageable, total);
     }
@@ -92,14 +99,15 @@ public class RestaurantRepository {
         QRestaurant restaurant = QRestaurant.restaurant;
 
         List<RestaurantDto> restaurantDtos = jpaQueryFactory.select(Projections.fields(
-                        RestaurantDto.class,
-                        restaurant.name,
-                        restaurant.type,
-                        restaurant.openTime,
-                        restaurant.closeTime
-                ))
-                .from(restaurant)
-                .fetch();
+                RestaurantDto.class,
+                restaurant.name,
+                restaurant.type,
+                restaurant.openTime,
+                restaurant.closeTime,
+                restaurant.pictureUrl1
+            ))
+            .from(restaurant)
+            .fetch();
 
         return restaurantDtos;
     }

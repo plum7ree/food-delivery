@@ -5,6 +5,10 @@ aws:
   s3:
     bucket-name: ""
 
+app:
+  init:
+    sql-data: true
+
 spring:
   application:
     name: "user"
@@ -13,7 +17,7 @@ spring:
   autoconfigure:
   #    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
   config:
-    import: "optional:configserver:http://localhost:8071/" # For default and 'native' profile, config will be fetched from config server
+    import: "optional:configserver:http://configserver:8071/" # For default and 'native' profile, config will be fetched from config server
   cloud:
     openfeign:
       circuitbreaker:
@@ -31,17 +35,20 @@ spring:
   database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=user_schema&binaryTransfer=true&reWriteBatchedInserts=true
+    url: jdbc:postgresql://user-db:5432/postgres?currentSchema=user_schema&binaryTransfer=true&reWriteBatchedInserts=true
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
-  sql:
-    init:
-      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
-      mode: always
-      platform: postgres
-      schema-locations: classpath:init-schema.sql
-      data-locations: classpath:init-data.sql
+  #  sql:
+  #    init:
+  #      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
+  #      mode: always
+  #      platform: postgres
+  #      schema-locations: classpath:users/init-schema.sql
+  #      data-locations: classpath:users/init-data.sql
+  data:
+    redis-server: redis://redis:6379
+
 
 retry-config:
   initial-interval-ms: 1000
@@ -88,17 +95,9 @@ eureka:
     fetchRegistry: true
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://eurekaserver:8761/eureka/
 
-#logging:
-#  level:
-#    org.springframework.context: DEBUG
-#    com.example: DEBUG
-#    org.hibernate.SQL: TRACE
 
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#        SQL: TRACE
-#        type: TRACE
+eats-order-service:
+  create-order:
+    uri: http://eats-order-application:8074/api/createorder

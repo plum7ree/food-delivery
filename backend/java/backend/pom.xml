@@ -16,19 +16,17 @@
         <module>gateway</module>
         <module>eurekaserver</module>
         <module>user</module>
-        <module>driver</module>
         <module>route</module>
-        <module>location-redis</module>
-        <module>eats-order-service</module>
         <module>eats-order-service/eats-order-domain</module>
         <module>eats-order-service/eats-order-dataaccess</module>
-        <module>eats-order-service/eats-order-config-data</module>
         <module>eats-order-service/eats-order-application</module>
-        <module>payment-service</module>
         <module>eats-search</module>
         <module>coupon/coupon-service</module>
         <module>coupon/coupon-app</module>
         <module>common-util</module>
+        <module>restaurant-approval-service</module>
+        <module>websocketserver</module>
+        <module>driver-assignment</module>
     </modules>
 
     <parent>
@@ -52,7 +50,7 @@
 
         <lombok.version>1.18.28</lombok.version>
 
-        <spring-boot.version>3.2.0</spring-boot.version>
+        <spring-boot.version>3.2.2</spring-boot.version>
         <spring-test.version>6.1.2</spring-test.version>
         <spring-retry.version>2.0.2</spring-retry.version>
         <spring-cloud.version>4.0.3</spring-cloud.version>
@@ -91,6 +89,11 @@
         <repository>
             <id>confluent</id>
             <url>https://packages.confluent.io/maven/</url>
+        </repository>
+
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
     </repositories>
 
@@ -137,19 +140,7 @@
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring-boot.version}</version>
                 <scope>test</scope>
-                <!--                <exclusions>-->
-                <!--                    <exclusion>-->
-                <!--                        <groupId>org.junit.vintage</groupId>-->
-                <!--                        <artifactId>junit-vintage-engine</artifactId>-->
-                <!--                    </exclusion>-->
-                <!--                </exclusions>-->
             </dependency>
-            <!--            <dependency>-->
-            <!--                <groupId>org.junit.vintage</groupId>-->
-            <!--                <artifactId>junit-vintage-engine</artifactId>-->
-            <!--                <version>RELEASE</version>-->
-            <!--                <scope>test</scope>-->
-            <!--            </dependency>-->
 
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -292,6 +283,14 @@
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-schema-registry-client</artifactId>
                 <version>${confluent-kafka.version}</version>
+            </dependency>
+            <!--  spring-cloud-stream-binder-kafka-reactive 등 설정 자동으로 다 세팅          -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud-dependencies.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.postgresql</groupId>
@@ -469,8 +468,49 @@
                 <artifactId>kafka-config-data</artifactId>
                 <version>${project.version}</version>
             </dependency>
-        </dependencies>
 
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>0.12.6</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>0.12.6</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>0.12.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bitbucket.b_c</groupId>
+                <artifactId>jose4j</artifactId>
+                <version>0.9.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.auth</groupId>
+                <artifactId>google-auth-library-oauth2-http</artifactId>
+                <version>1.3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.api-client</groupId>
+                <artifactId>google-api-client-jackson2</artifactId>
+                <version>1.20.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jgrapht</groupId>
+                <artifactId>jgrapht-core</artifactId>
+                <version>1.5.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>r2dbc-postgresql</artifactId>
+                <version>1.0.0.RELEASE</version>
+            </dependency>
+        </dependencies>
 
     </dependencyManagement>
 

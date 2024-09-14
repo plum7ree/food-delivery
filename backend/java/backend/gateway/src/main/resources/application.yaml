@@ -1,8 +1,20 @@
+server:
+  port: 8080
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://eurekaserver:8761/eureka/
+
 spring:
   application:
     name: "gateway"
   config:
-    import: "optional:configserver:http://localhost:8071/"
+    import: "optional:configserver:http://configserver:8071/"
   profiles:
     active: "default"
   cloud:
@@ -14,11 +26,29 @@ spring:
         locator:
           enabled: false
           lowerCaseServiceId: true
+      global-filter:
+        websocket-routing:
+          enabled: true
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: "https://accounts.google.com"
+
+jwt:
+  issuer-to-jwks-uri:
+    '[https://accounts.google.com]': "https://www.googleapis.com/oauth2/v3/certs"
+    '[https://www.facebook.com]': "https://www.facebook.com/.well-known/jwks.json"
+    # 다른 Issuer들에 대한 JWKS URI 추가
+
+lb-uri-config:
+  # websocket lb uri ref: https://github.com/jmlw/websocket-spring-gateway-demo/blob/master/gateway/src/main/java/com/joshmlwood/gateway/configuration/RouteLocatorConfiguration.java
+  # official doc: https://docs.spring.io/spring-cloud-gateway/reference/spring-cloud-gateway/global-filters.html#websocket-routing-filter
+  web-socket-ws-server-uri: "lb:ws://websocketserver:8094/ws" #
+  web-socket-sockjs-server-uri: "lb://websocketserver:8094/sockjs" # ws:// 없다. TODO websocket 으로 승격되면?
+
+
 
 #    kubernetes:
 #      discovery:

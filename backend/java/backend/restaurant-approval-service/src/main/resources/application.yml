@@ -2,66 +2,51 @@ server:
   port: 8076
 
 
-spring:
-  application:
-    name: restaurant-approval-service
-  profiles:
-    active: native
-  autoconfigure:
-    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
-
-# for test. These should be moved into configserver
-retry-config:
-  initial-interval-ms: 1000
-  max-interval-ms: 10000
-  multiplier: 2.0
-  maxAttempts: 3
-  sleep-time-ms: 2000
-
-topic-names:
-  payment-request-topic-name: payment-request
-  payment-response-topic-name: payment-response
-
-kafka-config:
-  bootstrap-servers: localhost:19092, localhost:29092, localhost:39092
-  schema-registry-url-key: schema.registry.url
-  schema-registry-url: http://localhost:8081
-  topic-names-to-create:
-    - payment-response
-    - payment-request
-  num-of-partitions: 3
-  replication-factor: 3
-
-kafka-producer-config:
-  key-serializer-class: org.apache.kafka.common.serialization.StringSerializer
-  value-serializer-class: io.confluent.kafka.serializers.KafkaAvroSerializer
-  compression-type: snappy
-  acks: all
-  batch-size: 16384
-  batch-size-boost-factor: 100
-  linger-ms: 5
-  request-timeout-ms: 60000
-  retry-count: 5
-
-kafka-consumer-config:
-  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-  value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-  consumer-group-id: payment-topic-consumer-group-id
-  auto-offset-reset: earliest
-  specific-avro-reader-key: specific.avro.reader
-  specific-avro-reader: true
-  batch-listener: true
-  auto-startup: false
-  concurrency-level: 3
-  session-timeout-ms: 10000
-  heartbeat-interval-ms: 3000
-  max-poll-interval-ms: 300000
-  max-poll-records: 500
-  max-partition-fetch-bytes-default: 1048576
-  max-partition-fetch-bytes-boost-factor: 1
-  poll-timeout-ms: 150
-  enable-auto-commit: true
 logging:
   level:
     org.springframework.context: DEBUG
     com.example: DEBUG
+
+spring:
+  application:
+    name: restaurant-approval-service
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
+
+  cloud:
+    function:
+      definition: processor
+    stream:
+      default:
+        producer:
+          useNativeEncoding: true
+      bindings:
+        processor-in-0:
+          destination: restaurant-approval-request
+          group: restaurant-approval-request-group
+        processor-out-0:
+          destination: restaurant-approval-response
+
+      kafka:
+        binder:
+          requiredAcks: all
+          brokers: localhost:19092,localhost:29092,localhost:39092
+          auto-create-topics: true
+          consumer-properties:
+            "value.deserializer": io.confluent.kafka.serializers.KafkaAvroDeserializer
+            "key.deserializer": org.apache.kafka.common.serialization.StringDeserializer
+            "schema.registry.url": http://localhost:8081
+            "specific.avro.reader": true
+          producer-properties:
+            "value.serializer": io.confluent.kafka.serializers.KafkaAvroSerializer
+            "key.serializer": org.apache.kafka.common.serialization.StringSerializer
+            schema.registry.url: http://localhost:8081
+        bindings:
+          processor-in-0:
+            consumer:
+              configuration:
+                isolation.level: read_committed
+                "auto.offset.reset": "earliest" # 최근 n 개의 메시지를 가져오기 위해 사용
+                "enable.auto.commit": false
+
+

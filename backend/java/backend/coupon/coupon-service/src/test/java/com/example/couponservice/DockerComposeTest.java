@@ -112,7 +112,7 @@ public class DockerComposeTest {
             executorService.submit(() -> {
                 try {
                     var message = new CouponIssueRequestAvroModel();
-                    message.setCallerId(UUID.randomUUID().toString());
+                    message.setCallerId(UUID.fromString(UUID.randomUUID().toString()));
                     message.setCouponId(couponId);
                     message.setIssueId((long) (Math.random() * 1000000)); // 랜덤 issueId
                     message.setAmount(1);

@@ -24,6 +24,5 @@ public class OptionGroupDto {
     List<OptionDto> selectedIndicesList = new ArrayList<>();
     @Builder.Default
     List<OptionDto> optionDtoList = new ArrayList<>();
-    @JsonIgnore
     private UUID id;
 }

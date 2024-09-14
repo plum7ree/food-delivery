@@ -11,11 +11,8 @@
       }
     },
     {
-      "name": "sagaId",
-      "type": {
-        "type": "string",
-        "logicalType": "uuid"
-      }
+      "name": "eventType",
+      "type": "string"
     },
     {
       "name": "callerId",
@@ -25,7 +22,14 @@
       }
     },
     {
-      "name": "callId",
+      "name": "orderId",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "paymentId",
       "type": {
         "type": "string",
         "logicalType": "uuid"
@@ -40,12 +44,7 @@
     },
     {
       "name": "price",
-      "type": {
-        "type": "bytes",
-        "logicalType": "decimal",
-        "precision": 10,
-        "scale": 2
-      }
+      "type": "double"
     },
     {
       "name": "createdAt",
@@ -55,19 +54,67 @@
       }
     },
     {
-      "name": "status",
+      "name": "orderStatus",
+      "type": "string"
+    },
+    {
+      "name": "address",
       "type": {
-        "type": "enum",
-        "name": "Status",
-        "symbols": [
-          "PENDING",
-          "COMPLETED",
-          "CANCELLED",
-          "FAILED",
-          "APPROVED",
-          "REJECTED"
+        "type": "record",
+        "name": "Address",
+        "fields": [
+          {
+            "name": "street",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "type": "string"
+          },
+          {
+            "name": "postalCode",
+            "type": "string"
+          }
         ]
       }
+    },
+    {
+      "name": "items",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "OrderItem",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "type": "string",
+                "logicalType": "uuid"
+              }
+            },
+            {
+              "name": "quantity",
+              "type": "int"
+            },
+            {
+              "name": "price",
+              "type": "double"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "failureMessages",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "string"
+        }
+      ],
+      "default": null
     }
   ]
 }

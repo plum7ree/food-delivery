@@ -91,7 +91,7 @@ class SpringBootTestWithEmbeddedKafka {
     void givenRepositoryThrowsError_whenKafkaListenerReceives_thenOffsetShouldNotBeCommitted() throws ExecutionException, InterruptedException {
         // Given
         var message = new CouponIssueRequestAvroModel();
-        message.setCallerId(UUID.randomUUID().toString());
+        message.setCallerId(UUID.fromString(UUID.randomUUID().toString()));
         message.setCouponId(1000000L);
         message.setIssueId(1000000L);
         message.setAmount(1L);

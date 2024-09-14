@@ -1,0 +1,38 @@
+name: order-db
+
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "13" # PostgreSQL 버전
+
+service:
+  type: ClusterIP
+  port: 5434
+  targetPort: 5432
+
+deployment:
+  volumeMounts:
+    mountPath: /var/lib/postgresql/data
+
+persistence:
+  enabled: true
+  size: 5Gi
+  storageClass: my-local-storage
+  hostPath: /opt/postgresql/order-db/data
+
+
+postgresql:
+  db: postgres
+  user: postgres
+  password: admin
+
+# TODO kubectl secret 이용
+#kubectl create secret generic postgres-secret \
+#--from-literal=POSTGRES_USER=postgresadmin \
+#--from-literal=POSTGRES_PASSWORD=admin123 \
+#--dry-run -o yaml > secrets.yaml
+
+# storageClass: 저장소 정책. 특정(SSD, HDD), 프로비저닝 방식(동적, 정적)
+# pv: 실제 저장소 자원. 저장소 크기, 접근 모드(읽기전용, 읽기-쓰기 등), 재활용 정책
+# pvc: 저장소 요청 객체. 필요한 저장소 크기, 접근 모드 지정. 적절한 pv 가 할당됨. storageClass 를 지정하여 원하는 저장소 정책을 선택.

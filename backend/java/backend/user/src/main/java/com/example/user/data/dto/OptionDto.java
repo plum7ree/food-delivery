@@ -14,7 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OptionDto {
-    @JsonIgnore
     private UUID id;
     private String name;
     private BigInteger cost;

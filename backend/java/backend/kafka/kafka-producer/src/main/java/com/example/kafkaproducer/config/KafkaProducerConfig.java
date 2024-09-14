@@ -5,6 +5,7 @@ import com.example.kafka.config.data.KafkaConfigData;
 import com.example.kafka.config.data.KafkaProducerConfigData;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.specific.SpecificRecordBase;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,7 @@ public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecor
     private final KafkaConfigData kafkaConfigData;
     private final KafkaProducerConfigData kafkaProducerConfigData;
 
-    @Bean
+    @Bean(name = "commonKafkaProducerConfigs")
     public Map<String, Object> producerConfig() {
         Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaConfigData.getBootstrapServers());
@@ -36,7 +37,7 @@ public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecor
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaProducerConfigData.getKeySerializerClass());
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaProducerConfigData.getValueSerializerClass());
         props.put(ProducerConfig.BATCH_SIZE_CONFIG, kafkaProducerConfigData.getBatchSize() *
-                kafkaProducerConfigData.getBatchSizeBoostFactor());
+            kafkaProducerConfigData.getBatchSizeBoostFactor());
         props.put(ProducerConfig.LINGER_MS_CONFIG, kafkaProducerConfigData.getLingerMs());
         props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, kafkaProducerConfigData.getCompressionType());
         props.put(ProducerConfig.ACKS_CONFIG, kafkaProducerConfigData.getAcks());
@@ -55,6 +56,11 @@ public class KafkaProducerConfig<K extends Serializable, V extends SpecificRecor
     @Bean
     public KafkaTemplate<K, V> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean("apacheKafkaProducer")
+    public KafkaProducer<K, V> kafkaProducer() {
+        return new KafkaProducer<>(producerConfig());
     }
 
 }
