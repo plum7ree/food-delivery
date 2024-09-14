@@ -1,11 +1,9 @@
 package com.example.eatsorderapplication.application.service;
 
 import com.example.commondata.dto.order.CreateOrderRequestDto;
+import com.example.commondata.dto.order.UserAddressDto;
 import com.example.eatsorderapplication.application.component.AfterCommitEventPublisher;
 import com.example.eatsorderapplication.mappers.Mapper;
-import com.example.eatsorderdataaccess.entity.OrderAddressEntity;
-import com.example.eatsorderdataaccess.entity.OrderEntity;
-import com.example.eatsorderdataaccess.entity.OrderItemEntity;
 import com.example.eatsorderdataaccess.repository.OrderRepository;
 import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
 import com.example.eatsorderdomain.data.domainentity.Order;
@@ -24,7 +22,6 @@ import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
-import java.util.List;
 import java.util.UUID;
 
 @Configuration
@@ -61,12 +58,9 @@ public class OrderService {
      */
     @Transactional
     public Mono<Void> createAndSaveOrder(CreateOrderRequestDto createOrderRequestDto) {
-        OrderEntity orderEntity = Mapper.createOrderRequestDtoToOrderEntity(createOrderRequestDto);
-        OrderAddressEntity orderAddressEntity;
-        List<OrderItemEntity> orderItemEntityList;
         // 여기에는 domain object 가 존재하면 안됨. 제일 로직 코어에 존재해야함. dto 가 대신 피룡.
         Order order = Mapper.createOrderRequestDtoToOrder(createOrderRequestDto);
-        return orderRepository.save(orderEntity)
+        return orderRepository.saveOrderWithDetails(order)
             .doOnError(error -> log.error("DB error occurred during orderRepository.save: {}", error.getMessage(), error)) // DB 에러 로그
             .thenReturn(Mapper.orderToRestaurantApprovalOutboxEntity(order))
             .flatMap(restaurantApprovalRequestOutboxRepository::upsert)
@@ -89,6 +83,11 @@ public class OrderService {
 
     public Mono<Order> findById(UUID orderId) {
         return orderRepository.findById(orderId);
+    }
+
+    public Mono<UserAddressDto> findUserAddressDtoByOrderId(UUID orderId) {
+        return orderRepository.findUserAddressDtoByOrderId(orderId);
+
     }
 
 }

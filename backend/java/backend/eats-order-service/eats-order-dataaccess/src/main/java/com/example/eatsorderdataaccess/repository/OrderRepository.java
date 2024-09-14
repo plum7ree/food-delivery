@@ -1,6 +1,6 @@
 package com.example.eatsorderdataaccess.repository;
 
-import com.example.eatsorderdataaccess.entity.OrderEntity;
+import com.example.commondata.dto.order.UserAddressDto;
 import com.example.eatsorderdomain.data.domainentity.Order;
 import reactor.core.publisher.Mono;
 
@@ -16,11 +16,13 @@ public interface OrderRepository {
 //    @Query(value = "INSERT INTO orders (id, customer_id, restaurant_id, tracking_id, price, order_status, failure_messages) " +
 //        "VALUES (:id, :customerId, :restaurantId, :price, :orderStatus, :failureMessages)",
 //        nativeQuery = true)
-    Mono<OrderEntity> save(OrderEntity order);
+    Mono<Order> saveOrderWithDetails(Order order);
 
     Mono<Long> updateStatus(UUID id, String orderStatus);
 
     Mono<Order> findById(UUID id);
 
+
+    Mono<UserAddressDto> findUserAddressDtoByOrderId(UUID orderId);
 
 }

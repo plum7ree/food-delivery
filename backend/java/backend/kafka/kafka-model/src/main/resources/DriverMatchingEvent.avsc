@@ -8,6 +8,10 @@
       "type": "string"
     },
     {
+      "name": "userId",
+      "type": "string"
+    },
+    {
       "name": "createdAt",
       "type": {
         "type": "long",

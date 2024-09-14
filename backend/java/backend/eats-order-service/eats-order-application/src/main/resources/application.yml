@@ -31,7 +31,7 @@ spring:
 
   cloud:
     function:
-      definition: restaurantApprovalResponseProcessor; restaurantApprovalSender
+      definition: restaurantApprovalSender;restaurantApprovalResponseProcessor;driverMatchingRequestListener;driverMatchingResultPublisher;failedDriverMatchingResultPublisher
     stream:
       bindings:
         restaurantApprovalSender-out-0:
@@ -42,7 +42,14 @@ spring:
         restaurantApprovalResponseProcessor-out-0:
           destination: restaurant-approval-notification
         restaurantApprovalResponseProcessor-out-1:
-          destination: driver-matching
+          destination: driver-matching-request
+        driverMatchingRequestListener-in-0:
+          destination: driver-matching-request
+          group: driver-matching-request-group
+        driverMatchingResultPublisher-out-0:
+          destination: driver-matching-result
+        failedDriverMatchingResultPublisher-out-0:
+          destination: failed-driver-matching-result
 
       kafka: # https://cloud.spring.io/spring-cloud-stream-binder-kafka/spring-cloud-stream-binder-kafka.html
         binder:
@@ -81,7 +88,18 @@ spring:
           restaurantApprovalResponseProcessor-out-1:
             producer:
               bufferSize: 14000
-
+          driverMatchingRequestListener-in-0:
+            consumer:
+              configuration:
+                isolation.level: read_committed
+                "auto.offset.reset": "earliest" # 최근 n 개의 메시지를 가져오기 위해 사용
+                "enable.auto.commit": false
+          driverMatchingResultPublisher-out-0:
+            producer:
+              bufferSize: 14000
+          failedDriverMatchingResultPublisher-out-0:
+            producer:
+              bufferSize: 14000
 
 
 retry-config:

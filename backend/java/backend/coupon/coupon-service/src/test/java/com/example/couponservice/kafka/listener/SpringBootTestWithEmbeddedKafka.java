@@ -6,6 +6,7 @@ import com.example.couponservice.entity.Coupon;
 import com.example.couponservice.entity.CouponIssue;
 import com.example.couponservice.repository.CouponIssueRepository;
 import com.example.couponservice.repository.CouponRepository;
+import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
 import io.confluent.kafka.schemaregistry.client.MockSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
@@ -90,7 +91,7 @@ class SpringBootTestWithEmbeddedKafka {
     void givenRepositoryThrowsError_whenKafkaListenerReceives_thenOffsetShouldNotBeCommitted() throws ExecutionException, InterruptedException {
         // Given
         var message = new CouponIssueRequestAvroModel();
-        message.setCallerId(UUID.randomUUID().toString());
+        message.setCallerId(UUID.fromString(UUID.randomUUID().toString()));
         message.setCouponId(1000000L);
         message.setIssueId(1000000L);
         message.setAmount(1L);

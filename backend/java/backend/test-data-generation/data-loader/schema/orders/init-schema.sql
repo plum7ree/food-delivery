@@ -23,13 +23,12 @@ DROP TABLE IF EXISTS "order".order_items CASCADE;
 
 CREATE TABLE "order".order_items
 (
-    id         bigint         NOT NULL,
     order_id   uuid           NOT NULL,
     product_id uuid           NOT NULL,
     price      numeric(10, 2) NOT NULL,
     quantity   integer        NOT NULL,
     sub_total  numeric(10, 2) NOT NULL,
-    CONSTRAINT order_items_pkey PRIMARY KEY (id, order_id) -- id, order_id 가 다중 키. aggregate root id 를 항상 포함시키는듯
+    CONSTRAINT order_items_pkey PRIMARY KEY (order_id, product_id)
 );
 
 ALTER TABLE "order".order_items
@@ -43,14 +42,13 @@ DROP TABLE IF EXISTS "order".order_address CASCADE;
 
 CREATE TABLE "order".order_address
 (
-    id          uuid                                           NOT NULL,
     order_id    uuid UNIQUE                                    NOT NULL,
     street      character varying COLLATE pg_catalog."default" NOT NULL,
     postal_code character varying COLLATE pg_catalog."default" NOT NULL,
     city        character varying COLLATE pg_catalog."default" NOT NULL,
     lat numeric(8, 6) NOT NULL,
     lon numeric(9, 6) NOT NULL,
-    CONSTRAINT order_address_pkey PRIMARY KEY (id, order_id) -- id, order_id 가 다중 키
+    CONSTRAINT order_address_pkey PRIMARY KEY (order_id) -- id, order_id 가 다중 키
 );
 
 ALTER TABLE "order".order_address
@@ -78,33 +76,3 @@ ALTER TABLE "order".restaurant_approval_outbox
         ON UPDATE NO ACTION
         ON DELETE CASCADE
         NOT VALID;
-
-DROP TABLE IF EXISTS "order".customers CASCADE;
-
-CREATE TABLE "order".customers
-(
-    id         uuid                                           NOT NULL,
-    username   character varying COLLATE pg_catalog."default" NOT NULL,
-    first_name character varying COLLATE pg_catalog."default" NOT NULL,
-    last_name  character varying COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT customers_pkey PRIMARY KEY (id)
-);
-
-DROP TABLE IF EXISTS "order".order_approval CASCADE; -- 해당 테이블에 의존하는 모든 객체들도 함께 삭제
-CREATE TABLE "order".order_approval
-(
-    id            uuid              NOT NULL,
-    restaurant_id uuid              NOT NULL,
-    order_id      uuid              NOT NULL,
-    status        character varying NOT NULL,
-    CONSTRAINT order_approval_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE "order".matching
-(
-    id         uuid              NOT NULL,
-    user_id    uuid              NOT NULL,
-    address_id uuid              NOT NULL,
-    driver_id  uuid              NOT NULL,
-    status     character varying NOT NULL
-)

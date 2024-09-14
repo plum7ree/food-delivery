@@ -20,8 +20,6 @@ public class OrderItem {
     @NotNull
     private UUID orderId;
     @NotNull
-    private UUID productId;
-    @NotNull
     private Integer quantity;
     @NotNull
     private Double price;

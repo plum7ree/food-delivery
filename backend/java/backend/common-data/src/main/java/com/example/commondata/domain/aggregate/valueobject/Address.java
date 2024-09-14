@@ -28,5 +28,7 @@ public class Address {
     @Max(value = 50)
     @JsonProperty
     private final String city;
+    private final Double lat;
+    private final Double lon;
 
 }

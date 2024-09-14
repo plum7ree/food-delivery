@@ -16,9 +16,6 @@ public class AddressDto {
     @JsonProperty
     private final String id;
     @NotNull
-    @JsonProperty
-    private String userId;
-    @NotNull
     @Max(value = 50)
     @JsonProperty
     private final String street;

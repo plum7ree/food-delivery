@@ -74,6 +74,7 @@
 //        // TODO convert to RDBC or do this with Virtual Thread.
 //        getUnmatchedOrders()
 //            .flatMap(unmatchedEntityList -> Mono.fromCallable(() ->
+////                유저에게 address 를 요구하지 말고 애초ㅛ에 createCommandDto 때 ㅁㅇdress 를 받아서 저장하자.
 //                userServiceFeignClient.findUserLatLonByIds(unmatchedEntityList.stream().map(MatchingEntity::getUserId).toList())))//TODO convert to non-blocking
 //            .subscribeOn(Schedulers.boundedElastic())
 //            .flatMap(strategy::findNearbyDrivers)

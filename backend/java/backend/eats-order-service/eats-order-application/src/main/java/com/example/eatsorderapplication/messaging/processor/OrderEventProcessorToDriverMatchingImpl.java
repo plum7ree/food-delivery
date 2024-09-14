@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
+import java.util.UUID;
 
 
 @Service
@@ -26,15 +27,14 @@ public class OrderEventProcessorToDriverMatchingImpl implements OrderEventProces
 
     @Override
     public Mono<DriverMatchingEvent> handle(OrderApprovedByRestaurant event) {
-        log.info("approved by restaurant handle called");
-//        return this.orderService.completeRestaurantApproval(event.orderId())
-//            .map(MessageDtoMapper::toNotificationCreated)
-//            .doOnNext(e -> log.info("to NotificationCreated{}", e));
-//            .transform(exceptionHandler(event));
-        return Mono.just(DriverMatchingEvent.newBuilder()
-            .setCorrelationId(event.getOrderId())
-            .setCreatedAt(Instant.now())
-            .build());
+        log.info("DriverMatchingEvent approved by restaurant handle called");
+        return this.orderService.findById(UUID.fromString(event.getOrderId().toString()))
+            .flatMap(o ->
+                Mono.just(DriverMatchingEvent.newBuilder()
+                    .setCorrelationId(event.getOrderId())
+                    .setUserId(o.getCallerId().toString())
+                    .setCreatedAt(Instant.now())
+                    .build()));
     }
 
     @Override

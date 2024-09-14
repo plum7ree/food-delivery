@@ -3,6 +3,7 @@ package com.example.couponservice;
 
 
 import com.example.commonutil.DockerComposeStarter;
+import com.example.kafka.avro.model.CouponIssueRequestAvroModel;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.AdminClientConfig;
@@ -111,7 +112,7 @@ public class DockerComposeTest {
             executorService.submit(() -> {
                 try {
                     var message = new CouponIssueRequestAvroModel();
-                    message.setCallerId(UUID.randomUUID().toString());
+                    message.setCallerId(UUID.fromString(UUID.randomUUID().toString()));
                     message.setCouponId(couponId);
                     message.setIssueId((long) (Math.random() * 1000000)); // 랜덤 issueId
                     message.setAmount(1);

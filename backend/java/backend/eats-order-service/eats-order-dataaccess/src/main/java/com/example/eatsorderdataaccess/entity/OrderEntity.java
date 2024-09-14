@@ -32,11 +32,6 @@ public class OrderEntity {
     private String orderStatus;
     private String failureMessages;
 
-    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
-    private OrderAddressEntity address;
-
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderItemEntity> items;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

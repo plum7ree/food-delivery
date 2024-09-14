@@ -1,7 +1,5 @@
 package com.example.eatsorderapplication.application.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Data
@@ -13,4 +11,16 @@ public class DriverDetailsDto {
     double lat;
     double lon;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DriverDetailsDto that = (DriverDetailsDto) o;
+        return driverId.equals(that.driverId);
+    }
+
+    @Override
+    public int hashCode() {
+        return driverId.hashCode();
+    }
 }
