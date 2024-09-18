@@ -58,48 +58,45 @@
 
 <p><br></p>  
 
-### Frontend
-
-- - -
-
-- 상태관리 redux
-
-### Backend
+### Architecture
 
 - - -    
 
-음식 검색
-
-- elastic search
-
-data 수집
-
-- selenium web crawling
+주문/결제 시스템  
+<img src="readme/order_matching_notification.png" alt="Checkout Confirm" style="width:700px; height:500">
+- Transactional Outbox Pattern 으로 신뢰성 있는 카프카 메시지 전달.
+- Reactive 기반 메시지 전송 및 backpressure 기능 구현 (Spring Cloud Stream). 
+- 메시지 전송 Exactly Once Semantic 보장
+    - idempotent kafka producer
+    - TransactionalEventListener 로 database commit 후 메시지 전송.
+    - read_committed kafka consumer
+   
+배달 기사 매칭 시스템 / 유저 알림 시스템
+- 실시간 배달 기사 위치 redis 에 업데이트
+- 주문 승인 이벤트 후 주문 사용자 그룹과 근처 배달기사들 그룹에 이분 매칭 수행
+- jwt 기반 유저 인증, 주문 승인 되거나 배달 기사 매칭 된후 유저에게 알림
 
 쿠폰 발행
-- webflux
-  - [CouponController.java](backend/java/backend/coupon/coupon-app/src/main/java/com/example/couponapp/controller/CouponController.java)
-  - [VerficationService.java](backend/java/backend/coupon/coupon-app/src/main/java/com/example/couponapp/service/VerificationService.java)
+- webflux 기반 서비스
 - reliable kafka, idempotence producer(`acks=1`, `enable-idempotence: true`)
-  - [application.yml](backend/java/backend/coupon/coupon-app/src/main/resources/application.yml)
 - rollback consumer (`enable-auto-commit: false`, manual kafka consumer's `commitSync`)
-  - [application.yml](backend/java/backend/coupon/coupon-service/src/main/resources/application.yml)
-  - [CouponIssueRequestKafkaConsumer](backend/java/backend/coupon/coupon-service/src/main/java/com/example/couponservice/kafka/listener/CouponIssueRequestKafkaConsumer.java)
 - redis 분산락 (`RLockReactive`)
-  - [VerficationService.java](backend/java/backend/coupon/coupon-app/src/main/java/com/example/couponapp/service/VerificationService.java)
 
+카프카 클러스터  
+- 1 주키퍼, 3 브로커, 1 스키마 레지스트리  
 
-결제 시스템
+Elastic Search 간단한 메뉴 검색   
 
-- outbox pattern, debezium
-  - [debezium docker](docker/kafka/postgres_debezium.yml)
-  - [debezium connector](docker/kafka/start-kafka-cluster.sh)
-- kafka
+레스토랑 이미지 및 데이터 수집   
+- Selenium 웹 크롤링
+
+프론트엔드   
+- OAuth2 로그인, 레스토랑 음식/옵션 선택, 장바구니, 토스페이 결제
+- Redux 상태 관리/ thunk 기반 비동기 이벤트 처리
 
 ### Test
 - BDD
 - mocking (service, controller layer)
-  - example: [VerificationServiceTest.java](/backend/java/backend/coupon/coupon-app/src/test/java/com/example/couponapp/service/VerificationServiceTest.java)
 - test container
   - docker compose util: [DockerComposeStarter.java](backend/java/backend/common-util/src/main/java/com/example/commonutil/DockerComposeStarter.java)
     - customized docker compose runner
@@ -121,181 +118,17 @@ data 수집
 
 <p><br></p>   
 
-
-### kube node environment setting
-
-we need docker desktop and enable kubernetes
-
-### build & run order
-
-```shell
-# all micorservices and obersavation apps
-# docker image build with Google Jib added in pom.xml
-<plugin>
-    <groupId>com.google.cloud.tools</groupId>
-    <artifactId>jib-maven-plugin</artifactId>
-    <version>3.3.2</version>
-    <configuration>
-        <to>
-            <image>lomojiki/uber-msa/${project.artifactId}:latest</image>
-        </to>
-    </configuration>
-</plugin>
-
-# for each microservices,
-intellij tab maven -> select service -> Plugins -> jib -> jib:dockerBuild
-
-# image name must be lomojiki/uber-msa/driver
-# Pushing into hub fails if : lomojiki/uber-msa/driver
-push images into hub with a docker desktop
-
-# in values.yaml in each micro service
-# default is IfNotPresent which will search on local image first and then remote.
-# IfNotPresent vs Always
-# https://stackoverflow.com/questions/74006353/difference-between-always-and-ifnotpresent-imagepullpolicy
-image:
-  repository: uber-msa/driver
-  pullPolicy: IfNotPresent
-  tag: ""
-  
-  
-# helm build dependencies & install
-cd environments
-helm dependencies build prod-env
-helm install <cluster-name> prod-env/ 
-helm uninstall <cluster-name>
-
-cd environment
-helm install uber-msa /prod-env
-```
-
-<br/>
-
-### Start order in local IDE environment for dev
-
-1. configserver
-2. eureka
-3. micro services
-4. gateway server
-   <br/>
-
-### Helm
-
-<b> container ports </b>   
-
-create new chart
-
-```shell
-helm create <chart-name>
-```
-
+```yaml
 gateway: 8080
 eurekaserver: 8761
 configserver: 8071   
 eatsorderservice: 8074
-route: 8075
 user: 8077
 driver-service: 8078
 eatssearch: 8079
 schema-registry: 8081
-route(python): 8082
-login: 8083
-driver: 8090
-monitoring: 8091
 coupon-app: 8092
 coupon-service: 8093
-# port must be same.
-
-# helm/.../user/values.yml
-
-containerPort: 8077
-
-service:
-type: ClusterIP
-port: 8077
-targetPort: 8077
----
-
-### Kafka Module Architecture
-
-<b>Dependencies</b>
-
-- KafkaAdminClient, KafkaProducerConfig(KafkaTemplate) <- KafkaProducer/KafkaConsumer <- Apps
-    - KafkaAdminClient contains `createTopic()`
-    - KafkaProducer contains `onAppCreated(ApplicationStartedEvent)` EventListener, which microservice application's
-      spring context will fire on their app started.
-- KafkaConfigData <- Apps
-    - configserver will feed config data into KafkaConfigData object.
-    - because of `@ConfigurationProperties(prefix = "appname")`
-
----
-
-### Note
-
-Module   
-`@ComponentScan(basePackages={"com.example"})` necessary to use shared classes.
-
 ```
-// main pom.xml
-// add new modules
-    <modules>
-        <module>kafka</module>
-        <module>kafka/kafka-model</module>
-        <module>kafka/kafka-admin</module>
-        <module>kafka/kafka-config-data</module>
-        ...
-    </modules>
-// sub modules kafka/pom.xml
-    <parent>
-        <artifactId>uber-msa</artifactId>
-        <groupId>com.example</groupId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-    <artifactId>kafka</artifactId>
-    
-// sub-sub modules... kafka/kafka-model/.../pom.xml
-    <parent>
-        <artifactId>uber-msa</artifactId>
-        <groupId>com.example</groupId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../../pom.xml</relativePath>
-    </parent>
-    <artifactId>kafka-model</artifactId>
-
-```
-
-Domain Driven Design
-
-- Messaging To Dto
-    - CallDataMapper
-
-### Micro Service Setting
-
-1. application apps
-
-- pom.xml
-    - spring cloud config client
-    - eureka client
-    - open feign
-- application.yml
-    - import config server url
-    - eureka server url
-    - actuator setting
-- configserver/app-name.yml setting
-- @ComponentScan in main() **Application.java
-    - must include itself. no Error even though not included.
-    - ``` 
-  // com.example.monitoring
-  @ComponentScan({"com.example.common.data",
-  "com.example.common.config",
-  "com.example.kafka.admin",
-  "com.example.kafka.config.data",
-  "com.example.kafkaconsumer",
-  "com.example.monitoring"} )
-    ```
-
-2. gateway server
-
-- route rules
 
 
