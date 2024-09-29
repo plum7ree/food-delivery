@@ -1,4 +1,4 @@
-package com.example.eatsorderapplication.utils;
+package com.example.eatsorderapplication.application.utils;
 
 
 import com.example.commondata.domain.aggregate.valueobject.Address;

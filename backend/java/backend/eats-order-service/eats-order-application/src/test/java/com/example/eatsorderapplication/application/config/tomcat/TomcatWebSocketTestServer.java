@@ -1,4 +1,4 @@
-package com.example.eatsorderapplication.config.tomcat;
+package com.example.eatsorderapplication.application.config.tomcat;
 
 // ref: https://github.com/rstoyanchev/spring-websocket-portfolio/blob/main/src/test/java/org/springframework/samples/portfolio/web/support/TomcatWebSocketTestServer.java#L46
 

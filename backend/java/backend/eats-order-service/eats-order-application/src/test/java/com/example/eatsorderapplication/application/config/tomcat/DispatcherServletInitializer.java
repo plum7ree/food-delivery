@@ -1,4 +1,4 @@
-package com.example.eatsorderapplication.config.tomcat;
+package com.example.eatsorderapplication.application.config.tomcat;
 
 
 import jakarta.servlet.ServletRegistration;

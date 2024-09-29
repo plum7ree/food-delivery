@@ -1,7 +1,6 @@
 package com.example.eatsorderapplication.application.service.driver;
 
-import com.example.commondata.dto.order.AddressDto;
-import com.example.commondata.dto.order.UserAddressDto;
+import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,9 +13,8 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 public class Matching {
-    UUID orderId;
     @NonNull
-    UserAddressDto address;
+    UserOrderAddressDto userOrderAddress;
     @NonNull
     DriverDetailsDto driver;
 }

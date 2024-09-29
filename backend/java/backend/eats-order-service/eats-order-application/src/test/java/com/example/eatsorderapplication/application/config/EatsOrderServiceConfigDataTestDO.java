@@ -1,4 +1,4 @@
-package com.example.eatsorderapplication.config;
+package com.example.eatsorderapplication.application.config;
 
 import com.example.eatsorderapplication.EatsOrderApplication;
 import com.example.eatsorderconfigdata.EatsOrderServiceConfigData;

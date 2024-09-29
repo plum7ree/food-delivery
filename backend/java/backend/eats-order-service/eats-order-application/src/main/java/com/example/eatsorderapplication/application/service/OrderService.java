@@ -1,7 +1,7 @@
 package com.example.eatsorderapplication.application.service;
 
 import com.example.commondata.dto.order.CreateOrderRequestDto;
-import com.example.commondata.dto.order.UserAddressDto;
+import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.component.AfterCommitEventPublisher;
 import com.example.eatsorderapplication.mappers.Mapper;
 import com.example.eatsorderdataaccess.repository.OrderRepository;
@@ -85,7 +85,7 @@ public class OrderService {
         return orderRepository.findById(orderId);
     }
 
-    public Mono<UserAddressDto> findUserAddressDtoByOrderId(UUID orderId) {
+    public Mono<UserOrderAddressDto> findUserAddressDtoByOrderId(UUID orderId) {
         return orderRepository.findUserAddressDtoByOrderId(orderId);
 
     }

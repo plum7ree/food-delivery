@@ -1,4 +1,4 @@
-package com.example.eatsorderapplication.config;
+package com.example.eatsorderapplication.application.config;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

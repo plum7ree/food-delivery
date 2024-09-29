@@ -1,4 +1,4 @@
-package com.example.eatsorderapplication.config;
+package com.example.eatsorderapplication.application.config;
 
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;

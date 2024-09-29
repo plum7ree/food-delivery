@@ -1,6 +1,6 @@
 package com.example.eatsorderapplication.application.service.driver;
 
-import com.example.commondata.dto.order.UserAddressDto;
+import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
 import org.redisson.api.GeoUnit;
 import org.redisson.api.RGeoReactive;
@@ -29,15 +29,24 @@ public class DriverService {
     public static final Function<String, String> DRIVER_LOCK_KEY =
         _driverId -> String.format("driver:lock:", _driverId);
 
+    private final DriverMatchingStrategy strategy;
+
     public DriverService(RedissonReactiveClient redissonReactiveClient,
-                         RedissonReactiveClient redissonClient) {
+                         @Qualifier("euclideanDistanceStrategy")
+                         DriverMatchingStrategy strategy) {
         this.redissonReactiveClient = redissonReactiveClient;
+        this.strategy = strategy;
     }
 
-    public Mono<Tuple3<Set<DriverDetailsDto>, Set<UserAddressDto>, Set<UserAddressDto>>> getNearbyDriversFromUsers(List<UserAddressDto> userLocations) {
+    public Mono<Tuple3<
+        Set<DriverDetailsDto>,
+        Set<UserOrderAddressDto>,
+        Set<UserOrderAddressDto>>>
+    getNearbyDriversFromUsers(
+        List<UserOrderAddressDto> userLocations) {
         Set<DriverDetailsDto> driverSet = new HashSet<>(); // 중복을 제거할 Set
-        Set<UserAddressDto> successLocations = new HashSet<>(); // 실패한 위치 저장
-        Set<UserAddressDto> failedLocations = new HashSet<>(); // 실패한 위치 저장
+        Set<UserOrderAddressDto> successLocations = new HashSet<>(); // 실패한 위치 저장
+        Set<UserOrderAddressDto> failedLocations = new HashSet<>(); // 실패한 위치 저장
 
         RGeoReactive<DriverDetailsDto> geo = redissonReactiveClient.getGeo(DRIVER_GEO_KEY, new TypedJsonJacksonCodec(DriverDetailsDto.class));
 
@@ -66,10 +75,12 @@ public class DriverService {
 
     }
 
-    public Mono<List<Matching>> performMatching(Tuple2<Set<DriverDetailsDto>, Set<UserAddressDto>> orderEvents) {
+    public Mono<List<Matching>> performMatching(Tuple2<Set<DriverDetailsDto>, Set<UserOrderAddressDto>> orderEvents) {
         // 여기에 매칭 로직을 구현 (orderEvents를 사용하여 드라이버 매칭)
+        var drivers = orderEvents.getT1();
+        var users = orderEvents.getT2();
 
-        return Mono.just(List.of()); // 매칭된 드라이버 리스트 반환 (예시)
+        return strategy.match(users, drivers); // 매칭된 드라이버 리스트 반환 (예시)
     }
 }
 

@@ -3,12 +3,11 @@ package com.example.eatsorderdataaccess.repository;
 import com.example.commondata.domain.aggregate.valueobject.Address;
 import com.example.commondata.domain.events.order.OrderStatus;
 import com.example.commondata.dto.order.AddressDto;
-import com.example.commondata.dto.order.UserAddressDto;
+import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.eatsorderdomain.data.domainentity.OrderItem;
 import org.springframework.r2dbc.core.DatabaseClient;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.reactive.TransactionalOperator;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -117,7 +116,7 @@ public class R2DBCOrderRepository implements OrderRepository {
     }
 
     @Override
-    public Mono<UserAddressDto> findUserAddressDtoByOrderId(UUID orderId) {
+    public Mono<UserOrderAddressDto> findUserAddressDtoByOrderId(UUID orderId) {
         // OrderEntity 를 가져오는 쿼리
         String query = "SELECT t1.id, t1.user_id, t2.street, t2.postal_code, t2.city, t2.lon, t2.lat " +
             "FROM orders t1" +
@@ -127,7 +126,8 @@ public class R2DBCOrderRepository implements OrderRepository {
 
         return databaseClient.sql(query)
             .bind("order_id", orderId)
-            .map(row -> UserAddressDto.builder()
+            .map(row -> UserOrderAddressDto.builder()
+                .orderId(row.get("id", String.class))
                 .userId(row.get("user_id", String.class))
                 .address(AddressDto.builder()
                     .street(row.get("street", String.class))

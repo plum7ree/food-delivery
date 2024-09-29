@@ -1,6 +1,6 @@
 package com.example.eatsorderdataaccess.repository;
 
-import com.example.commondata.dto.order.UserAddressDto;
+import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderdomain.data.domainentity.Order;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +23,6 @@ public interface OrderRepository {
     Mono<Order> findById(UUID id);
 
 
-    Mono<UserAddressDto> findUserAddressDtoByOrderId(UUID orderId);
+    Mono<UserOrderAddressDto> findUserAddressDtoByOrderId(UUID orderId);
 
 }
