@@ -6,8 +6,7 @@ import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
 import com.example.eatsorderapplication.application.service.OrderService;
 import com.example.eatsorderapplication.application.service.driver.DriverService;
 import com.example.eatsorderapplication.application.service.driver.Matching;
-import com.example.kafka.avro.model.DriverMatchingEvent;
-import com.example.kafka.avro.model.RestaurantApprovalNotificationEvent;
+import com.example.kafka.avro.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +15,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.kafka.receiver.ReceiverOffset;
 import reactor.util.function.Tuple2;
@@ -35,13 +35,15 @@ import java.util.function.Supplier;
 @Configuration
 public class DriverMatchingToNotificationProcessorImpl {
 
-    private final int maxWindowCount; // 드라이버 매칭에 필요한 최대 드라이버 수
+    private final Integer maxWindowCount; // 드라이버 매칭에 필요한 최대 드라이버 수
     private final Duration driverWindowMaxInterval; // 최대 기다리는 시간 (10초)
 
     private final DriverService driverService;
     private final OrderService orderService;
 
-    private final ConcurrentHashMap<UUID, Tuple2<Long, Message<DriverMatchingEvent>>> messageMap
+    private final ConcurrentHashMap<
+        UUID,
+        Tuple2<Long, Message<DriverMatchingRequestEvent>>> messageMap
         = new ConcurrentHashMap<>();
 
     private static AtomicLong offsetCounter = new AtomicLong(0);
@@ -51,32 +53,26 @@ public class DriverMatchingToNotificationProcessorImpl {
         Set<UserOrderAddressDto>,
         Set<UserOrderAddressDto>>> getNearbyDriversSink;
 
+    private final Sinks.Many<Matching> matchedResultSink;
+
     public DriverMatchingToNotificationProcessorImpl(
-        @Qualifier("maxWindowCount") int maxWindowCount,
+        @Qualifier("maxWindowCount") Integer maxWindowCount,
         @Qualifier("driverWindowMaxInterval") Duration interval,
         DriverService driverService,
         OrderService orderService,
-        @Qualifier("nearbySink") Sinks.Many<Tuple3<Set<DriverDetailsDto>, Set<UserOrderAddressDto>, Set<UserOrderAddressDto>>> getNearByDriversSink) {
+        @Qualifier("nearbySink") Sinks.Many<Tuple3<
+            Set<DriverDetailsDto>,
+            Set<UserOrderAddressDto>,
+            Set<UserOrderAddressDto>>>
+            getNearByDriversSink,
+        @Qualifier("matchedResult") Sinks.Many<Matching>
+            matchedResultSink) {
         this.maxWindowCount = maxWindowCount;
         this.driverWindowMaxInterval = interval;
         this.driverService = driverService;
         this.orderService = orderService;
         this.getNearbyDriversSink = getNearByDriversSink;
-    }
-
-    @Bean(name = "maxWindowCount")
-    public int count() {
-        return 5;
-    }
-
-    @Bean(name = "driverWindowMaxInterval")
-    public Duration interval() {
-        return Duration.ofSeconds(10);
-    }
-
-    @Bean(name = "nearbySink")
-    public Sinks.Many<Tuple3<Set<DriverDetailsDto>, Set<UserOrderAddressDto>, Set<UserOrderAddressDto>>> getNearByDriversSink() {
-        return Sinks.many().multicast().onBackpressureBuffer();
+        this.matchedResultSink = matchedResultSink;
     }
 
     /**
@@ -88,7 +84,7 @@ public class DriverMatchingToNotificationProcessorImpl {
      * @return
      */
     @Bean
-    public Consumer<Flux<Message<DriverMatchingEvent>>> driverMatchingRequestListener() {
+    public Consumer<Flux<Message<DriverMatchingRequestEvent>>> driverMatchingRequestListener() {
         return flux -> flux
             .map(m -> {
                 var tuple2 = Tuples.of(offsetCounter.incrementAndGet(), m);
@@ -96,7 +92,7 @@ public class DriverMatchingToNotificationProcessorImpl {
                 return m;
             })
             .map(MessageConverter::toRecord)
-            .doOnNext(event -> log.info("Received DriverMatchingEvent: {}", event.message().toString()))
+            .doOnNext(event -> log.info("Received DriverMatchingRequestEvent: {}", event.message().toString()))
             .flatMap(record -> orderService.findUserAddressDtoByOrderId(
                 UUID.fromString(record.message().getCorrelationId().toString())))
             .windowTimeout(maxWindowCount, driverWindowMaxInterval) // maxDriverCount 만큼의 드라이버가 모이거나, interval 이 지나면 매칭 수행
@@ -115,10 +111,11 @@ public class DriverMatchingToNotificationProcessorImpl {
      * @return
      */
     @Bean
-    public Supplier<Flux<Message<RestaurantApprovalNotificationEvent>>> driverMatchingResultPublisher() {
+    public Supplier<Flux<Message<UserNotificationEvent>>> driverMatchedNotificationPublisher() {
         return () -> getNearbyDriversSink.asFlux()
             .flatMap(tuple3 -> driverService.performMatching(Tuples.of(tuple3.getT1(), tuple3.getT2())))
             .flatMap(Flux::fromIterable)
+            .doOnNext(matchedResultSink::tryEmitNext)
             .doOnNext(matching -> {
                 var key = UUID.fromString(matching.getUserOrderAddress().orderId());
 
@@ -140,14 +137,38 @@ public class DriverMatchingToNotificationProcessorImpl {
             .map(this::toMessage);
     }
 
+    @Bean
+    public Supplier<Flux<Message<DriverMatchedEvent>>> driverMatchedEventPublisher() {
+        return () -> matchedResultSink.asFlux()
+            .flatMap(matching -> {
+                var addressDto = matching.getUserOrderAddress().address();
+                var driverDto = matching.getDriver();
+                var message = DriverMatchedEvent.newBuilder()
+                    .setCorrelationId(matching.getUserOrderAddress().orderId())
+                    .setUserId(matching.getUserOrderAddress().userId())
+                    .setAddress(Address.newBuilder()
+                        .setCity(addressDto.getCity())
+                        .setPostalCode(addressDto.getPostalCode())
+                        .setStreet(addressDto.getStreet())
+                        .build())
+                    .setDriverDetails(DriverDetails.newBuilder()
+                        .setDriverId(driverDto.getDriverId())
+                        .setLat(driverDto.getLat())
+                        .setLon(driverDto.getLon())
+                        .build())
+                    .build();
+                return Mono.just(message);
+            })
+            .map(this::toMessage);
+    }
 
     /**
-     * 실패한 DriverMatchingEvent 카프카에 다른 토픽으로 전송
+     * 실패한 DriverMatchingRequestEvent 카프카에 다른 토픽으로 전송
      *
      * @return
      */
     @Bean
-    public Supplier<Flux<Message<DriverMatchingEvent>>> failedDriverMatchingResultPublisher() {
+    public Supplier<Flux<Message<DriverMatchingRequestEvent>>> failedDriverMatchingResultPublisher() {
         return () -> getNearbyDriversSink.asFlux()
             .flatMap(tuple3 -> Flux.fromIterable(tuple3.getT3()))
             .map(userOrderAddressDto -> {
@@ -161,9 +182,9 @@ public class DriverMatchingToNotificationProcessorImpl {
     // 매칭 알고리즘 수행
 
 
-    // 매칭 결과를 RestaurantApprovalNotificationEvent로 변환
-    private Message<RestaurantApprovalNotificationEvent> toMessage(Matching matching) {
-        var notificationEvent = RestaurantApprovalNotificationEvent.newBuilder()
+    // 매칭 결과를 UserNotificationEvent로 변환
+    private Message<UserNotificationEvent> toMessage(Matching matching) {
+        var notificationEvent = UserNotificationEvent.newBuilder()
             .setCorrelationId(matching.getUserOrderAddress().orderId())
             .setUserId(matching.getUserOrderAddress().userId())
             // driverId
@@ -177,7 +198,13 @@ public class DriverMatchingToNotificationProcessorImpl {
             .build();
     }
 
-    private Message<DriverMatchingEvent> toMessage(DriverMatchingEvent event) {
+    private Message<DriverMatchingRequestEvent> toMessage(DriverMatchingRequestEvent event) {
+        return MessageBuilder.withPayload(event)
+            .setHeader(KafkaHeaders.KEY, event.getCorrelationId().toString()) // Order ID를 key로 사용
+            .build();
+    }
+
+    private Message<DriverMatchedEvent> toMessage(DriverMatchedEvent event) {
         return MessageBuilder.withPayload(event)
             .setHeader(KafkaHeaders.KEY, event.getCorrelationId().toString()) // Order ID를 key로 사용
             .build();

@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "DriverMatchingEvent",
+  "name": "DriverMatchingRequestEvent",
   "namespace": "com.example.kafka.avro.model",
   "fields": [
     {

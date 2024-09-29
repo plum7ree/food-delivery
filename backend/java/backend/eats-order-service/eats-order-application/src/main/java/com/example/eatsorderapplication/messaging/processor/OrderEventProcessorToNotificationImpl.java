@@ -14,23 +14,23 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class OrderEventProcessorToNotificationImpl implements OrderEventProcessor<RestaurantApprovalNotificationEvent> {
+public class OrderEventProcessorToNotificationImpl implements OrderEventProcessor<UserNotificationEvent> {
 
     private final OrderService orderService;
 
     @Override
-    public Mono<RestaurantApprovalNotificationEvent> handle(OrderCreated event) {
+    public Mono<UserNotificationEvent> handle(OrderCreated event) {
         return null;
 
     }
 
 
     @Override
-    public Mono<RestaurantApprovalNotificationEvent> handle(OrderApprovedByRestaurant event) {
+    public Mono<UserNotificationEvent> handle(OrderApprovedByRestaurant event) {
         log.info("approved by restaurant handle called");
         return this.orderService.findById(UUID.fromString(event.getOrderId().toString()))
             .flatMap(o ->
-                Mono.just(RestaurantApprovalNotificationEvent.newBuilder()
+                Mono.just(UserNotificationEvent.newBuilder()
                     .setCorrelationId(event.getOrderId())
                     .setUserId(o.getCallerId().toString())
                     .setMessage("order approved")
@@ -48,12 +48,12 @@ public class OrderEventProcessorToNotificationImpl implements OrderEventProcesso
     }
 
     @Override
-    public Mono<RestaurantApprovalNotificationEvent> handle(OrderRejectedByRestaurant event) {
+    public Mono<UserNotificationEvent> handle(OrderRejectedByRestaurant event) {
         return null;
     }
 
     @Override
-    public Mono<RestaurantApprovalNotificationEvent> handle(OrderCompleted event) {
+    public Mono<UserNotificationEvent> handle(OrderCompleted event) {
         return null;
     }
 

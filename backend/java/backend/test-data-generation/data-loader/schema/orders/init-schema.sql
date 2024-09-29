@@ -11,7 +11,7 @@ DROP TABLE IF EXISTS "order".orders CASCADE;
 CREATE TABLE "order".orders
 (
     id            uuid              NOT NULL,
-    customer_id   uuid              NOT NULL,
+    user_id uuid NOT NULL,
     restaurant_id uuid              NOT NULL,
     price         numeric(10, 2)    NOT NULL,
     order_status  character varying NOT NULL,

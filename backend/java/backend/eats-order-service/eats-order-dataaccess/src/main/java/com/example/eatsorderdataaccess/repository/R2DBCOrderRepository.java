@@ -32,7 +32,7 @@ public class R2DBCOrderRepository implements OrderRepository {
     }
 
     private Mono<Long> saveOrder(Order order) {
-        String query = "INSERT INTO orders (id, customer_id, restaurant_id, price, order_status, failure_messages) " +
+        String query = "INSERT INTO orders (id, user_id, restaurant_id, price, order_status, failure_messages) " +
             "VALUES (:id, :customerId, :restaurantId, :price, :orderStatus, :failureMessages)";
 
         return databaseClient.sql(query)
@@ -95,7 +95,7 @@ public class R2DBCOrderRepository implements OrderRepository {
 
     @Override
     public Mono<Order> findById(UUID id) {
-        String query = "SELECT id, customer_id, restaurant_id, price, order_status, failure_messages " +
+        String query = "SELECT id, user_id, restaurant_id, price, order_status, failure_messages " +
             "FROM orders WHERE id = :id";
 
         return databaseClient.sql(query)
@@ -104,7 +104,7 @@ public class R2DBCOrderRepository implements OrderRepository {
 
                     var order = Order.builder()
                         .id(row.get("id", UUID.class))
-                        .callerId(row.get("customer_id", UUID.class))
+                        .callerId(row.get("user_id", UUID.class))
                         .calleeId(row.get("restaurant_id", UUID.class))
                         .price(row.get("price", Double.class))
                         .orderStatus(OrderStatus.valueOf(row.get("order_status", String.class)))
@@ -119,7 +119,7 @@ public class R2DBCOrderRepository implements OrderRepository {
     public Mono<UserOrderAddressDto> findUserAddressDtoByOrderId(UUID orderId) {
         // OrderEntity 를 가져오는 쿼리
         String query = "SELECT t1.id, t1.user_id, t2.street, t2.postal_code, t2.city, t2.lon, t2.lat " +
-            "FROM orders t1" +
+            "FROM orders t1 " +
             "INNER JOIN order_address t2 ON t1.id = t2.order_id " +
             "WHERE t1.id = :order_id";
 

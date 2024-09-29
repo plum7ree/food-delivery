@@ -28,12 +28,15 @@ spring:
 
   cloud:
     function:
-      definition: restaurantApprovalNotificationReceiver
+      definition: restaurantApprovalNotificationReceiver;matchedDriverProcessor
     stream:
       bindings:
-        restaurantApprovalNotificationReceiver-in-0:
-          destination: restaurant-approval-notification
-          group: restaurant-approval-notification-group
+        restaurantApprovalNotificationReceiver-in-0: # 레스토랑 승인 알림, driver 매칭 알림
+          destination: restaurant-approval-notification,driver-matched-notification
+          group: user-notification-group
+        matchedDriverProcessor-in-0: # 특정 사용자에게 배달기사 위치를 지속적으로 보내야함.
+          destination: driver-matched-event
+          group: driver-matched-event-group
       kafka:
         binder:
           brokers: localhost:19092,localhost:29092,localhost:39092

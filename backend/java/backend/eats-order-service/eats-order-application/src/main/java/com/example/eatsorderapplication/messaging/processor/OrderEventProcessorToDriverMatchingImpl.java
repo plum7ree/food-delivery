@@ -14,23 +14,23 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class OrderEventProcessorToDriverMatchingImpl implements OrderEventProcessor<DriverMatchingEvent> {
+public class OrderEventProcessorToDriverMatchingImpl implements OrderEventProcessor<DriverMatchingRequestEvent> {
 
     private final OrderService orderService;
 
     @Override
-    public Mono<DriverMatchingEvent> handle(OrderCreated event) {
+    public Mono<DriverMatchingRequestEvent> handle(OrderCreated event) {
         return null;
 
     }
 
 
     @Override
-    public Mono<DriverMatchingEvent> handle(OrderApprovedByRestaurant event) {
-        log.info("DriverMatchingEvent approved by restaurant handle called");
+    public Mono<DriverMatchingRequestEvent> handle(OrderApprovedByRestaurant event) {
+        log.info("DriverMatchingRequestEvent approved by restaurant handle called");
         return this.orderService.findById(UUID.fromString(event.getOrderId().toString()))
             .flatMap(o ->
-                Mono.just(DriverMatchingEvent.newBuilder()
+                Mono.just(DriverMatchingRequestEvent.newBuilder()
                     .setCorrelationId(event.getOrderId())
                     .setUserId(o.getCallerId().toString())
                     .setCreatedAt(Instant.now())
@@ -38,12 +38,12 @@ public class OrderEventProcessorToDriverMatchingImpl implements OrderEventProces
     }
 
     @Override
-    public Mono<DriverMatchingEvent> handle(OrderRejectedByRestaurant event) {
+    public Mono<DriverMatchingRequestEvent> handle(OrderRejectedByRestaurant event) {
         return null;
     }
 
     @Override
-    public Mono<DriverMatchingEvent> handle(OrderCompleted event) {
+    public Mono<DriverMatchingRequestEvent> handle(OrderCompleted event) {
         return null;
     }
 

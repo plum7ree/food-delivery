@@ -31,7 +31,7 @@ spring:
 
   cloud:
     function:
-      definition: restaurantApprovalSender;restaurantApprovalResponseProcessor;driverMatchingRequestListener;driverMatchingResultPublisher;failedDriverMatchingResultPublisher
+      definition: restaurantApprovalSender;restaurantApprovalResponseProcessor;driverMatchingRequestListener;driverMatchedNotificationPublisher;driverMatchedEventPublisher;failedDriverMatchingResultPublisher
     stream:
       bindings:
         restaurantApprovalSender-out-0:
@@ -46,8 +46,10 @@ spring:
         driverMatchingRequestListener-in-0:
           destination: driver-matching-request,failed-driver-matching-result # failed 된걸 다시 넣어줌.
           group: driver-matching-request-group
-        driverMatchingResultPublisher-out-0:
-          destination: driver-matching-result
+        driverMatchedNotificationPublisher-out-0:
+          destination: driver-matched-notification
+        driverMatchedEventPublisher-out-0:
+          destination: driver-matched-event
         failedDriverMatchingResultPublisher-out-0:
           destination: failed-driver-matching-result
 
@@ -94,7 +96,10 @@ spring:
                 isolation.level: read_committed
                 "auto.offset.reset": "earliest" # 최근 n 개의 메시지를 가져오기 위해 사용
                 "enable.auto.commit": false
-          driverMatchingResultPublisher-out-0:
+          driverMatchedNotificationPublisher-out-0:
+            producer:
+              bufferSize: 14000
+          driverMatchedEventPublisher-out-0:
             producer:
               bufferSize: 14000
           failedDriverMatchingResultPublisher-out-0:

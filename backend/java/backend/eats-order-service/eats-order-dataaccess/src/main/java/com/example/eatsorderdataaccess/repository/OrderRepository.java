@@ -13,7 +13,7 @@ public interface OrderRepository {
 //    // 따라서 조회시 영속성 컨텍스트는 업데이트 되어있는 상태가 아니다.
 //    // 따라서 clearAutomatically 옵션으로 1차 캐시 날려줘야함.
 //    @Modifying(clearAutomatically = true)
-//    @Query(value = "INSERT INTO orders (id, customer_id, restaurant_id, tracking_id, price, order_status, failure_messages) " +
+//    @Query(value = "INSERT INTO orders (id, user_id, restaurant_id, tracking_id, price, order_status, failure_messages) " +
 //        "VALUES (:id, :customerId, :restaurantId, :price, :orderStatus, :failureMessages)",
 //        nativeQuery = true)
     Mono<Order> saveOrderWithDetails(Order order);

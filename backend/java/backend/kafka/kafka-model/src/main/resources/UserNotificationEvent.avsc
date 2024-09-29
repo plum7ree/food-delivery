@@ -1,6 +1,6 @@
 {
   "type": "record",
-  "name": "RestaurantApprovalNotificationEvent",
+  "name": "UserNotificationEvent",
   "namespace": "com.example.kafka.avro.model",
   "fields": [
     {

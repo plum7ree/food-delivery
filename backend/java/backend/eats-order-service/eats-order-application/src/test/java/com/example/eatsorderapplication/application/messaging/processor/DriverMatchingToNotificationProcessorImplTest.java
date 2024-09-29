@@ -5,8 +5,7 @@ import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
 import com.example.eatsorderapplication.application.service.OrderService;
 import com.example.eatsorderapplication.application.service.driver.DriverService;
-import com.example.kafka.avro.model.DriverMatchingEvent;
-import com.example.kafka.avro.model.RestaurantApprovalNotificationEvent;
+import com.example.kafka.avro.model.DriverMatchingRequestEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -55,9 +54,9 @@ class DriverMatchingToNotificationProcessorImplTest {
 
     private DriverMatchingToNotificationProcessorImpl processor;
 
-    private Consumer<Flux<Message<DriverMatchingEvent>>> driverMatchingRequestListener;
-    private Supplier<Flux<Message<RestaurantApprovalNotificationEvent>>> driverMatchingResultPublisher;
-    private Supplier<Flux<Message<DriverMatchingEvent>>> failedDriverMatchingResultPublisher;
+    private Consumer<Flux<Message<DriverMatchingRequestEvent>>> driverMatchingRequestListener;
+    private Supplier<Flux<Message<UserNotificationEvent>>> driverMatchingResultPublisher;
+    private Supplier<Flux<Message<DriverMatchingRequestEvent>>> failedDriverMatchingResultPublisher;
 
     private int maxWindowCount;
     private Duration driverWindowMaxInterval;
@@ -109,13 +108,13 @@ class DriverMatchingToNotificationProcessorImplTest {
         // window 함수 테스트 할 때 주의점: source flux 가 완료되면 window 조건 충족 못해도 다음단계로 넘어감.
         // Given
         var correlationId = UUID.randomUUID().toString();
-        DriverMatchingEvent event = DriverMatchingEvent.newBuilder()
+        DriverMatchingRequestEvent event = DriverMatchingRequestEvent.newBuilder()
             .setCorrelationId(correlationId)
             .setUserId("userId")
             .setCreatedAt(Instant.now())
             .build();
 
-        Message<DriverMatchingEvent> message = MessageBuilder.withPayload(event)
+        Message<DriverMatchingRequestEvent> message = MessageBuilder.withPayload(event)
             .setHeader(KafkaHeaders.KEY, correlationId)
             .build();
 
@@ -128,7 +127,7 @@ class DriverMatchingToNotificationProcessorImplTest {
         when(orderService.findUserAddressDtoByOrderId(UUID.fromString(correlationId))).thenReturn(Mono.just(userOrderAddressDto));
 
         // When
-        Flux<Message<DriverMatchingEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
+        Flux<Message<DriverMatchingRequestEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
         driverMatchingRequestListener.accept(infiniteFlux);
         // driverMatchingRequestListener.accept(Flux.just(message));
 
@@ -141,13 +140,13 @@ class DriverMatchingToNotificationProcessorImplTest {
         setUp2();
         // Given
         var correlationId = UUID.randomUUID().toString();
-        DriverMatchingEvent event = DriverMatchingEvent.newBuilder()
+        DriverMatchingRequestEvent event = DriverMatchingRequestEvent.newBuilder()
             .setCorrelationId(correlationId)
             .setUserId("userId")
             .setCreatedAt(Instant.now())
             .build();
 
-        Message<DriverMatchingEvent> message = MessageBuilder.withPayload(event)
+        Message<DriverMatchingRequestEvent> message = MessageBuilder.withPayload(event)
             .setHeader(KafkaHeaders.KEY, correlationId)
             .build();
 
@@ -160,7 +159,7 @@ class DriverMatchingToNotificationProcessorImplTest {
         when(orderService.findUserAddressDtoByOrderId(UUID.fromString(correlationId))).thenReturn(Mono.just(userOrderAddressDto));
 
         // When
-        Flux<Message<DriverMatchingEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
+        Flux<Message<DriverMatchingRequestEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
         driverMatchingRequestListener.accept(infiniteFlux);
 
         // Then
@@ -174,13 +173,13 @@ class DriverMatchingToNotificationProcessorImplTest {
         // window 함수 테스트 할 때 주의점: source flux 가 완료되면 window 조건 충족 못해도 다음단계로 넘어감.
         // Given
         var correlationId = UUID.randomUUID().toString();
-        DriverMatchingEvent event = DriverMatchingEvent.newBuilder()
+        DriverMatchingRequestEvent event = DriverMatchingRequestEvent.newBuilder()
             .setCorrelationId(correlationId)
             .setUserId("userId")
             .setCreatedAt(Instant.now())
             .build();
 
-        Message<DriverMatchingEvent> message = MessageBuilder.withPayload(event)
+        Message<DriverMatchingRequestEvent> message = MessageBuilder.withPayload(event)
             .setHeader(KafkaHeaders.KEY, correlationId)
             .build();
 
@@ -193,7 +192,7 @@ class DriverMatchingToNotificationProcessorImplTest {
         when(orderService.findUserAddressDtoByOrderId(UUID.fromString(correlationId))).thenReturn(Mono.just(userOrderAddressDto));
 
         // When
-        Flux<Message<DriverMatchingEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
+        Flux<Message<DriverMatchingRequestEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
         driverMatchingRequestListener.accept(infiniteFlux);
         // driverMatchingRequestListener.accept(Flux.just(message));
 
@@ -207,13 +206,13 @@ class DriverMatchingToNotificationProcessorImplTest {
         // window 함수 테스트 할 때 주의점: source flux 가 완료되면 window 조건 충족 못해도 다음단계로 넘어감.
         // Given
         var correlationId = UUID.randomUUID().toString();
-        DriverMatchingEvent event = DriverMatchingEvent.newBuilder()
+        DriverMatchingRequestEvent event = DriverMatchingRequestEvent.newBuilder()
             .setCorrelationId(correlationId)
             .setUserId("userId")
             .setCreatedAt(Instant.now())
             .build();
 
-        Message<DriverMatchingEvent> message = MessageBuilder.withPayload(event)
+        Message<DriverMatchingRequestEvent> message = MessageBuilder.withPayload(event)
             .setHeader(KafkaHeaders.KEY, correlationId)
             .build();
 
@@ -226,7 +225,7 @@ class DriverMatchingToNotificationProcessorImplTest {
         when(orderService.findUserAddressDtoByOrderId(UUID.fromString(correlationId))).thenReturn(Mono.just(userOrderAddressDto));
 
         // When
-        Flux<Message<DriverMatchingEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
+        Flux<Message<DriverMatchingRequestEvent>> infiniteFlux = Flux.concat(Flux.just(message), Flux.never());
         driverMatchingRequestListener.accept(infiniteFlux);
         // driverMatchingRequestListener.accept(Flux.just(message));
 
@@ -239,13 +238,13 @@ class DriverMatchingToNotificationProcessorImplTest {
         setUp1();
         // Given
         var correlationId = UUID.randomUUID().toString();
-        DriverMatchingEvent event = DriverMatchingEvent.newBuilder()
+        DriverMatchingRequestEvent event = DriverMatchingRequestEvent.newBuilder()
             .setCorrelationId(correlationId)
             .setUserId("userId")
             .setCreatedAt(Instant.now())
             .build();
 
-        Message<DriverMatchingEvent> message = MessageBuilder.withPayload(event)
+        Message<DriverMatchingRequestEvent> message = MessageBuilder.withPayload(event)
             .setHeader(KafkaHeaders.KEY, correlationId)
             .build();
 
@@ -297,12 +296,12 @@ class DriverMatchingToNotificationProcessorImplTest {
 //        when(driverService.performMatching(any())).thenReturn(Flux.fromIterable(matchingList));
 //
 //        // When
-//        Flux<Message<RestaurantApprovalNotificationEvent>> publisherFlux = driverMatchingResultPublisher.get();
+//        Flux<Message<UserNotificationEvent>> publisherFlux = driverMatchingResultPublisher.get();
 //
 //        // Then
 //        StepVerifier.create(publisherFlux)
 //                .expectNextMatches(message -> {
-//                    RestaurantApprovalNotificationEvent payload = message.getPayload();
+//                    UserNotificationEvent payload = message.getPayload();
 //                    return payload.getCorrelationId().equals(correlationId.toString()) &&
 //                            payload.getUserId().equals("user123") &&
 //                            payload.getMessage().isEmpty();
@@ -325,7 +324,7 @@ class DriverMatchingToNotificationProcessorImplTest {
 //        // Here, we'll skip detailed implementation due to complexity
 //
 //        // When
-//        Flux<Message<DriverMatchingEvent>> failedFlux = failedDriverMatchingResultPublisher.get();
+//        Flux<Message<DriverMatchingRequestEvent>> failedFlux = failedDriverMatchingResultPublisher.get();
 //
 //        // Then
 //        // Since no failed events are emitted, expect no messages
@@ -336,15 +335,15 @@ class DriverMatchingToNotificationProcessorImplTest {
 //
 //    @Test
 //    void testEndToEndFlow() {
-//        // This test simulates the end-to-end flow from receiving a DriverMatchingEvent to publishing a RestaurantApprovalNotificationEvent
+//        // This test simulates the end-to-end flow from receiving a DriverMatchingRequestEvent to publishing a UserNotificationEvent
 //
 //        // Given
 //        UUID correlationId = UUID.randomUUID();
-//        DriverMatchingEvent matchingEvent = DriverMatchingEvent.newBuilder()
+//        DriverMatchingRequestEvent matchingEvent = DriverMatchingRequestEvent.newBuilder()
 //                .setCorrelationId(correlationId.toString())
 //                .build();
 //
-//        Message<DriverMatchingEvent> message = MessageBuilder.withPayload(matchingEvent)
+//        Message<DriverMatchingRequestEvent> message = MessageBuilder.withPayload(matchingEvent)
 //                .setHeader(KafkaHeaders.KEY, correlationId.toString())
 //                .build();
 //
@@ -367,7 +366,7 @@ class DriverMatchingToNotificationProcessorImplTest {
 //        // When
 //        driverMatchingRequestListener.accept(Flux.just(message));
 //
-//        Flux<Message<RestaurantApprovalNotificationEvent>> publisherFlux = driverMatchingResultPublisher.get();
+//        Flux<Message<UserNotificationEvent>> publisherFlux = driverMatchingResultPublisher.get();
 //
 //        // Then
 //        StepVerifier.create(publisherFlux)

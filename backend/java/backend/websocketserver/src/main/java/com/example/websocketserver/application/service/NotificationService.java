@@ -1,7 +1,6 @@
 package com.example.websocketserver.application.service;
 
 
-import com.example.kafka.avro.model.RestaurantApprovalNotificationEvent;
 import com.example.websocketserver.application.data.dto.DriverDetailsDto;
 import com.example.websocketserver.application.data.dto.NotificationDto;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,13 +36,13 @@ public class NotificationService {
     private final RedissonReactiveClient redissonReactiveClient;
     public static final String DRIVER_GEO_KEY = "drivers:geo";
 
-    private final Sinks.Many<RestaurantApprovalNotificationEvent> generalSink;
+    private final Sinks.Many<UserNotificationEvent> generalSink;
 
     public NotificationService(SimpMessagingTemplate messagingTemplate,
                                ObjectMapper objectMapper,
                                ConcurrentHashMap<String, DriverDetailsDto> driverMatchingMap,
                                RedissonReactiveClient redissonReactiveClient,
-                               @Qualifier("generalSink") Sinks.Many<RestaurantApprovalNotificationEvent> generalSink) {
+                               @Qualifier("generalSink") Sinks.Many<UserNotificationEvent> generalSink) {
         this.messagingTemplate = messagingTemplate;
         this.objectMapper = objectMapper;
         this.driverMatchingMap = driverMatchingMap;
@@ -54,8 +53,8 @@ public class NotificationService {
     @PostConstruct
     public void init() {
         generalSink.asFlux().doOnNext(e -> {
-            if (e instanceof RestaurantApprovalNotificationEvent) {
-                var event = ((RestaurantApprovalNotificationEvent) e);
+            if (e instanceof UserNotificationEvent) {
+                var event = ((UserNotificationEvent) e);
                 sendOrderApprovedNotification(event.getUserId().toString(), ""); // TODO is this async?
             }
         }).subscribe();
