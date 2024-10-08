@@ -183,6 +183,7 @@
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
@@ -202,12 +203,27 @@
                 <artifactId>native-maven-plugin</artifactId>
                 <configuration>
                     <mainClass>com.example.eatsorderapplication.EatsOrderApplication</mainClass>
+
+                    <!--                    <buildArgs>-->
+                    <!--                        <arg>&#45;&#45;initialize-at-run-time=org.slf4j.LoggerFactory</arg>-->
+                    <!--                        <arg>&#45;&#45;initialize-at-run-time=org.slf4j.simple.SimpleLogger</arg>-->
+                    <!--                        <arg>&#45;&#45;initialize-at-run-time=org.slf4j.impl.StaticLoggerBinder</arg>-->
+                    <!--                    </buildArgs>-->
                 </configuration>
 
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <image>
+                        <env>
+                            <BP_NATIVE_IMAGE_BUILD_ARGUMENTS>--trace-class-initialization=ch.qos.logback.classic.Logger
+                            </BP_NATIVE_IMAGE_BUILD_ARGUMENTS>
+                        </env>
+                    </image>
+                </configuration>
+
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
