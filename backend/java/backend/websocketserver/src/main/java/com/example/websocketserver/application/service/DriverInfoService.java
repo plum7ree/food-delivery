@@ -117,7 +117,7 @@ public class DriverInfoService {
     }
 
     public void sendLocationToUser(String userId, DriverDetailsDto driverDetailsDto) {
-        log.info("sendLocationToUser userId: {} driver: {}", userId, driverDetailsDto);
+        log.info("sendLocationToUser  userId: {} driver: {}", userId, driverDetailsDto);
         // 웹소켓을 통해 실시간 알림 전송
         messagingTemplate.convertAndSendToUser(userId, "/queue/driver", driverDetailsDto);
 
