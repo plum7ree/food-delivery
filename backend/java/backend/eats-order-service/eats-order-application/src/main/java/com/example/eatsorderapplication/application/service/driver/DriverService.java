@@ -6,7 +6,7 @@ import org.redisson.api.GeoUnit;
 import org.redisson.api.RGeoReactive;
 import org.redisson.api.RedissonReactiveClient;
 import org.redisson.api.geo.GeoSearchArgs;
-import org.redisson.codec.TypedJsonJacksonCodec;
+import org.redisson.client.codec.StringCodec;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -48,7 +48,7 @@ public class DriverService {
         Set<UserOrderAddressDto> successLocations = new HashSet<>(); // 실패한 위치 저장
         Set<UserOrderAddressDto> failedLocations = new HashSet<>(); // 실패한 위치 저장
 
-        RGeoReactive<DriverDetailsDto> geo = redissonReactiveClient.getGeo(DRIVER_GEO_KEY, new TypedJsonJacksonCodec(DriverDetailsDto.class));
+        RGeoReactive<String> geo = redissonReactiveClient.getGeo(DRIVER_GEO_KEY, new StringCodec());
 
         return Flux.fromIterable(userLocations)
             .flatMap(userAddress -> {
@@ -58,7 +58,8 @@ public class DriverService {
                     .radius(4, GeoUnit.KILOMETERS)
                     .count(50);
 
-                return geo.search(searchArgs)
+                return geo.searchWithPosition(searchArgs)
+                    // Map<String, GeoPosition> 타입
                     .doOnNext(driverDetailsDto -> {
                         successLocations.add(userAddress);
                     })
@@ -67,7 +68,17 @@ public class DriverService {
                         //  kafka consumer 에서 ack 수행 하지 말아야함.
                         failedLocations.add(userAddress);
                     })
-                    .flatMapMany(Flux::fromIterable)
+                    .flatMapMany(driverIdAndGeoPositionMap -> Flux.fromIterable(driverIdAndGeoPositionMap.entrySet()))
+                    .map(driverIdAndGeoPositionEntry -> {
+                        var driverId = driverIdAndGeoPositionEntry.getKey();
+                        var lat = driverIdAndGeoPositionEntry.getValue().getLatitude();
+                        var lon = driverIdAndGeoPositionEntry.getValue().getLongitude();
+                        return DriverDetailsDto.builder()
+                            .driverId(driverId)
+                            .lat(lat)
+                            .lon(lon)
+                            .build();
+                    })
                     .onErrorResume(error -> Mono.empty());
             })
             .collect(() -> driverSet, Set::add) // 결과를 Set에 수집 (중복 제거)

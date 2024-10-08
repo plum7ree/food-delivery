@@ -1,11 +1,11 @@
-package com.example.eatsorderapplication.service.driver;
+package com.example.eatsorderapplication.application.service.driver;
 
 import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
 import com.example.eatsorderapplication.application.service.driver.DriverMatchingStrategy;
 import com.example.eatsorderapplication.application.service.driver.Matching;
 import com.example.eatsorderapplication.application.service.driver.SimpleWeightedEdge;
-import lombok.extern.slf4j.Slf4j;
+//import lombok.extern.slf4j.Slf4j;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MatchingAlgorithm;
 import org.jgrapht.alg.matching.KuhnMunkresMinimalWeightBipartitePerfectMatching;
@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component("euclideanDistanceStrategy")
-@Slf4j
+//@Slf4j
 public class EuclideanDistanceStrategy implements DriverMatchingStrategy {
     private static final int MAX_NEARBY_DRIVERS = 100;
     private static final int LOCK_TIMEOUT = 10; // 10초 타임아웃

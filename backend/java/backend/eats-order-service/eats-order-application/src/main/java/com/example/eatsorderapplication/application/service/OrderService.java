@@ -8,7 +8,7 @@ import com.example.eatsorderdataaccess.repository.OrderRepository;
 import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
 import com.example.eatsorderdomain.data.domainentity.Order;
 import com.example.kafka.avro.model.RestaurantEvent;
-import lombok.extern.slf4j.Slf4j;
+//import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.IntegrationMessageHeaderAccessor;
@@ -25,7 +25,7 @@ import reactor.core.publisher.Sinks;
 import java.util.UUID;
 
 @Configuration
-@Slf4j
+//@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -61,10 +61,10 @@ public class OrderService {
         // 여기에는 domain object 가 존재하면 안됨. 제일 로직 코어에 존재해야함. dto 가 대신 피룡.
         Order order = Mapper.createOrderRequestDtoToOrder(createOrderRequestDto);
         return orderRepository.saveOrderWithDetails(order)
-            .doOnError(error -> log.error("DB error occurred during orderRepository.save: {}", error.getMessage(), error)) // DB 에러 로그
+//            .doOnError(error -> log.error("DB error occurred during orderRepository.save: {}", error.getMessage(), error)) // DB 에러 로그
             .thenReturn(Mapper.orderToRestaurantApprovalOutboxEntity(order))
             .flatMap(restaurantApprovalRequestOutboxRepository::upsert)
-            .doOnError(error -> log.error("DB error occurred during restaurantApprovalRequestOutboxRepository::upsert: {}", error.getMessage(), error)) // DB 에러 로그
+//            .doOnError(error -> log.error("DB error occurred during restaurantApprovalRequestOutboxRepository::upsert: {}", error.getMessage(), error)) // DB 에러 로그
             .then(afterCommitEventPublisher.publishEvent(Mapper.orderToRequestRestaurantApprovalEvent(order)))
             .then();
     }

@@ -19,9 +19,9 @@ public class Address extends org.apache.avro.specific.SpecificRecordBase impleme
 
   public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Address\",\"namespace\":\"com.example.kafka.avro.model\",\"fields\":[{\"name\":\"street\",\"type\":\"string\"},{\"name\":\"city\",\"type\":\"string\"},{\"name\":\"postalCode\",\"type\":\"string\"}]}");
 
-    public static org.apache.avro.Schema getClassSchema() {
-        return SCHEMA$;
-    }
+  public static org.apache.avro.Schema getClassSchema() {
+    return SCHEMA$;
+  }
 
   private static final SpecificData MODEL$ = new SpecificData();
 
@@ -102,26 +102,26 @@ public class Address extends org.apache.avro.specific.SpecificRecordBase impleme
 
   @Override
   public org.apache.avro.specific.SpecificData getSpecificData() {
-      return MODEL$;
+    return MODEL$;
   }
 
   @Override
   public org.apache.avro.Schema getSchema() {
-      return SCHEMA$;
+    return SCHEMA$;
   }
 
   // Used by DatumWriter.  Applications should not call.
   @Override
   public java.lang.Object get(int field$) {
     switch (field$) {
-        case 0:
-            return street;
-        case 1:
-            return city;
-        case 2:
-            return postalCode;
-        default:
-            throw new IndexOutOfBoundsException("Invalid index: " + field$);
+      case 0:
+        return street;
+      case 1:
+        return city;
+      case 2:
+        return postalCode;
+      default:
+        throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -130,17 +130,17 @@ public class Address extends org.apache.avro.specific.SpecificRecordBase impleme
   @SuppressWarnings(value = "unchecked")
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
-        case 0:
-            street = (java.lang.CharSequence) value$;
-            break;
-        case 1:
-            city = (java.lang.CharSequence) value$;
-            break;
-        case 2:
-            postalCode = (java.lang.CharSequence) value$;
-            break;
-        default:
-            throw new IndexOutOfBoundsException("Invalid index: " + field$);
+      case 0:
+        street = (java.lang.CharSequence) value$;
+        break;
+      case 1:
+        city = (java.lang.CharSequence) value$;
+        break;
+      case 2:
+        postalCode = (java.lang.CharSequence) value$;
+        break;
+      default:
+        throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
 
@@ -426,9 +426,9 @@ public class Address extends org.apache.avro.specific.SpecificRecordBase impleme
   private static final org.apache.avro.io.DatumWriter<Address>
       WRITER$ = (org.apache.avro.io.DatumWriter<Address>) MODEL$.createDatumWriter(SCHEMA$);
 
-    @Override
-    public void writeExternal(java.io.ObjectOutput out)
-        throws java.io.IOException {
+  @Override
+  public void writeExternal(java.io.ObjectOutput out)
+      throws java.io.IOException {
     WRITER$.write(this, SpecificData.getEncoder(out));
   }
 
@@ -436,20 +436,20 @@ public class Address extends org.apache.avro.specific.SpecificRecordBase impleme
   private static final org.apache.avro.io.DatumReader<Address>
       READER$ = (org.apache.avro.io.DatumReader<Address>) MODEL$.createDatumReader(SCHEMA$);
 
-    @Override
-    public void readExternal(java.io.ObjectInput in)
-        throws java.io.IOException {
+  @Override
+  public void readExternal(java.io.ObjectInput in)
+      throws java.io.IOException {
     READER$.read(this, SpecificData.getDecoder(in));
   }
 
-    @Override
-    protected boolean hasCustomCoders() {
-        return true;
-    }
+  @Override
+  protected boolean hasCustomCoders() {
+    return true;
+  }
 
-    @Override
-    public void customEncode(org.apache.avro.io.Encoder out)
-        throws java.io.IOException {
+  @Override
+  public void customEncode(org.apache.avro.io.Encoder out)
+      throws java.io.IOException {
     out.writeString(this.street);
 
     out.writeString(this.city);
@@ -458,34 +458,34 @@ public class Address extends org.apache.avro.specific.SpecificRecordBase impleme
 
   }
 
-    @Override
-    public void customDecode(org.apache.avro.io.ResolvingDecoder in)
-        throws java.io.IOException {
+  @Override
+  public void customDecode(org.apache.avro.io.ResolvingDecoder in)
+      throws java.io.IOException {
     org.apache.avro.Schema.Field[] fieldOrder = in.readFieldOrderIfDiff();
     if (fieldOrder == null) {
-        this.street = in.readString(this.street instanceof Utf8 ? (Utf8) this.street : null);
+      this.street = in.readString(this.street instanceof Utf8 ? (Utf8) this.street : null);
 
-        this.city = in.readString(this.city instanceof Utf8 ? (Utf8) this.city : null);
+      this.city = in.readString(this.city instanceof Utf8 ? (Utf8) this.city : null);
 
-        this.postalCode = in.readString(this.postalCode instanceof Utf8 ? (Utf8) this.postalCode : null);
+      this.postalCode = in.readString(this.postalCode instanceof Utf8 ? (Utf8) this.postalCode : null);
 
     } else {
       for (int i = 0; i < 3; i++) {
         switch (fieldOrder[i].pos()) {
-            case 0:
-                this.street = in.readString(this.street instanceof Utf8 ? (Utf8) this.street : null);
-                break;
+          case 0:
+            this.street = in.readString(this.street instanceof Utf8 ? (Utf8) this.street : null);
+            break;
 
-            case 1:
-                this.city = in.readString(this.city instanceof Utf8 ? (Utf8) this.city : null);
-                break;
+          case 1:
+            this.city = in.readString(this.city instanceof Utf8 ? (Utf8) this.city : null);
+            break;
 
-            case 2:
-                this.postalCode = in.readString(this.postalCode instanceof Utf8 ? (Utf8) this.postalCode : null);
-                break;
+          case 2:
+            this.postalCode = in.readString(this.postalCode instanceof Utf8 ? (Utf8) this.postalCode : null);
+            break;
 
-            default:
-                throw new java.io.IOException("Corrupt ResolvingDecoder.");
+          default:
+            throw new java.io.IOException("Corrupt ResolvingDecoder.");
         }
       }
     }

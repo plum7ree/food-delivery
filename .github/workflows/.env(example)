@@ -1,0 +1,4 @@
+DOCKER_USERNAME=your_docker_username
+DOCKER_HUB_ACCESS_TOKEN=your_docker_password
+ARGOCD_SERVER=your_argocd_server
+ARGOCD_AUTH_TOKEN=your_argocd_auth_token

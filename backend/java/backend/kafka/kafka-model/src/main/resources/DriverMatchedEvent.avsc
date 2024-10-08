@@ -8,6 +8,11 @@
       "type": "string"
     },
     {
+      "name": "type",
+      // MATCHED, CANCELLED, DELIVERY_COMPLETED
+      "type": "string"
+    },
+    {
       "name": "userId",
       "type": "string"
     },

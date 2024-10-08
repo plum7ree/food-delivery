@@ -3,7 +3,7 @@ package com.example.eatsorderapplication.messaging.processor;
 import com.example.eatsorderapplication.application.service.OrderService;
 import com.example.kafka.avro.model.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+//import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 
 @Service
-@Slf4j
+//@Slf4j
 @RequiredArgsConstructor
 public class OrderEventProcessorToDriverMatchingImpl implements OrderEventProcessor<DriverMatchingRequestEvent> {
 
@@ -27,7 +27,7 @@ public class OrderEventProcessorToDriverMatchingImpl implements OrderEventProces
 
     @Override
     public Mono<DriverMatchingRequestEvent> handle(OrderApprovedByRestaurant event) {
-        log.info("DriverMatchingRequestEvent approved by restaurant handle called");
+//        log.info("DriverMatchingRequestEvent approved by restaurant handle called");
         return this.orderService.findById(UUID.fromString(event.getOrderId().toString()))
             .flatMap(o ->
                 Mono.just(DriverMatchingRequestEvent.newBuilder()

@@ -4,7 +4,8 @@ import com.example.commondata.message.MessageConverter;
 import com.example.eatsorderapplication.messaging.processor.OrderEventProcessor;
 import com.example.kafka.avro.model.DriverMatchingRequestEvent;
 import com.example.kafka.avro.model.OrderEvent;
-import lombok.extern.slf4j.Slf4j;
+import com.example.kafka.avro.model.UserNotificationEvent;
+//import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -18,7 +19,7 @@ import reactor.util.function.Tuples;
 import java.util.Objects;
 import java.util.function.Function;
 
-@Slf4j
+//@Slf4j
 @Configuration
 public class Processors {
 
@@ -42,7 +43,7 @@ public class Processors {
             Flux<Tuple2<Message<UserNotificationEvent>, Message<DriverMatchingRequestEvent>>> processedFlux =
                 flux.map(MessageConverter::toRecord)
                     .filter(Objects::nonNull)  // null 값 필터링
-                    .doOnNext(r -> log.info("approval event received {}", r.message()))
+//                    .doOnNext(r -> log.info("approval event received {}", r.message()))
                     .flatMap(r -> Mono.zip(
                         userNotificationEventProcessor.process(r.message()),  // 첫 번째 이벤트 프로세서
                         DriverMatchingRequestEventProcessor.process(r.message())    // 두 번째 이벤트 프로세서

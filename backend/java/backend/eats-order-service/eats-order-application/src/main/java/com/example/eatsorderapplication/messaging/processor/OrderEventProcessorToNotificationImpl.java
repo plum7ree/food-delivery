@@ -3,7 +3,6 @@ package com.example.eatsorderapplication.messaging.processor;
 import com.example.eatsorderapplication.application.service.OrderService;
 import com.example.kafka.avro.model.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -12,7 +11,6 @@ import java.util.UUID;
 
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class OrderEventProcessorToNotificationImpl implements OrderEventProcessor<UserNotificationEvent> {
 
@@ -27,7 +25,7 @@ public class OrderEventProcessorToNotificationImpl implements OrderEventProcesso
 
     @Override
     public Mono<UserNotificationEvent> handle(OrderApprovedByRestaurant event) {
-        log.info("approved by restaurant handle called");
+
         return this.orderService.findById(UUID.fromString(event.getOrderId().toString()))
             .flatMap(o ->
                 Mono.just(UserNotificationEvent.newBuilder()

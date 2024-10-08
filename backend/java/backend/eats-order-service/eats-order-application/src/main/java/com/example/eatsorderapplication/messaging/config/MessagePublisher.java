@@ -4,7 +4,7 @@ import com.example.commondata.domain.events.order.OutboxStatus;
 import com.example.eatsorderdataaccess.repository.RestaurantApprovalRequestOutboxRepository;
 import com.example.kafka.avro.model.RestaurantEvent;
 import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+//import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 @Configuration
-@Slf4j
+//@Slf4j
 public class MessagePublisher {
 
     private final RestaurantApprovalRequestOutboxRepository restaurantApprovalRequestOutboxRepository;
@@ -41,7 +41,7 @@ public class MessagePublisher {
         @Qualifier("restaurantApprovalSinks") Sinks.Many<Message<RestaurantEvent>> sender) {
         return () -> sender.asFlux()
             .onErrorContinue((err, obj) -> {
-                log.error("requestRestaurantApproval: e: {}", err.getMessage() != null ? err.getMessage() : "failed to send eventMessage", err);
+//                log.error("requestRestaurantApproval: e: {}", err.getMessage() != null ? err.getMessage() : "failed to send eventMessage", err);
             });
     }
 
@@ -56,9 +56,9 @@ public class MessagePublisher {
     @ServiceActivator(inputChannel = "requestRestaurantApprovalSendResultChannel")
     public void receiveSendResult(SenderResult<String> results) {
         if (results.exception() != null) {
-            log.error("sendEventMessage", results.exception().getMessage() != null
-                ? results.exception().getMessage()
-                : "receive an exception for event message send.", results.exception());
+//            log.error("sendEventMessage", results.exception().getMessage() != null
+//                ? results.exception().getMessage()
+//                : "receive an exception for event message send.", results.exception());
         }
 
         sendResult.emitNext(results, Sinks.EmitFailureHandler.FAIL_FAST);
@@ -78,8 +78,8 @@ public class MessagePublisher {
                         OutboxStatus.FAILED);
                 }
             })
-            .onErrorContinue((err, obj) -> log.error("handleSendResult",
-                err.getMessage() != null ? err.getMessage() : "failed to mark the outbox message.", err))
+//            .onErrorContinue((err, obj) -> log.error("handleSendResult",
+//                err.getMessage() != null ? err.getMessage() : "failed to mark the outbox message.", err))
             .subscribeOn(Schedulers.newSingle("handle-send-result-event-message"))
             .subscribe();
     }

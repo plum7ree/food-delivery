@@ -7,7 +7,7 @@ import com.example.eatsorderapplication.application.service.OrderService;
 import com.example.eatsorderapplication.application.service.driver.DriverService;
 import com.example.eatsorderapplication.application.service.driver.Matching;
 import com.example.kafka.avro.model.*;
-import lombok.extern.slf4j.Slf4j;
+//import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-@Slf4j
+//@Slf4j
 @Configuration
 public class DriverMatchingToNotificationProcessorImpl {
 
@@ -46,6 +46,8 @@ public class DriverMatchingToNotificationProcessorImpl {
         Tuple2<Long, Message<DriverMatchingRequestEvent>>> messageMap
         = new ConcurrentHashMap<>();
 
+    // commitAsync 이기 때문에 commit 순서 보장을 하기 위한 테크닉.
+    // 현재까지 받은 메시지중 가장 마지막 메시지만 ack 부르면 된다.
     private static AtomicLong offsetCounter = new AtomicLong(0);
 
     private final Sinks.Many<Tuple3<
@@ -92,7 +94,7 @@ public class DriverMatchingToNotificationProcessorImpl {
                 return m;
             })
             .map(MessageConverter::toRecord)
-            .doOnNext(event -> log.info("Received DriverMatchingRequestEvent: {}", event.message().toString()))
+//            .doOnNext(event -> log.info("Received DriverMatchingRequestEvent: {}", event.message().toString()))
             .flatMap(record -> orderService.findUserAddressDtoByOrderId(
                 UUID.fromString(record.message().getCorrelationId().toString())))
             .windowTimeout(maxWindowCount, driverWindowMaxInterval) // maxDriverCount 만큼의 드라이버가 모이거나, interval 이 지나면 매칭 수행

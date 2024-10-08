@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBatchReactive;
 import org.redisson.api.RGeoReactive;
 import org.redisson.api.RedissonReactiveClient;
+import org.redisson.client.codec.StringCodec;
 import org.redisson.codec.TypedJsonJacksonCodec;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -64,15 +65,12 @@ public class DriverSimulationService {
     public void sendLocation() {
         // 매번 새로운 배치와 geo 객체를 생성
         RBatchReactive batch = redissonReactiveClient.createBatch();
-        RGeoReactive<DriverDetailsDto> geo = batch.getGeo(DRIVER_GEO_KEY, new TypedJsonJacksonCodec(DriverDetailsDto.class));
+        // driverId 만 저장하며, lat, lon 은 어짜피 add 시 넣어줘야한다.
+        // 만일 driver 에 대한 더 자세한 정보는 다른 hash 을 만들어서 거기서 동일한 driverId 로 다시 조회하자.
+        RGeoReactive<String> geo = batch.getGeo(DRIVER_GEO_KEY, new StringCodec());
 
         driverSimulationObjectList.stream().forEach(driverDomainEntity -> {
-            DriverDetailsDto driverDetailsDto = DriverDetailsDto.builder()
-                .driverId(String.valueOf(driverDomainEntity.getId()))
-                .lat(driverDomainEntity.getLat())
-                .lon(driverDomainEntity.getLon())
-                .build();
-            geo.add(driverDomainEntity.getLon(), driverDomainEntity.getLat(), driverDetailsDto);
+            geo.add(driverDomainEntity.getLon(), driverDomainEntity.getLat(), String.valueOf(driverDomainEntity.getId()));
         });
 
         batch.execute()
