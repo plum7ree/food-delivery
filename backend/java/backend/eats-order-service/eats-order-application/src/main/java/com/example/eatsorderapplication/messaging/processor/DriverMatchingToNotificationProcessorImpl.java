@@ -1,13 +1,16 @@
 package com.example.eatsorderapplication.messaging.processor;
 
+import com.example.commondata.domain.events.order.DriverMatchedStatus;
 import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.commondata.message.MessageConverter;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
 import com.example.eatsorderapplication.application.service.OrderService;
+import com.example.eatsorderapplication.application.service.driver.Candidate;
 import com.example.eatsorderapplication.application.service.driver.DriverService;
 import com.example.eatsorderapplication.application.service.driver.Matching;
 import com.example.kafka.avro.model.*;
 //import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-//@Slf4j
+@Slf4j
 @Configuration
 public class DriverMatchingToNotificationProcessorImpl {
 
@@ -50,9 +53,8 @@ public class DriverMatchingToNotificationProcessorImpl {
     // 현재까지 받은 메시지중 가장 마지막 메시지만 ack 부르면 된다.
     private static AtomicLong offsetCounter = new AtomicLong(0);
 
-    private final Sinks.Many<Tuple3<
-        Set<DriverDetailsDto>,
-        Set<UserOrderAddressDto>,
+    private final Sinks.Many<Tuple2<
+        Set<Candidate>,
         Set<UserOrderAddressDto>>> getNearbyDriversSink;
 
     private final Sinks.Many<Matching> matchedResultSink;
@@ -62,9 +64,8 @@ public class DriverMatchingToNotificationProcessorImpl {
         @Qualifier("driverWindowMaxInterval") Duration interval,
         DriverService driverService,
         OrderService orderService,
-        @Qualifier("nearbySink") Sinks.Many<Tuple3<
-            Set<DriverDetailsDto>,
-            Set<UserOrderAddressDto>,
+        @Qualifier("nearbySink") Sinks.Many<Tuple2<
+            Set<Candidate>,
             Set<UserOrderAddressDto>>>
             getNearByDriversSink,
         @Qualifier("matchedResult") Sinks.Many<Matching>
@@ -79,9 +80,8 @@ public class DriverMatchingToNotificationProcessorImpl {
 
     /**
      * TODO 1. geo.search failed 난 것들은 kafka failed queue 로 잘 가는지.
-     *  2. driver matching 할때 레디스에 락을 어떻게 걸어야하는지. 락이 실패할경우 리트라이? 전략은?
-     *  최종적으로 실패한 애들은 dlq? 내 생각에 지역별로 하나의 매칭 알고리즘만 있는게 좋을것같다.
-     *  3. commitAsync 이기 때문에 중복된 메시지 재발행시 멱등성 보장해야함.
+     *  2. 지역별 파티셔닝
+     *  3. 카프카에서 중복된 메시지 다시 읽는 다면 멱등성 체크.
      *
      * @return
      */
@@ -101,7 +101,10 @@ public class DriverMatchingToNotificationProcessorImpl {
             .flatMap(window -> window
                 .collectList()
                 .filter(list -> !list.isEmpty()) // 리스트가 비어 있지 않을 때만 처리
-                .flatMap(driverService::getNearbyDriversFromUsers))
+                .flatMap(driverService::getNearbyDriversFromUsers)
+                .flatMap(tuple2 -> driverService.filterDriversWithoutLock(tuple2.getT1(), tuple2.getT2()))
+            )
+
             .doOnNext(getNearbyDriversSink::tryEmitNext) // Sink에 퍼블리시
             .subscribe();
 
@@ -115,8 +118,13 @@ public class DriverMatchingToNotificationProcessorImpl {
     @Bean
     public Supplier<Flux<Message<UserNotificationEvent>>> driverMatchedNotificationPublisher() {
         return () -> getNearbyDriversSink.asFlux()
-            .flatMap(tuple3 -> driverService.performMatching(Tuples.of(tuple3.getT1(), tuple3.getT2())))
+            // 현재 candidate set 에는 {user1, driver1}, {user1, driver2}, {user2, driver3}
+            .flatMap(tuple2 -> driverService.performMatching(tuple2.getT1()))
+            .doOnNext(matchings -> log.info("matching successful: {}", matchings))
+            // TODO tryLock 구현. 레디스 하나만 쓰면 동시성문제가 없으므로 여러 드라이버와 유저를 한번에 전부 안겹치게 락을 걸 수 있다.
+            //  만일 클러스터를 쓴다면? 락 시도 실패하면 재시도를 해야하나?
             .flatMap(Flux::fromIterable)
+            .flatMap(driverService::tryLock)
             .doOnNext(matchedResultSink::tryEmitNext)
             .doOnNext(matching -> {
                 var key = UUID.fromString(matching.getUserOrderAddress().orderId());
@@ -146,6 +154,7 @@ public class DriverMatchingToNotificationProcessorImpl {
                 var addressDto = matching.getUserOrderAddress().address();
                 var driverDto = matching.getDriver();
                 var message = DriverMatchedEvent.newBuilder()
+                    .setStatus(DriverMatchedStatus.MATCHED.name())
                     .setCorrelationId(matching.getUserOrderAddress().orderId())
                     .setUserId(matching.getUserOrderAddress().userId())
                     .setAddress(Address.newBuilder()
@@ -158,6 +167,7 @@ public class DriverMatchingToNotificationProcessorImpl {
                         .setLat(driverDto.getLat())
                         .setLon(driverDto.getLon())
                         .build())
+                    .setCreatedAt(Instant.now())
                     .build();
                 return Mono.just(message);
             })
@@ -172,7 +182,7 @@ public class DriverMatchingToNotificationProcessorImpl {
     @Bean
     public Supplier<Flux<Message<DriverMatchingRequestEvent>>> failedDriverMatchingResultPublisher() {
         return () -> getNearbyDriversSink.asFlux()
-            .flatMap(tuple3 -> Flux.fromIterable(tuple3.getT3()))
+            .flatMap(tuple3 -> Flux.fromIterable(tuple3.getT2()))
             .map(userOrderAddressDto -> {
                 var key = UUID.fromString(userOrderAddressDto.orderId());
                 var message = messageMap.get(key).getT2();

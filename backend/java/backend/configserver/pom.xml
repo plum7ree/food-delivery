@@ -35,7 +35,23 @@
                     </to>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.example.configserver.ConfigserverApplication</mainClass>
+                    <buildArgs>
+                        <!-- SftpFileSystemProvider를 런타임에 초기화 -->
+                        <!--                        <buildArg>&#45;&#45;initialize-at-run-time=org.apache.sshd.sftp.client.fs.SftpFileSystemProvider-->
+                        <!--                        </buildArg>-->
+                        <!-- 객체 인스턴스화 추적 로그 활성화 -->
+                        <buildArg>--trace-object-instantiation=org.apache.sshd.sftp.client.fs.SftpFileSystemProvider
+                        </buildArg>
+                        <!-- 예외 스택트레이스 보고 활성화 -->
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                    </buildArgs>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

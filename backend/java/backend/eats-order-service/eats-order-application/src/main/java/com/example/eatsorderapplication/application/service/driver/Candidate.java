@@ -12,7 +12,7 @@ import java.util.Objects;
 @Data
 @Builder
 @AllArgsConstructor
-public class Matching {
+public class Candidate {
     @NonNull
     UserOrderAddressDto userOrderAddress;
     @NonNull
@@ -22,7 +22,7 @@ public class Matching {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Matching that = (Matching) o;
+        Candidate that = (Candidate) o;
         return userOrderAddress.userId().equals(that.getUserOrderAddress().userId()) &&
             userOrderAddress.orderId().equals(that.getUserOrderAddress().orderId()) &&
             driver.getDriverId().equals(that.getDriver().getDriverId());

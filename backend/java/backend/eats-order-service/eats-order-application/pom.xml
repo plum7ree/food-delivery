@@ -52,6 +52,7 @@
             <groupId>io.confluent</groupId>
             <artifactId>kafka-avro-serializer</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>payment-service</artifactId>

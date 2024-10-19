@@ -8,7 +8,7 @@
       "type": "string"
     },
     {
-      "name": "type",
+      "name": "status",
       // MATCHED, CANCELLED, DELIVERY_COMPLETED
       "type": "string"
     },

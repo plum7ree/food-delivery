@@ -51,7 +51,8 @@ spring:
             consumer:
               configuration:
                 isolation.level: read_committed
-                "auto.offset.reset": "earliest" # 최근 n 개의 메시지를 가져오기 위해 사용
+                #                "auto.offset.reset": "earliest" # 최근 n 개의 메시지를 가져오기 위해 사용
+                "auto.offset.reset": "latest" # 최근 n 개의 메시지를 가져오기 위해 사용
                 "enable.auto.commit": true
 
 eureka:

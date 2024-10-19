@@ -7,6 +7,9 @@ logging:
     org.springframework.kafka: ERROR
     kafka: ERROR
     state.change.logger: ERROR
+    io.confluent.kafka: ERROR
+
+
 
 spring:
   application:

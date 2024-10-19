@@ -4,7 +4,6 @@ package com.example.websocketserver.application.service;
 import com.example.commondata.domain.events.order.DriverMatchedStatus;
 import com.example.kafka.avro.model.DriverMatchedEvent;
 import com.example.websocketserver.application.data.dto.DriverDetailsDto;
-import com.example.websocketserver.application.data.dto.NotificationDto;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +62,8 @@ public class DriverInfoService {
 
     private void handleDriverMatchedEvent(DriverMatchedEvent event) {
         String userId = event.getUserId().toString();
-        if (event.getType() == DriverMatchedStatus.MATCHED.name()) {
+        DriverMatchedStatus status = DriverMatchedStatus.valueOf(event.getStatus().toString());
+        if (status == DriverMatchedStatus.MATCHED) {
             // 배달 매칭 이벤트: map에 추가 또는 업데이트
             var driver = event.getDriverDetails();
             DriverDetailsDto driverDetails = DriverDetailsDto.builder()
@@ -72,13 +72,13 @@ public class DriverInfoService {
                 .lon(driver.getLon())
                 .build();
             driverMatchingMap.put(userId, driverDetails);
-            System.out.println("매칭 추가/업데이트: userId=" + userId + ", driverId=" + driverDetails.getDriverId());
-        } else if (event.getType() == DriverMatchedStatus.DELIVERY_COMPLETED.name()) {
+            log.info("매칭 추가/업데이트: userId={} driverId={}", userId, driverDetails.getDriverId());
+        } else if (status == DriverMatchedStatus.DELIVERY_COMPLETED) {
+
             // 배달 완료 이벤트: map에서 제거
             driverMatchingMap.remove(userId);
-            System.out.println("배달 완료로 매칭 제거: userId=" + userId);
-        } else if (event.getType() == DriverMatchedStatus.CANCELLED.name()) {
-
+            log.info("배달 완료로 매칭 제거: userId={}", userId);
+        } else if (status == DriverMatchedStatus.CANCELLED) {
         }
     }
 
@@ -100,9 +100,12 @@ public class DriverInfoService {
             .then();
     }
 
+    // getGeo 에서 드라이버가 더이상 레디스에 존재하지 않는 경우 에러를 방출함: filter(map->!map.isEmpty()) 로 해결
+    // TODO 카프카에서 구독 못하게 하려면 어떻게하지.. 현재도 latest + read_commited + enable.auto.commit 인데.
     public Mono<DriverDetailsDto> getDriverLocation(String driverId) {
         RGeoReactive<String> geo = redissonReactiveClient.getGeo(DRIVER_GEO_KEY, new StringCodec());
         return geo.pos(driverId)
+            .filter(map -> !map.isEmpty())
             .map(map -> {
                 var entry = map.entrySet().iterator().next();
                 var _driverId = entry.getKey();
@@ -117,8 +120,8 @@ public class DriverInfoService {
     }
 
     public void sendLocationToUser(String userId, DriverDetailsDto driverDetailsDto) {
-        log.info("sendLocationToUser  userId: {} driver: {}", userId, driverDetailsDto);
         // 웹소켓을 통해 실시간 알림 전송
+        log.info("sendLocationToUser: {} {}", userId, driverDetailsDto);
         messagingTemplate.convertAndSendToUser(userId, "/queue/driver", driverDetailsDto);
 
     }

@@ -2,13 +2,8 @@ package com.example.eatsorderapplication.application.service.driver;
 
 import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
-import com.example.eatsorderapplication.application.service.driver.DriverMatchingStrategy;
-import com.example.eatsorderapplication.application.service.driver.Matching;
-import com.example.eatsorderapplication.application.service.driver.SimpleWeightedEdge;
-//import lombok.extern.slf4j.Slf4j;
 import org.jgrapht.Graph;
 import org.jgrapht.alg.interfaces.MatchingAlgorithm;
-import org.jgrapht.alg.matching.KuhnMunkresMinimalWeightBipartitePerfectMatching;
 import org.jgrapht.alg.matching.MaximumWeightBipartiteMatching;
 import org.jgrapht.graph.SimpleWeightedGraph;
 import org.springframework.stereotype.Component;
@@ -39,44 +34,43 @@ public class EuclideanDistanceStrategy implements DriverMatchingStrategy {
      * @return
      */
     @Override
-    public Mono<List<Matching>> match(Set<UserOrderAddressDto> users, Set<DriverDetailsDto> drivers) {
+    public Mono<List<Matching>> match(Set<Candidate> candidates) {
 
         Graph<String, SimpleWeightedEdge> biGraph = new SimpleWeightedGraph<>(SimpleWeightedEdge.class);
 
         Set<String> uSet = new HashSet<>(); // users
         Set<String> vSet = new HashSet<>(); // drivers
 
-        users.stream()
-            .map(UserOrderAddressDto::userId)
-            .forEach(userId -> {
+        // 매칭된 userId, driverId 에 대해 쉽게 검색용.
+        HashMap<String, UserOrderAddressDto> tempUsersMap = new HashMap<>();
+        HashMap<String, DriverDetailsDto> tempDriversMap = new HashMap<>();
+
+        candidates
+            .forEach(candidate -> {
+                var userAddressDto = candidate.getUserOrderAddress();
+                var driverDetailsDto = candidate.getDriver();
+                var userId = userAddressDto.userId();
+                var driverId = driverDetailsDto.getDriverId();
                 uSet.add(userId);
-                biGraph.addVertex(userId);
-            });
-
-        drivers.stream()
-            .map(DriverDetailsDto::getDriverId)
-            .forEach(driverId -> {
                 vSet.add(driverId);
+                biGraph.addVertex(userId);
                 biGraph.addVertex(driverId);
-            });
 
-        drivers.forEach(driverDetailsDto -> {
-            users.forEach(userAddressDto -> {
                 double driverLatitude = driverDetailsDto.getLat();
                 double driverLongitude = driverDetailsDto.getLon();
+
                 double addressLatitude = userAddressDto.address().getLat();
                 double addressLongitude = userAddressDto.address().getLon();
 
-                // 맨하탄 거리 계산
-                String u = userAddressDto.userId();
-                String v = driverDetailsDto.getDriverId();
-                // 적도 기준 위경도 거리.
                 double manhattanDistanceInMeter = MANHANTTAN_MAX - (Math.abs(addressLatitude - driverLatitude) * 111320 + Math.abs(addressLongitude - driverLongitude) * 111320);
-                SimpleWeightedEdge edge = biGraph.addEdge(u, v);
+                SimpleWeightedEdge edge = biGraph.addEdge(userId, driverId);
                 biGraph.setEdgeWeight(edge, manhattanDistanceInMeter);
+
+                tempUsersMap.put(userId, userAddressDto);
+                tempDriversMap.put(driverId, driverDetailsDto);
+
             });
 
-        });
 
         // Kuhn-Munkres 알고리즘 실행
         // 조건: equally sized partition 이여야함. O(V^3)
@@ -93,22 +87,12 @@ public class EuclideanDistanceStrategy implements DriverMatchingStrategy {
             matchingAlgorithm.getMatching();
 
 
-        HashMap<String, UserOrderAddressDto> usersMap = new HashMap<>();
-        HashMap<String, DriverDetailsDto> driversMap = new HashMap<>();
-
-        drivers.stream().forEach(e -> {
-            driversMap.put(e.getDriverId(), e);
-        });
-        users.stream().forEach(e -> {
-            usersMap.put(e.userId(), e);
-        });
-
         return Mono.just(result.getEdges().stream().map(e -> {
             var userId = e.getSource();
             var driverId = e.getTarget();
 
-            var userOrderAddressDto = usersMap.get(userId);
-            var driverDto = driversMap.get(driverId);
+            var userOrderAddressDto = tempUsersMap.get(userId);
+            var driverDto = tempDriversMap.get(driverId);
 
 
             return Matching.builder()

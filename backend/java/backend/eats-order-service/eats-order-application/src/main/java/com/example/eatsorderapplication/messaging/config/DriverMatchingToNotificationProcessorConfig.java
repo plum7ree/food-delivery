@@ -2,10 +2,12 @@ package com.example.eatsorderapplication.messaging.config;
 
 import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
+import com.example.eatsorderapplication.application.service.driver.Candidate;
 import com.example.eatsorderapplication.application.service.driver.Matching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Sinks;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
 import java.time.Duration;
@@ -24,7 +26,7 @@ public class DriverMatchingToNotificationProcessorConfig {
     }
 
     @Bean(name = "nearbySink")
-    public Sinks.Many<Tuple3<Set<DriverDetailsDto>, Set<UserOrderAddressDto>, Set<UserOrderAddressDto>>> getNearByDriversSink() {
+    public Sinks.Many<Tuple2<Set<Candidate>, Set<UserOrderAddressDto>>> getNearByDriversSink() {
         return Sinks.many().multicast().onBackpressureBuffer();
     }
 

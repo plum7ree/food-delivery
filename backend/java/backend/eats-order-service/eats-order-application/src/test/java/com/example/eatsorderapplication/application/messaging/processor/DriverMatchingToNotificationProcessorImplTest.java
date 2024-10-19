@@ -1,11 +1,15 @@
-package com.example.eatsorderapplication.messaging.processor;
+package com.example.eatsorderapplication.application.messaging.processor;
 
 import com.example.commondata.dto.order.AddressDto;
 import com.example.commondata.dto.order.UserOrderAddressDto;
 import com.example.eatsorderapplication.application.dto.DriverDetailsDto;
 import com.example.eatsorderapplication.application.service.OrderService;
+import com.example.eatsorderapplication.application.service.driver.Candidate;
 import com.example.eatsorderapplication.application.service.driver.DriverService;
+import com.example.eatsorderapplication.application.service.driver.Matching;
+import com.example.eatsorderapplication.messaging.processor.DriverMatchingToNotificationProcessorImpl;
 import com.example.kafka.avro.model.DriverMatchingRequestEvent;
+import com.example.kafka.avro.model.UserNotificationEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -17,6 +21,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
@@ -46,16 +51,16 @@ class DriverMatchingToNotificationProcessorImplTest {
     private OrderService orderService;
 
     @Mock
-    private Sinks.Many<Tuple3<
-        Set<DriverDetailsDto>,
-        Set<UserOrderAddressDto>,
-        Set<UserOrderAddressDto>>> getNearbyDriversSink;
-
-
+    private Sinks.Many<Tuple2<
+            Set<Candidate>,
+            Set<UserOrderAddressDto>>> getNearbyDriversSink;
+    @Mock
+    private Sinks.Many<Matching>
+        matchedResultSink;
     private DriverMatchingToNotificationProcessorImpl processor;
 
     private Consumer<Flux<Message<DriverMatchingRequestEvent>>> driverMatchingRequestListener;
-    private Supplier<Flux<Message<UserNotificationEvent>>> driverMatchingResultPublisher;
+    private Supplier<Flux<Message<UserNotificationEvent>>> driverMatchedNotificationPublisher;
     private Supplier<Flux<Message<DriverMatchingRequestEvent>>> failedDriverMatchingResultPublisher;
 
     private int maxWindowCount;
@@ -67,9 +72,10 @@ class DriverMatchingToNotificationProcessorImplTest {
             driverWindowMaxInterval,
             driverService,
             orderService,
-            getNearbyDriversSink);
+            getNearbyDriversSink,
+            matchedResultSink);
         driverMatchingRequestListener = processor.driverMatchingRequestListener();
-        driverMatchingResultPublisher = processor.driverMatchingResultPublisher();
+        driverMatchedNotificationPublisher = processor.driverMatchedNotificationPublisher();
         failedDriverMatchingResultPublisher = processor.failedDriverMatchingResultPublisher();
 
     }
@@ -254,26 +260,25 @@ class DriverMatchingToNotificationProcessorImplTest {
             .address(AddressDto.builder().build())
             .build();
 
-        Set<DriverDetailsDto> t1 = new HashSet<>();
+        Set<Candidate> t1 = new HashSet<>();
         Set<UserOrderAddressDto> t2 = new HashSet<>();
-        Set<UserOrderAddressDto> t3 = new HashSet<>();
 
 
         when(orderService.findUserAddressDtoByOrderId(UUID.fromString(correlationId)))
             .thenReturn(Mono.just(userOrderAddressDto));
         when(driverService.getNearbyDriversFromUsers(any()))
-            .thenReturn(Mono.just(Tuples.of(t1, t2, t3)));
+            .thenReturn(Mono.just(Tuples.of(t1, t2)));
 
         // When
         driverMatchingRequestListener.accept(Flux.just(message));
 
         // Then
-        ArgumentCaptor<Tuple3<Set<DriverDetailsDto>, Set<UserOrderAddressDto>, Set<UserOrderAddressDto>>> captor =
-            ArgumentCaptor.forClass(Tuple3.class);
+        ArgumentCaptor<Tuple2<Set<Candidate>, Set<UserOrderAddressDto>>> captor =
+            ArgumentCaptor.forClass(Tuple2.class);
 
         verify(getNearbyDriversSink, timeout(1000)).tryEmitNext(captor.capture());
 
-        Tuple3<Set<DriverDetailsDto>, Set<UserOrderAddressDto>, Set<UserOrderAddressDto>> capturedTuple = captor.getValue();
+        Tuple2<Set<Candidate>, Set<UserOrderAddressDto>> capturedTuple = captor.getValue();
 
         assertNotNull(capturedTuple, "Captured Tuple3 should not be null");
 //        assertEquals(driverDetails, capturedTuple.getT1(), "DriverDetailsDto set should match");

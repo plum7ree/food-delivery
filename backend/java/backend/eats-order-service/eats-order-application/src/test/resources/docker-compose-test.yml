@@ -35,13 +35,24 @@ services:
     depends_on:
       - eurekaserver
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    restart: always
+    #    hostname: coupon-redis # hostname 을 comment 처리 해도, coupon-app 실행하면 coupon-redis 로 url해야 연결됨.
+    command: redis-server --loglevel debug
+    networks:
+      - test-network
+
   #TODO config server 가 제대로 동작하는지 테스트 필요한듯. 현재는 모든 설정은 마이크로 서비스에서 관리
   configserver:
     image: lomojiki/uber-msa-configserver
     container_name: configserver
     ports:
       - "8071:8071"
-    restart: always
+    #    restart: always
     networks:
       - test-network
 
@@ -52,7 +63,7 @@ services:
       - "8761:8761"
     networks:
       - test-network
-    restart: always
+    #    restart: always
     depends_on:
       - configserver
 
@@ -201,18 +212,6 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-broker-1:9092,kafka-broker-2:9092,kafka-broker-3:9092
     networks:
       - test-network
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-    restart: always
-    #    hostname: coupon-redis # hostname 을 comment 처리 해도, coupon-app 실행하면 coupon-redis 로 url해야 연결됨.
-    command: redis-server --loglevel debug
-    networks:
-      - test-network
-
 networks:
   test-network:
     driver: bridge
