@@ -4,7 +4,7 @@ import com.example.commondata.dto.order.CreateOrderRequestDto;
 import com.example.commondata.dto.order.OptionDto;
 import com.example.commondata.dto.order.OrderItemDto;
 import com.example.commondata.dto.order.PaymentDto;
-import com.example.user.data.dto.AddressDto;
+import com.example.user.data.dto.web.AddressDto;
 import com.example.user.service.AccountService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,8 +28,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -171,7 +169,7 @@ public class PayController {
 
         // User 정보 가져옴.
         var sub = Objects.requireNonNull(headers.get("X-Auth-User-Sub")).get(0);
-        var accountEntity = accountService.getUserByOauth2Subject(sub);
+        var accountEntity = accountService.getUserByEmail(sub);
 
         // 성공시 eats order service 에게 승인 요청해야함.
         String userId = accountEntity.get().getId();

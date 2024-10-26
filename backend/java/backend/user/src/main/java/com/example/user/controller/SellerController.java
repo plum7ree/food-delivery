@@ -1,8 +1,8 @@
 package com.example.user.controller;
 
 
-import com.example.user.data.dto.RestaurantDto;
-import com.example.user.data.dto.RestaurantTypeEnum;
+import com.example.user.data.dto.web.RestaurantDto;
+import com.example.user.data.dto.web.RestaurantTypeEnum;
 import com.example.user.data.repository.AccountRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.service.ImageService;

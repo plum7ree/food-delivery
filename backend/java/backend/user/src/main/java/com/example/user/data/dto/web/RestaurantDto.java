@@ -1,4 +1,4 @@
-package com.example.user.data.dto;
+package com.example.user.data.dto.web;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

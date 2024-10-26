@@ -1,4 +1,4 @@
-package com.example.user.data.dto;
+package com.example.user.data.dto.web;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ public class UserDto {
     private String username;
     private String profilePicUrl;
     @JsonIgnore
-    private String password;
+    private String encryptedPassword;
 
     @JsonIgnore
     private String role;

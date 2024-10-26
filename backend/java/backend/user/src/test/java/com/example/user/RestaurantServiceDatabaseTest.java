@@ -1,6 +1,6 @@
 package com.example.user;
 
-import com.example.user.data.dto.*;
+import com.example.user.data.dto.web.*;
 import com.example.user.data.repository.MenuRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.service.RestaurantService;

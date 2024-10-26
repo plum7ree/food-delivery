@@ -1,6 +1,5 @@
-package com.example.user.data.dto;
+package com.example.user.data.dto.web;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

@@ -17,6 +17,9 @@ spring:
     import: "optional:configserver:http://configserver:8071/"
   profiles:
     active: "default"
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   cloud:
     gateway:
       httpclient:

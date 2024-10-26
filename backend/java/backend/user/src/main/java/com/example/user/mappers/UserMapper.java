@@ -1,7 +1,7 @@
 package com.example.user.mappers;
 
-import com.example.user.data.dto.AddressDto;
-import com.example.user.data.dto.UserDto;
+import com.example.user.data.dto.web.AddressDto;
+import com.example.user.data.dto.web.UserDto;
 import com.example.user.data.entity.Account;
 import com.example.user.data.entity.Address;
 import org.mapstruct.Mapper;
@@ -12,6 +12,7 @@ import java.util.UUID;
 @Mapper(componentModel = "spring", imports = UUID.class)
 public interface UserMapper {
     @Mapping(target = "id", expression = "java(UUID.fromString(userDto.getId()))")
+    @Mapping(target = "password", expression = "java(userDto.getEncryptedPassword())")
     Account userDtoToAccount(UserDto userDto);
 
     @Mapping(target = "id", expression = "java(account.getId().toString())")

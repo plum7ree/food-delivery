@@ -1,8 +1,7 @@
 package com.example.user.controller;
 
-import com.example.user.data.dto.RestaurantDto;
-import com.example.user.data.dto.RestaurantTypeEnum;
-import com.example.user.data.entity.Comment;
+import com.example.user.data.dto.web.RestaurantDto;
+import com.example.user.data.dto.web.RestaurantTypeEnum;
 import com.example.user.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/restaurant")

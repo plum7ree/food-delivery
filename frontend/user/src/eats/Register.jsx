@@ -37,7 +37,7 @@ const Register = () => {
       e.preventDefault();
       setError('');
       try {
-         const response = await axios.post(SERVER_URL + '/user/api/register', formData, {
+         const response = await axios.post(SERVER_URL + '/user/api/oauth2/register', formData, {
             headers: {
                Authorization: `Bearer ${credential}`,
                'Content-Type': 'application/json',

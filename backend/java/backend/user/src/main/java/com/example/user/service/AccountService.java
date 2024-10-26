@@ -1,7 +1,7 @@
 package com.example.user.service;
 
-import com.example.user.data.dto.AddressDto;
-import com.example.user.data.dto.UserDto;
+import com.example.user.data.dto.web.AddressDto;
+import com.example.user.data.dto.web.UserDto;
 import com.example.user.data.entity.Account;
 import com.example.user.data.entity.Address;
 import com.example.user.data.repository.AccountRepository;
@@ -28,9 +28,9 @@ public class AccountService {
     private final AddressRepository addressRepository;
     private final UserMapper userMapper;
 
-    public Optional<UserDto> getUserByOauth2Subject(String sub) {
+    public Optional<UserDto> getUserByEmail(String email) {
         try {
-            return accountRepository.findByOauth2Sub(sub).map(userMapper::accountEntityToUser
+            return accountRepository.findByEmail(email).map(userMapper::accountEntityToUser
             );
         } catch (Exception exception) {
             return Optional.empty();

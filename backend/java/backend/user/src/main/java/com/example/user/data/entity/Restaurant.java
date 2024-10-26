@@ -1,6 +1,6 @@
 package com.example.user.data.entity;
 
-import com.example.user.data.dto.RestaurantTypeEnum;
+import com.example.user.data.dto.web.RestaurantTypeEnum;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

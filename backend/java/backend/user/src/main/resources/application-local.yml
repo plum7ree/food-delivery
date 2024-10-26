@@ -14,8 +14,6 @@ spring:
     name: "user"
   autoconfigure:
   #    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration # We don't need a datasource yet
-  config:
-    import: "optional:configserver:http://localhost:8071/" # For default and 'native' profile, config will be fetched from config server
   cloud:
     openfeign:
       circuitbreaker:
@@ -37,13 +35,13 @@ spring:
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
-  #  sql:
-  #    init:
-  #      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
-  #      mode: always
-  #      platform: postgres
-  #      schema-locations: classpath:users/init-schema.sql
-  #      data-locations: classpath:users/init-data.sql
+  sql:
+    init:
+      #      #TODO: "mode: always + hibernate.ddl-auto: none" 로 설정해야 스크립트가 실행된다. hibernate.ddl-auto: none 과 같이.
+      mode: always
+      platform: postgres
+      schema-locations: classpath:users/init-schema.sql
+      # data-locations: classpath:users/init-data.sql
   data:
     redis-server: redis://localhost:6379
 
@@ -98,3 +96,4 @@ eureka:
 eats-order-service:
   create-order:
     uri: http://localhost:8074/api/createorder
+

@@ -1,7 +1,7 @@
 package com.example.user.service;
 
 
-import com.example.user.data.dto.*;
+import com.example.user.data.dto.web.*;
 import com.example.user.data.entity.*;
 import com.example.user.data.repository.MenuRepository;
 import com.example.user.data.repository.OptionGroupRepository;

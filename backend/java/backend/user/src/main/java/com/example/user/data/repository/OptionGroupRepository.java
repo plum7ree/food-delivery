@@ -1,7 +1,7 @@
 package com.example.user.data.repository;
 
 
-import com.example.user.data.dto.OptionGroupDto;
+import com.example.user.data.dto.web.OptionGroupDto;
 import com.example.user.data.entity.OptionGroup;
 import com.example.user.data.entity.QOptionGroup;
 import com.querydsl.core.types.Projections;

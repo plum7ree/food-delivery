@@ -5,6 +5,15 @@ CREATE SCHEMA user_schema;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp" SCHEMA user_schema;
 
+-- refresh token
+CREATE TABLE user_schema.refresh_token
+(
+    email      VARCHAR(255) NOT NULL UNIQUE,
+    value      VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP    NOT NULL,
+    updated_at TIMESTAMP    NOT NULL
+);
+
 -- users
 CREATE TABLE user_schema.account
 (
@@ -32,8 +41,8 @@ CREATE TABLE user_schema.restaurant
     picture_url1 character varying COLLATE pg_catalog."default",
     picture_url2 character varying COLLATE pg_catalog."default",
     picture_url3 character varying COLLATE pg_catalog."default",
-    created_at   TIMESTAMP NOT NULL,
-    updated_at   TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
     CONSTRAINT restaurant_pkey PRIMARY KEY (id),
     CONSTRAINT fk_account_id FOREIGN KEY (account_id) REFERENCES user_schema.account (id)
 );

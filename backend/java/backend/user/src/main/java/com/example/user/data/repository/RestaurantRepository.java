@@ -1,7 +1,7 @@
 package com.example.user.data.repository;
 
-import com.example.user.data.dto.RestaurantDto;
-import com.example.user.data.dto.RestaurantTypeEnum;
+import com.example.user.data.dto.web.RestaurantDto;
+import com.example.user.data.dto.web.RestaurantTypeEnum;
 import com.example.user.data.entity.QRestaurant;
 import com.example.user.data.entity.Restaurant;
 import com.querydsl.core.types.Projections;

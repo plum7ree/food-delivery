@@ -2,8 +2,8 @@ package com.example.user.service;
 
 import com.example.commonawsutil.s3.GeneratePresignedGetUrlAndRetrieve;
 import com.example.commonawsutil.s3.UrlUtils;
-import com.example.user.data.dto.MenuDto;
-import com.example.user.data.dto.RestaurantDto;
+import com.example.user.data.dto.web.MenuDto;
+import com.example.user.data.dto.web.RestaurantDto;
 import com.example.user.data.repository.AccountRepository;
 import com.example.user.data.repository.RestaurantRepository;
 import lombok.extern.slf4j.Slf4j;

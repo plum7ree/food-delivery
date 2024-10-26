@@ -1,4 +1,4 @@
-package com.example.user.data.dto;
+package com.example.user.data.dto.web;
 
 public class RiderServiceRecordDto {
 }

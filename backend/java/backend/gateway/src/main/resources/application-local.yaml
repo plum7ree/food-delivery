@@ -15,6 +15,9 @@ spring:
     name: "gateway"
   config:
     import: "optional:configserver:http://localhost:8071/"
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   cloud:
     gateway:
       httpclient:
@@ -38,6 +41,7 @@ jwt:
     '[https://accounts.google.com]': "https://www.googleapis.com/oauth2/v3/certs"
     '[https://www.facebook.com]': "https://www.facebook.com/.well-known/jwks.json"
     # 다른 Issuer들에 대한 JWKS URI 추가
+
 
 lb-uri-config:
   # websocket lb uri ref: https://github.com/jmlw/websocket-spring-gateway-demo/blob/master/gateway/src/main/java/com/joshmlwood/gateway/configuration/RouteLocatorConfiguration.java
@@ -76,4 +80,3 @@ logging:
   level:
     com.example.gateway: INFO
     org.springframework.cloud.gateway: TRACE
-

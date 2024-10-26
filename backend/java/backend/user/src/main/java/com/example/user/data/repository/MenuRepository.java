@@ -1,7 +1,6 @@
 package com.example.user.data.repository;
 
-import com.example.user.data.dto.MenuDto;
-import com.example.user.data.dto.RestaurantDto;
+import com.example.user.data.dto.web.MenuDto;
 import com.example.user.data.entity.Menu;
 import com.example.user.data.entity.QMenu;
 import com.example.user.data.entity.QRestaurant;
@@ -10,11 +9,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.print.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

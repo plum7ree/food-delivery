@@ -1,8 +1,8 @@
 package com.example.user;
 
-import com.example.user.data.dto.MenuDto;
-import com.example.user.data.dto.RestaurantDto;
-import com.example.user.data.dto.RestaurantTypeEnum;
+import com.example.user.data.dto.web.MenuDto;
+import com.example.user.data.dto.web.RestaurantDto;
+import com.example.user.data.dto.web.RestaurantTypeEnum;
 import com.example.user.data.entity.Restaurant;
 import com.example.user.data.repository.RestaurantRepository;
 import com.example.user.service.RestaurantService;

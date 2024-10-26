@@ -1,6 +1,5 @@
-package com.example.user.data.dto;
+package com.example.user.data.dto.web;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,10 @@ public class RegisterUserDto {
     private String city;
     private String street;
     private String postalCode;
+    private String email;
+    private String profile_pic_url;
     private String username;
+    private String password;
     // Getters and setters
 
     // ...
