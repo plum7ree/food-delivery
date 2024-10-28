@@ -17,12 +17,11 @@ import {CheckoutSuccessPage} from "./eats/checkout/CheckoutSuccessPage";
 import {CheckoutFailPage} from "./eats/checkout/CheckoutFailPage";
 import RestaurantListFromSearch from "./eats/RestaurantListFromSearch";
 import {useDispatch, useSelector} from "react-redux";
-import Login from "./Login";
+import Login from "./login/Login";
 import Register from "./eats/Register";
 import {asyncGetAuth} from "./state/authSlice";
 import {toast, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import DriverMap from "./eats/driver/DriverMap";
 
 const IconContainer = styled(Box)({
    display: "flex",
@@ -55,11 +54,11 @@ const IconWrapper = styled(Box)({
  * React-Redux의 useSelector 훅:
  * useSelector는 Redux 스토어의 상태를 구독합니다. 선택된 상태가 변경될 때마다 컴포넌트를 다시 렌더링합니다.
  * 상태 변경 감지:
- * Redux 스토어에서 isLoggedIn 상태가 변경되면, useSelector가 이를 감지합니다.
+ * Redux 스토어에서 userdetails 상태가 변경되면, useSelector가 이를 감지합니다.
  * 컴포넌트 리렌더링:
  * 상태 변경이 감지되면, React는 PrivateRoute 컴포넌트를 리렌더링합니다.
  * 조건부 렌더링:
- * 리렌더링 시 새로운 isLoggedIn 값에 따라 적절한 내용(자식 컴포넌트 또는 리다이렉트)을 렌더링합니다.
+ * 리렌더링 시 새로운 userdetails 값에 따라 적절한 내용(자식 컴포넌트 또는 리다이렉트)을 렌더링합니다.
  *
  * @param children
  * @returns {*|React.JSX.Element}
@@ -67,7 +66,7 @@ const IconWrapper = styled(Box)({
  */
 const PrivateRoute = ({children}) => {
    const getAuthStatus = useSelector((state) => state.auth.getAuthStatus);
-   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+   const userdetails = useSelector((state) => state.auth.userdetails);
 
    if (getAuthStatus === 'pending') {
       console.log('pending')
@@ -81,7 +80,7 @@ const PrivateRoute = ({children}) => {
    }
 
    if (getAuthStatus === 'fulfilled') {
-      return isLoggedIn ? children : <Navigate to="/login"/>;
+      return userdetails ? children : <Navigate to="/login"/>;
    }
 };
 const router = createBrowserRouter([
@@ -101,36 +100,9 @@ const router = createBrowserRouter([
       path: "/",
       element: (
          <PrivateRoute>
-            <Grid container display="flex" justifyContent="center" alignItems="center">
-               <Grid container style={{justifyContent: "flex-center", flexDirection: "column"}}>
-                  <Typography style={{fontSize: "2.5rem", fontWeight: "bold", marginBottom: "2rem"}}>
-                     Choose a Service
-                  </Typography>
-               </Grid>
-               <Grid container style={{justifyContent: "flex-end", flexDirection: "column"}}>
-                  <IconContainer>
-                     <IconLink to="/uber">
-                        <IconWrapper>
-                           <FaCar/>
-                        </IconWrapper>
-                        <Typography variant="h5">Taxi</Typography>
-                     </IconLink>
-                     <IconLink to="/eats">
-                        <IconWrapper>
-                           <FaUtensils/>
-                        </IconWrapper>
-                        <Typography variant="h5">Delivery</Typography>
-                     </IconLink>
-                  </IconContainer>
-               </Grid>
-            </Grid>
 
          </PrivateRoute>
       ),
-   },
-   {
-      path: "/uber",
-      element: <UberLikeApp/>,
    },
    {
       path: "/eats",
@@ -181,7 +153,7 @@ const router = createBrowserRouter([
 
 export default function App() {
    const dispatch = useDispatch();
-   const isLoggedIn = useSelector((state) => state.auth?.isLoggedIn ?? false);
+   const userdetails = useSelector((state) => state.auth?.userdetails ?? false);
    const credential = useSelector((state) => state.auth?.credential ?? null);
    const getAuthStatus = useSelector((state) => state.auth.getAuthStatus);
 
@@ -192,31 +164,30 @@ export default function App() {
    }, [dispatch, getAuthStatus]);
 
    useEffect(() => {
-      if (isLoggedIn && credential) {
+      if (userdetails && credential) {
          dispatch({type: 'notifications/connect'});
       }
 
       return () => {
          dispatch({type: 'notifications/disconnect'});
       };
-   }, [isLoggedIn, credential, dispatch]);
+   }, [userdetails, credential, dispatch]);
 
 
    useEffect(() => {
-      if (isLoggedIn && credential) {
+      if (userdetails && credential) {
          dispatch({type: 'notifications/connect'});
       }
 
       return () => {
          dispatch({type: 'notifications/disconnect'});
       };
-   }, [isLoggedIn, credential, dispatch]);
+   }, [userdetails, credential, dispatch]);
 
    return (
       <>
          <RouterProvider router={router}/>
-         <DriverMap />
-         <ToastContainer autoClose={2000} stacked />
+         <ToastContainer autoClose={2000} stacked/>
       </>
    );
 }

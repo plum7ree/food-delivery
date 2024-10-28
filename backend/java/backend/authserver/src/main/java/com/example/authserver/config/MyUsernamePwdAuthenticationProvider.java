@@ -1,4 +1,4 @@
-package com.example.user.config;
+package com.example.authserver.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class MyUsernamePwdAuthenticationProvider implements AuthenticationProvider {
+
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
@@ -23,7 +24,6 @@ public class MyUsernamePwdAuthenticationProvider implements AuthenticationProvid
         String pwd = authentication.getCredentials().toString();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if (passwordEncoder.matches(pwd, userDetails.getPassword())) {
-            // Fetch Age details and perform validation to check if age >18
             return new UsernamePasswordAuthenticationToken(username, pwd, userDetails.getAuthorities());
         } else {
             throw new BadCredentialsException("Invalid password!");

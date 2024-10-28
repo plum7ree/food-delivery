@@ -33,7 +33,7 @@
 //             params[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
 //          }
 //          if (Object.keys(params).length > 0 && params['state']) {
-//             if (params['state'] == localStorage.getItem('state')) {
+//             if (params['state'] == sessionStorage.getItem('state')) {
 //                // param 생김새
 //                // access_token:""
 //                // authuser:"0"

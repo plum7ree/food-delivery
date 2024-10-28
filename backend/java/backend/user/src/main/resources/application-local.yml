@@ -18,6 +18,12 @@ spring:
     openfeign:
       circuitbreaker:
         enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9000/oauth2/jwks  # 인증 서버의 JWK Set URI
+
   jpa:
     #TODO: none 으로 설정해야 init-x.sql 스크립트로 실행된 테이블이 drop 안된다.
     hibernate.ddl-auto: none

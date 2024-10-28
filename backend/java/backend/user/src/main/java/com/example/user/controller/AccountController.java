@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import org.springframework.security.core.Authentication;
+
 @Slf4j
 @RestController
 @RequestMapping("/account")
@@ -43,15 +45,11 @@ public class AccountController {
      * @throws ParseException
      */
     @GetMapping("/info")
-    public ResponseEntity<UserDto> getUserInfo(@RequestHeader HttpHeaders headers) throws ParseException {
-
-        log.info("headers: {}", headers);
-//        var oauth2LoginTypeEmail = Objects.requireNonNull(headers.get("X-Auth-User-Email")).get(0);
-//
-//        return accountService.getUserByEmail(oauth2LoginTypeEmail)
-//            .map(ResponseEntity::ok)
-//            .orElse(ResponseEntity.badRequest().body(null));
-        return ResponseEntity.ok(UserDto.builder().build());
+    public ResponseEntity<UserDto> getUserInfo(Authentication authentication, @RequestHeader HttpHeaders headers) throws ParseException {
+        var email = authentication.getName();
+        var account = accountService.getUserByEmail(email);
+        log.info(account.get().toString());
+        return account.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.badRequest().body(null));
 
     }
 }

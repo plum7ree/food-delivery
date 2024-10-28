@@ -192,6 +192,7 @@ helm create <chart-name>
 gateway: 8080
 eurekaserver: 8761
 configserver: 8071   
+authserver: 9000
 eatsorderservice: 8074
 route: 8075
 user: 8077

@@ -1,13 +1,11 @@
 package com.example.gateway.config;
 
-import com.example.gateway.security.JwtVerificationFilter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
@@ -45,8 +43,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(
-        ServerHttpSecurity http,
-        JwtVerificationFilter jwtVerificationFilter) {
+        ServerHttpSecurity http) {
         http
             .cors(corsSpec -> corsSpec.configurationSource(corsConfigurationSource()))
 //                .cors(cors->cors.disable())
@@ -55,7 +52,8 @@ public class SecurityConfig {
                 .pathMatchers(
                     "/ws/**",
                     "/sockjs/**",
-                    "/user/auth/**" // 겹치는 경우 먼저와야함.
+                    "/user/register", // 겹치는 경우 먼저와야함.
+                    "/user/oauth2/register" // 겹치는 경우 먼저와야함.
                 ).permitAll()
                 .pathMatchers("/my-account",
                     "/driver/**",
@@ -64,10 +62,9 @@ public class SecurityConfig {
                     "/eatssearch/**"
                 ).authenticated()
                 .anyExchange().authenticated())
-            .addFilterBefore(jwtVerificationFilter, SecurityWebFiltersOrder.AUTHENTICATION);
-//            .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
-//                .jwt(jwtSpec -> jwtSpec
-//                    .jwtAuthenticationConverter(grantedAuthoritiesExtractor())));
+            .oauth2ResourceServer(oAuth2ResourceServerSpec -> oAuth2ResourceServerSpec
+                .jwt(jwtSpec -> jwtSpec
+                    .jwtAuthenticationConverter(grantedAuthoritiesExtractor())));
 
 
         return http.build();
@@ -106,5 +103,16 @@ public class SecurityConfig {
         return new ReactiveJwtAuthenticationConverterAdapter(jwtAuthenticationConverter);
     }
 
+
+//    @Bean
+//    public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
+//          // filterChain 에 이렇게 추가
+//          // .oauth2ResourceServer(oauth2 -> oauth2
+//          //         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())) // 커스텀 JwtAuthenticationConverter 설정
+//          //     )
+//        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+//        converter.setPrincipalClaimName("email"); // "email" 클레임을 getName()으로 설정
+//        return converter;
+//    }
 
 }

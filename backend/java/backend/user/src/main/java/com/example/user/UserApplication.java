@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableConfigurationProperties()
-@ComponentScan(basePackages = {"com.example.user", "com.example.commonawsutil"})
 @EnableScheduling
 public class UserApplication {
 

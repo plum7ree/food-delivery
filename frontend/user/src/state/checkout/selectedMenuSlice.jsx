@@ -101,7 +101,7 @@ const selectedMenuSlice = createSlice({
       addMenu: (state, action) => {
          const {menuItem, selectedOptions} = action.payload;
          state.menus.push({menuItem, selectedOptions, quantity: 1});
-         localStorage.setItem("selectedMenu", JSON.stringify(state.menus));
+         sessionStorage.setItem("selectedMenu", JSON.stringify(state.menus));
       },
       removeMenu: (state, action) => {
          const menuItemId = action.payload;
@@ -109,7 +109,7 @@ const selectedMenuSlice = createSlice({
          if (index !== -1) {
             state.splice(index, 1);
          }
-         localStorage.setItem("selectedMenu", JSON.stringify(state.menus));
+         sessionStorage.setItem("selectedMenu", JSON.stringify(state.menus));
       },
       updateQuantity: (state, action) => {
          const {menuItemId, quantity} = action.payload;
@@ -117,7 +117,7 @@ const selectedMenuSlice = createSlice({
          if (menuItem) {
             menuItem.quantity = quantity;
          }
-         localStorage.setItem("selectedMenu", JSON.stringify(state.menus));
+         sessionStorage.setItem("selectedMenu", JSON.stringify(state.menus));
       },
 
    },

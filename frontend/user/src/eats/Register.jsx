@@ -19,6 +19,8 @@ const Register = () => {
    const credential = useSelector((state) => state.auth.credential);
    const [formData, setFormData] = useState({
       username: '',
+      email: '',
+      password: '',
       lat: '37.5150416261073',
       lon: '127.00024128933235',
       postalCode: '54501',
@@ -37,15 +39,10 @@ const Register = () => {
       e.preventDefault();
       setError('');
       try {
-         const response = await axios.post(SERVER_URL + '/user/api/oauth2/register', formData, {
+         const response = await axios.post(SERVER_URL + '/user/register', formData, {
             headers: {
                Authorization: `Bearer ${credential}`,
                'Content-Type': 'application/json',
-            },
-            body: {
-               username: formData.username,
-               lat: formData.lat,
-               lon: formData.lon
             }
          });
          if (response.status === 200) {
@@ -93,9 +90,32 @@ const Register = () => {
                   margin="normal"
                   required
                   fullWidth
+                  id="email"
+                  label="Email"
+                  name="email"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+               />
+               <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  type="password"
+                  id="password"
+                  label="Password"
+                  name="password"
+                  autoComplete="current-password"
+                  value={formData.password}
+                  onChange={handleChange}
+               />
+               <TextField
+                  margin="normal"
+                  required
+                  fullWidth
                   id="latitude"
                   label="Latitude"
-                  name="latitude"
+                  name="lat"
                   value={formData.lat}
                   onChange={handleChange}
                />
@@ -105,11 +125,11 @@ const Register = () => {
                   fullWidth
                   id="longitude"
                   label="Longitude"
-                  name="longitude"
+                  name="lon"
                   value={formData.lon}
                   onChange={handleChange}
                />
-                <TextField
+               <TextField
                   margin="normal"
                   required
                   fullWidth
@@ -119,7 +139,7 @@ const Register = () => {
                   value={formData.city}
                   onChange={handleChange}
                />
-                <TextField
+               <TextField
                   margin="normal"
                   required
                   fullWidth
@@ -129,12 +149,12 @@ const Register = () => {
                   value={formData.street}
                   onChange={handleChange}
                />
-                <TextField
+               <TextField
                   margin="normal"
                   required
                   fullWidth
                   id="postalCode"
-                  label="PostalCode"
+                  label="Postal Code"
                   name="postalCode"
                   value={formData.postalCode}
                   onChange={handleChange}

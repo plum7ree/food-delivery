@@ -1,8 +1,7 @@
-package com.example.user.config;
+package com.example.authserver.config;
 
-import com.example.user.data.entity.Account;
-import com.example.user.data.repository.AccountRepository;
-import lombok.RequiredArgsConstructor;
+import com.example.authserver.data.entity.Account;
+import com.example.authserver.data.repository.AccountRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -10,9 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

@@ -34,7 +34,10 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: "https://accounts.google.com"
+          # issuer 여러개 하려면 JwtIssuerAuthenticationManagerResolver 를
+          # SecurityFilterChain 의 .oauth2ResourceServer() 에 추가해야함.
+          issuer-uri: "http://localhost:9000"
+          jwk-set-uri: ${JWK_SET_URI:http://localhost:9000/oauth2/jwks}
 
 jwt:
   issuer-to-jwks-uri:

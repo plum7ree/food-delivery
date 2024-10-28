@@ -7,13 +7,14 @@ const axiosInstance = axios.create({
 // Request interceptor to add Bearer token
 axiosInstance.interceptors.request.use(
    (config) => {
-      // Retrieve the token from localStorage or any other method
-      const token = localStorage.getItem('access-token'); // Adjust this as needed
-
+      // Retrieve the token from sessionStorage or any other method
+      const token = sessionStorage.getItem('access-token'); // Adjust this as needed
+      console.log("token: ", token)
       // Add the Bearer token to the Authorization header if it exists
       if (token) {
          config.headers.Authorization = `Bearer ${token}`;
       }
+      console.log("axiosInstance.interceptors.request config: ", config)
 
       return config;
    },
