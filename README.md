@@ -14,51 +14,20 @@
   <img src="https://img.shields.io/badge/-elasticsearch-green?logo=elasticsearch&logoColor=f5f5f5"/>&nbsp
 </p>
 
-### Sample Images
 
-- - -
+<p><br></p>  
+
+### Architecture
+
 <table>
     <tr>
       <td style="text-align: center;"><b>Category</b></td>
       <td style="text-align: center;"><b>Search</b></td>
       <td style="text-align: center;"><b>Checkout</b></td>
-    </tr>
-    <tr>
-        <td style="text-align: center;">    
-          <img src="readme/category2checkout.gif" alt="Category and Checkout" style="width:250px; height:350px" >
-        </td>
-        <td style="text-align: center;">    
-          <img src="readme/search.gif" alt="Restaurant Search" style="width:250px; height:350px">
-        </td>
-        <td style="text-align: center;">  
-          <img src="readme/checkoutconfirm.gif" alt="Checkout Confirm" style="width:250px; height:350px">
-        </td>
-    </tr>
-</table>
-<table>
-    <tr>
       <td style="text-align: center;"><b>My Page</b></td>
       <td style="text-align: center;"><b>Restaurant Registration</b></td>
-      <td style="text-align: center;"><b></b></td>
-    </tr>
-    <tr>
-        <td style="text-align: center;">    
-          <img src="readme/my_page.png" alt="Checkout Confirm" style="width:250px; height:350px">
-        </td>
-        <td style="text-align: center;">    
-            <img src="readme/restaurant_registration.png" alt="Checkout Confirm" style="width:250px; height:350px">
-        </td>
-        <td style="text-align: center;">    
-        </td>
     </tr>
 </table>
-
-
-
-
-<p><br></p>  
-
-### Architecture
 
 - - -    
 
